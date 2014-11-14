@@ -1,0 +1,27 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>Basic Startup Test</title>
+    <script type="text/javascript"
+            src ="/usr/local/lib/greenhorn.js"></script>
+    <script type="text/javascript">
+        //adjust Game Enviorment here
+        
+        //name Sprites as globally avaliable
+        //var sprite1, sprite2, ... spriteN
+        
+        function init(){
+            Greenhorn.start();
+        }//end init
+        
+        //create an update function that will be called once per frame
+        //inbetween the screen being cleared and the sprites being redrawn
+        //function update(){
+            //handle game specific events here
+            //e.g. win or lose conditions
+        //}//end update
+    </script>
+</head>
+<body onload = "init()"></body>
+</html>
