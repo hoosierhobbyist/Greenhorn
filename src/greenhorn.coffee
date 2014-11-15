@@ -55,13 +55,9 @@ game.env =
     BUTTON_DEFAULT_LABEL: "Launch the Missiles!"
     #default TextBox settings
     TEXTBOX_DEFAULT_CONFIG:
-        x: 100
-        y: 100
         z: -1
         text: "*-TextBox-*"
         align: "center"
-        width: 50
-        height: 50
         backgroundColor: "black"
         backgroundAlpha: 1.0
         backgroundVisible: yes
@@ -833,9 +829,6 @@ class game.Button
 class game.TextBox extends Sprite
     #constructor
     constructor: (config = {}) ->
-        #call Sprite constructor
-        super()
-        
         #add the environment defaults to config,
         #if the user has chosen to omit them
         for key, value of env.TEXTBOX_DEFAULT_CONFIG
@@ -848,10 +841,9 @@ class game.TextBox extends Sprite
         @_font = {}
         @_margins = {}
         
-        #initialize TextBox
-        @set "config", config
+        #call Sprite constructor
+        super(config)
         @_fitText()
-        return this
     
     #generic getter
     get: (what) ->
@@ -876,7 +868,7 @@ class game.TextBox extends Sprite
     #generic setter
     set: (what, to) ->
         if what is "config"
-            @set k, v for k, v of to
+            @set k, v, false for k, v of to
         else if what is "text"
             @_text = to.split "\n"
         else if what is "align"
@@ -942,7 +934,7 @@ class game.TextBox extends Sprite
         else
             @change "y", Math.abs(@_dis.height - old_height) / 2
         
-        return
+        return this
     _writeText: ->
         #calculate offset
         xOffset = @_margins.left
@@ -961,30 +953,26 @@ class game.TextBox extends Sprite
             for line, i in @_text
                 @_dis.context.fillText line,
                 @_pos.x + xOffset - (@_dis.width / 2),
-                @_pos.y + yOffset - (@_dis.height / 2) + (@_font.size * 2 * i)
+                -@_pos.y + yOffset - (@_dis.height / 2) + (@_font.size * 2 * i)
         else
-            @_dis.context.fillText @_text[0], @_pos.x + xOffset - (@_dis.width / 2), @_pos.y + yOffset - (@_dis.height / 2)
+            @_dis.context.fillText @_text[0], @_pos.x + xOffset - (@_dis.width / 2), -@_pos.y + yOffset - (@_dis.height / 2)
         return
     _draw: ->
         #save current context
         @_dis.context.save()
         
-        #same as super, minus drawing an image
-        @_dis.context.translate @_pos.x, -@_pos.y
-        @_dis.context.rotate @_pos.a
-        
         #draw background
         if @_background.visible
             @_dis.context.fillStyle = @_background.color
             @_dis.context.globalAlpha = @_background.alpha
-            @_dis.context.fillRect @_pos.x - @_dis.width / 2, @_pos.y - @_dis.height / 2, @_dis.width, @_dis.height
+            @_dis.context.fillRect @_pos.x - @_dis.width / 2, -@_pos.y - @_dis.height / 2, @_dis.width, @_dis.height
         
         #draw borders
         if @_border.visible
             @_dis.context.strokeStyle = @_border.color
             @_dis.context.lineWidth = @_border.size
             @_dis.context.globalAlpha = @_border.alpha
-            @_dis.context.strokeRect @_pos.x - (@_dis.width / 2), @_pos.y - (@_dis.height / 2), @_dis.width, @_dis.height
+            @_dis.context.strokeRect @_pos.x - (@_dis.width / 2), -@_pos.y - (@_dis.height / 2), @_dis.width, @_dis.height
         
         #draw text
         @_writeText()
