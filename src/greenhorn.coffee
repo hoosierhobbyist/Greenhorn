@@ -54,32 +54,29 @@ game.env =
     #default button settings
     BUTTON_DEFAULT_LABEL: "Launch the Missiles!"
     #default TextBox settings
-    TEXTBOX_DEFAULT_TEXT: "This is a TextBox"
-    TEXTBOX_DEFAULT_ALIGN: "center"
-    TEXTBOX_DEFAULT_WIDTH: 50
-    TEXTBOX_DEFAULT_HEIGHT: 50
-    TEXTBOX_DEFAULT_X: 25
-    TEXTBOX_DEFAULT_Y: 25
-    TEXTBOX_DEFAULT_Z: -1
-    #TextBox background settings
-    TEXTBOX_BACKGROUND_COLOR: "black"
-    TEXTBOX_BACKGROUND_ALPHA: 1.0
-    TEXTBOX_BACKGROUND_VISIBLE: yes
-    #TextBox border settings
-    TEXTBOX_BORDER_SIZE: 5
-    TEXTBOX_BORDER_COLOR: "white"
-    TEXTBOX_BORDER_ALPHA: 1.0
-    TEXTBOX_BORDER_VISIBLE: yes
-    #TextBox font settings
-    TEXTBOX_FONT_NAME: "Arial"
-    TEXTBOX_FONT_SIZE: 8
-    TEXTBOX_FONT_COLOR: "white"
-    TEXTBOX_FONT_ALPHA: 1.0
-    #TextBox margins settings
-    TEXTBOX_MARGINS_TOP: 5
-    TEXTBOX_MARGINS_BOTTOM: 5
-    TEXTBOX_MARGINS_RIGHT: 5
-    TEXTBOX_MARGINS_LEFT: 5
+    TEXTBOX_DEFAULT_CONFIG:
+        x: 100
+        y: 100
+        z: -1
+        text: "*-TextBox-*"
+        align: "center"
+        width: 50
+        height: 50
+        backgroundColor: "#FFFFFF"
+        backgroundAlpha: 1.0
+        backgroundVisible: yes
+        borderSize: 5
+        borderColor: "#000000"
+        borderAlpha: 1.0
+        borderVisible: yes
+        fontName: "Arial"
+        fontSize: 8
+        fontColor: "#000000"
+        fontAlpha: 1.0
+        marginsTop: 5
+        marginsBottom: 5
+        marginsRight: 5
+        marginsLeft: 5
 
 #generate a sort rule to determine
 #in what order the sprites are drawn
@@ -349,7 +346,7 @@ class game.Sprite
             "posAngle"
             "motAngle"
             "accAngle"
-        ]#end forbidden config words
+        ]#end forbidden config keys
         
         #throw an error if a forbidden key is provided in the configuration
         throw new _GameError "#{key} is a forbidden config value" for key in forbidden when config[key]?
@@ -835,91 +832,69 @@ class game.Button
 #simple textbox
 class game.TextBox extends Sprite
     #constructor
-    constructor: (text = env.TEXTBOX_DEFAULT_TEXT, config = {}) ->
-        #adjust the configuration if nesseccary
-        config.imageFile = ""
-        config.width ?= env.TEXTBOX_DEFAULT_WIDTH
-        config.height ?= env.TEXTBOX_DEFAULT_HEIGHT
-        config.x ?= env.TEXTBOX_DEFAULT_X
-        config.y ?= env.TEXTBOX_DEFAULT_Y
-        config.z ?= env.TEXTBOX_DEFAULT_Z
-        
+    constructor: (config = {}) ->
         #call Sprite constructor
-        super config
+        super()
         
-        #instance variables
-        @_text = text.split '\n'
-        #background object
-        @_background =
-            color: config.backgroundColor ? env.TEXTBOX_BACKGROUND_COLOR
-            alpha: config.backgroundAlpah ? env.TEXTBOX_BACKGROUND_ALPHA
-            visible: config.backgroundVisible ? env.TEXTBOX_BACKGROUND_VISIBLE
-        #border object
-        @_border =
-            size: config.borderSize ? env.TEXTBOX_BORDER_SIZE
-            color: config.borderColor ? env.TEXTBOX_BORDER_COLOR
-            alpha: config.borderAlpha ? env.TEXTBOX_BORDER_ALPHA
-            visible: config.borderVisible ? env.TEXTBOX_BORDER_VISIBLE
-        #font object
-        @_font =
-            name: config.fontName ? env.TEXTBOX_FONT_NAME
-            size: config.fontSize ? env.TEXTBOX_FONT_SIZE
-            color: config.fontColor ? env.TEXTBOX_FONT_COLOR
-            alpha: config.fontAlpha ? env.TEXTBOX_FONT_ALPHA
-        #margins object
-        @_margins =
-            top: config.marginsTop ? env.TEXTBOX_MARGINS_TOP
-            bottom: config.marginsBottom ? env.TEXTBOX_MARGINS_BOTTOM
-            right: config.marginsRight ? env.TEXTBOX_MARGINS_RIGHT
-            left: config.marginsLeft ? env.TEXTBOX_MARGINS_LEFT
+        #add the environment defaults to config,
+        #if the user has chosen to omit them
+        for key, value of env.TEXTBOX_DEFAULT_CONFIG
+            config[key] ?= value
+        
+        #primary objects
+        @_text = []
+        @_background = {}
+        @_border = {}
+        @_font = {}
+        @_margins = {}
         
         #initialize TextBox
-        @_dis.context.textAlign = config.textAlign ? env.TEXTBOX_DEFAULT_ALIGN
+        @set "config", config
         @_fitText()
         return this
     
-    #getters
-    getText: -> @_text.join '\n'
-    getAlign: -> @_dis.context.textAlign
-    getBackground: -> @_background
-    getBorder: -> @_border
-    getFont: -> @_font
-    getMargins: -> @_margins
+    #generic getter
+    get: (what) ->
+        switch what
+            when "text"
+                @_text.join '\n'
+            when "align"
+                @_dis.context.textAlign
+            when "background", "border", "font", "margins"
+                @["_".concat what]
+            when what.indexOf("background") is 0
+                @_background[what.slice(10).toLowerCase()]
+            when what.indexOf("border") is 0
+                @_border[what.slice(6).toLowerCase()]
+            when what.indexOf("font") is 0
+                @_font[what.slice(4).toLowerCase()]
+            when what.indexOf("margins") is 0
+                @_margins[what.slice(7).toLowerCase()]
+            else
+                super what
     
-    #setters
-    setText: (new_text) ->
-        @_text = new_text.split '\n'
-        @_fitText()
-        return
-    setAlign: (new_align) ->
-        @_dis.context.textAlign = new_align
-        return
-    setBackground: (new_background) ->
-        @_background.color = new_background.color?
-        @_background.alpha = new_background.alpha?
-        @_background.visible = new_background.visible?
-        return
-    setBorder: (new_border) ->
-        @_border.size = new_border.size?
-        @_border.color = new_border.color?
-        @_border.alpha = new_border.alpha?
-        @_border.visible = new_border.visible?
-        @_fitText()
-        return
-    setFont: (new_font) ->
-        @_font.name = new_font.name?
-        @_font.size = new_font.size?
-        @_font.color = new_font.color?
-        @_font.alpha = new_font.alpha?
-        @_fitText()
-        return
-    setMargins: (new_margins) ->
-        @_margins.top = new_margins.top?
-        @_margins.bottom = new_margins.bottom?
-        @_margins.right = new_margins.right?
-        @_margins.left = new_margins.left?
-        @_fitText()
-        return
+    #generic setter
+    set: (what, to) ->
+        if what is "config"
+            @set k, v for k, v of to
+        else if what is "text"
+            console.log to
+            @_text = to.split '/n'
+        else if what is "align"
+            @_dis.context.textAlign = to
+        else if what is "background" or what is "border" or what is "font" or what is "margins"
+            @["_".concat what][k] = v for k, v of to
+        else if what.indexOf("background") is 0
+            @_background[what.slice(10).toLowerCase()] = to
+        else if what.indexOf("border") is 0
+            @_border[what.slice(6).toLowerCase()] = to
+        else if what.indexOf("font") is 0
+            @_font[what.slice(4).toLowerCase()] = to
+        else if what.indexOf("margins") is 0
+            @_margins[what.slice(7).toLowerCase()] = to
+        else
+            super what, to
+        this
     
     #style control
     showBackground: ->
@@ -958,19 +933,24 @@ class game.TextBox extends Sprite
             @_dis.height += 2 * @_border.size
         
         #keep coordinate (top, left) in same position
-        if @_dis.width < old_width then @changeXby(-Math.abs(@_dis.width - old_width) / 2)
-        else @changeXby(Math.abs(@_dis.width - old_width) / 2)
-        if @_dis.height < old_height then @changeYby(-Math.abs(@_dis.height - old_height) / 2)
-        else @changeYby(Math.abs(@_dis.height - old_height) / 2)
+        if @_dis.width < old_width
+            @change "x", -Math.abs(@_dis.width - old_width) / 2
+        else
+            @change "x", Math.abs(@_dis.width - old_width) / 2
+        
+        if @_dis.height < old_height
+            @change "y", -Math.abs(@_dis.height - old_height) / 2
+        else
+            @change "y", Math.abs(@_dis.height - old_height) / 2
         
         return
     _writeText: ->
         #calculate offset
         xOffset = @_margins.left
-        yOffset = @_margins.top
+        yOffset = -@_margins.top
         if @_border.visible
             xOffset += @_border.size
-            yOffset += @_border.size
+            yOffset -= @_border.size
         
         #initialize context
         @_dis.context._font = "#{@_font.size}px #{@_font.name}"
@@ -989,6 +969,10 @@ class game.TextBox extends Sprite
     _draw: ->
         #save current context
         @_dis.context.save()
+        
+        #same as super, minus drawing an image
+        @_dis.context.translate @_pos.x, -@_pos.y
+        @_dis.context.rotate @_pos.a
         
         #draw background
         if @_background.visible
