@@ -13,4 +13,4 @@ build = (callback) ->
         callback?() if code is 0
 
 task 'build', 'Build lib/ from src/', ->
-    build()
+    build(-> console.log "build complete")
