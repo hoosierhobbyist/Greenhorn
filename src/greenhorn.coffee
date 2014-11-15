@@ -322,17 +322,17 @@ class game.Sprite
     _sortRule = makeSortRule "z", "ascending"
     
     #Sprite class methods
-    @howMany = -> @_list.length
+    @howMany = -> _list.length
     @_updateAll = -> sp._update() for sp in _list
     #@sortBy = (@_sortRule) -> @resort()
     
     #collective manipulation
     @getAll = (what, excep...) ->
-        sp.get what for sp in @_list when sp not in excep
+        sp.get what for sp in _list when sp not in excep
     @setAll = (what, to, excep...) ->
-        sp.set what, to for sp in @_list when sp not in excep
+        sp.set what, to for sp in _list when sp not in excep
     @changeAll = (what, step, excep...) ->
-        sp.change what, step for sp in @_list when sp not in excep
+        sp.change what, step for sp in _list when sp not in excep
     
     #<---INSTANCE-LEVEL--->
     #constructor
