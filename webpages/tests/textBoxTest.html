@@ -14,17 +14,35 @@
         
         function init(){
             //initialize textBox
-            textBox = new TextBox();
+            textBox = new TextBox({text: "This is my Textbox\nIt's a beautiful Textbox"});
             
+            //start the engine
             Greenhorn.start();
         }//end init
         
         //create an update function that will be called once per frame
         //inbetween the screen being cleared and the sprites being redrawn
-        //function update(){
+        function update(){
             //handle game specific events here
             //e.g. win or lose conditions
-        //}//end update
+            if (keysDown[KEYS.LEFT]) {
+                textBox.change("x", -80);
+            }//end if
+            if (keysDown[KEYS.RIGHT]) {
+                textBox.change("x", 80);
+            }//end if
+            if (keysDown[KEYS.UP]) {
+                textBox.change("y", 80);
+            }//end if
+            if (keysDown[KEYS.DOWN]) {
+                textBox.change("y", -80);
+            }//end if
+            if (keysDown[KEYS.SPACE]) {
+                textBox.change("a", 1);
+            }//end if
+            
+            Greenhorn.set("leftPanel", "innerHTML", textBox.report());
+        }//end update
     </script>
 </head>
 <body onload = "init()"></body>

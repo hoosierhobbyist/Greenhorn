@@ -62,16 +62,16 @@ game.env =
         align: "center"
         width: 50
         height: 50
-        backgroundColor: "#FFFFFF"
+        backgroundColor: "black"
         backgroundAlpha: 1.0
         backgroundVisible: yes
         borderSize: 5
-        borderColor: "#000000"
+        borderColor: "white"
         borderAlpha: 1.0
         borderVisible: yes
         fontName: "Arial"
         fontSize: 8
-        fontColor: "#000000"
+        fontColor: "white"
         fontAlpha: 1.0
         marginsTop: 5
         marginsBottom: 5
@@ -645,8 +645,8 @@ class game.Sprite
     report: ->
         """
         display:
-            width: #{@_dis.width}
-            height: #{@_dis.height}
+            width: #{Math.round @_dis.width}
+            height: #{Math.round @_dis.height}
             visible: #{@_dis.visible}
             boundAction: #{@_dis.boundAction}
         position:
@@ -878,8 +878,7 @@ class game.TextBox extends Sprite
         if what is "config"
             @set k, v for k, v of to
         else if what is "text"
-            console.log to
-            @_text = to.split '/n'
+            @_text = to.split "\n"
         else if what is "align"
             @_dis.context.textAlign = to
         else if what is "background" or what is "border" or what is "font" or what is "margins"
@@ -920,9 +919,9 @@ class game.TextBox extends Sprite
         
         #calculate new values
         @_dis.width = 0
-        @_dis.height = (@_font.size * @_text.length) + ((@_font.size // 3) * (@_text.length - 1))
+        @_dis.height = (@_font.size * @_text.length) + (@_font.size * (@_text.length - 1))
         for line in @_text
-            len = @_dis.context.measureText line.width
+            len = @_dis.context.measureText(line).width
             @_dis.width = len if @_dis.width < len
         
         #adjust for margins and border
@@ -947,10 +946,10 @@ class game.TextBox extends Sprite
     _writeText: ->
         #calculate offset
         xOffset = @_margins.left
-        yOffset = -@_margins.top
+        yOffset = @_margins.top + @_font.size
         if @_border.visible
             xOffset += @_border.size
-            yOffset -= @_border.size
+            yOffset += @_border.size
         
         #initialize context
         @_dis.context._font = "#{@_font.size}px #{@_font.name}"
@@ -962,7 +961,7 @@ class game.TextBox extends Sprite
             for line, i in @_text
                 @_dis.context.fillText line,
                 @_pos.x + xOffset - (@_dis.width / 2),
-                @_pos.y + yOffset - (@_dis.height / 2) + (@_font.size * i) + ((@_font.size // 3) if i isnt 0)
+                @_pos.y + yOffset - (@_dis.height / 2) + (@_font.size * 2 * i)
         else
             @_dis.context.fillText @_text[0], @_pos.x + xOffset - (@_dis.width / 2), @_pos.y + yOffset - (@_dis.height / 2)
         return
