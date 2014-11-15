@@ -868,7 +868,7 @@ class game.TextBox extends Sprite
     #generic setter
     set: (what, to) ->
         if what is "config"
-            @set k, v, false for k, v of to
+            @set k, v for k, v of to
         else if what is "text"
             @_text = to.split "\n"
         else if what is "align"
