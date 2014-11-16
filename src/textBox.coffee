@@ -4,16 +4,8 @@ textBox.coffee
 The Greenhorn Gaming TextBox class
 ###
 
-#anything attached to game
-#is a part of the public API
-game = exports ? this
-
-#bring in dependancies
-{env} = require './environment'
-{Sprite} = require './sprite'
-
 #simple textbox
-class game.TextBox extends Sprite
+class @TextBox extends @Sprite
     #constructor
     constructor: (config = {}) ->
         #add the environment defaults to config,

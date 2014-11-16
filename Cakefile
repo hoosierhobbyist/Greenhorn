@@ -1,10 +1,18 @@
 fs = require 'fs'
 
 {print} = require 'sys'
-{spawn} = require 'child_process'
+{spawn, exec} = require 'child_process'
+
+concat = (callback) ->
+    exec '(while read file; do cat ./src/$file; echo "\n\n"; done < ./src/index.txt;) > ./build/Greenhorn.coffee', (error) ->
+        if error?
+            console.log "exec error: #{error}"
+        else
+            callback?()
 
 build = (callback) ->
-    coffee = spawn 'coffee', ['-c', '-o', 'lib', 'src']
+    coffee = spawn 'coffee', ['-c', '-o', 'lib', 'build']
+    
     coffee.stderr.on 'data', (data) ->
         process.stderr.write data.toString()
     coffee.stdout.on 'data', (data) ->
@@ -12,5 +20,17 @@ build = (callback) ->
     coffee.on 'exit', (code) ->
         callback?() if code is 0
 
-task 'build', 'Build lib/ from src/', ->
-    build(-> console.log "build complete")
+clean = (callback) ->
+    exec 'rm ./lib/* ./build/*', (error) ->
+        if error?
+            console.log "exec error: #{error}"
+        else
+            console.log callback?()
+
+task 'build:library', 'Build lib/Greenhorn.js from src/', ->
+    concat ->
+        build ->
+            'build complete'
+
+task 'clean', 'Clean the build/ and lib/ directories', ->
+    clean(-> 'cleaning complete')

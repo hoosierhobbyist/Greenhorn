@@ -4,15 +4,8 @@ timer.coffee
 The Greenhorn Gaming Timer class
 ###
 
-#anything attached to game
-#is a part of the public API
-game = exports ? this
-
-#bring in dependancies
-{env} = require './environment'
-
 #simple timer class
-class game.Timer
+class @Timer
     #constructor
     constructor: (start_now = env.TIMER_START_ON_CONSTRUCTION) ->
         @_elapsedTime = 0

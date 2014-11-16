@@ -8,15 +8,8 @@ primarily inspired by Andy Harris'
 (aharrisbooks.net) simpleGame.js gaming engine
 ###
 
-#anything attached to game
-#is a part of the public API
-game = exports ? this
-
-#bring in the environment
-{env} = require './environment'
-
 #keyboard value mapping object
-game.KEYS =
+@KEYS =
     LEFT: 37, RIGHT: 39, UP: 38, DOWN: 40
     SPACE: 32, ESC: 27, PGUP: 33
     PGDOWN: 34, HOME: 36, END: 35
@@ -28,7 +21,7 @@ game.KEYS =
     T: 84, U: 85, V: 86, W: 87, X: 88, Y: 89, Z: 90
 
 #keyboard input tracking array
-game.keysDown = (key = false for key in (new Array(256)))
+@keysDown = (key = false for key in (new Array(256)))
 
 #document event handlers
 document.onkeydown = (e) ->
@@ -58,7 +51,7 @@ _masterUpdate = ->
 #end _masterUpdate
 
 #<canvas> tag wrapper class
-class game.Greenhorn
+class @Greenhorn
     #create Engine elements
     @_elmnts =
         main: document.createElement "div"

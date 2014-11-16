@@ -4,19 +4,11 @@ sound.coffee
 Greenhorn Gaming Engine Sound class
 ###
 
-#anything attached to game
-#is a part of the public API
-game = exports ? this
-
-#bring in dependancies
-{env} = require './environment'
-{Greenhorn} = require './greenhorn'
-
 #audio context for webkit browsers
 _webkitAudioContext = new webkitAudioContext?()
 
 #simple sound class
-class game.Sound
+class @Sound
     #constructor
     constructor: (url = env.SOUND_DEFAULT_URL) ->
         #instance variable

@@ -4,11 +4,7 @@ environment.coffee
 The Greenhorn Gaming environment object
 ###
 
-#anything attached to game
-#is a part of the public API
-game = exports ? this
-
-game.env =
+@env =
     #miscellaneous
     FRAME_RATE: 25
     #document body settings
@@ -68,3 +64,4 @@ game.env =
     TIMER_START_ON_CONSTRUCTION: yes
     #default button settings
     BUTTON_DEFAULT_LABEL: "Launch the Missiles!"
+#end environment object

@@ -4,14 +4,6 @@ sprite.coffee
 The Greenhorn Gaming Engine core class
 ###
 
-#anything attached to game
-#is a part of the public API
-game = exports ? this
-
-#bring in dependancies
-{env} = require './environment'
-{Greenhorn} = require './greenhorn'
-
 #Sprite boundaryAction enumeration
 BOUND_ACTIONS =
     WRAP: 0
@@ -34,7 +26,7 @@ makeSortRule = (sortBy, order) ->
         throw new Error "order must be ascending or decending"
 
 #core engine class
-class game.Sprite
+class @Sprite
     #<---CLASS-LEVEL--->
     #state values
     _list = []
@@ -392,5 +384,6 @@ class game.Sprite
         return
 #end class Sprite
 
-#more natural alias when calling class methods
-game.Sprites = game.Sprite
+#more natural alias for
+#calling collective methods
+@Sprites = @Sprite
