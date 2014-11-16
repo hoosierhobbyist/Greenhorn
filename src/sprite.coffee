@@ -85,6 +85,12 @@ class @Sprite
         
         #set this sprite's configuration
         @set "config", config
+        
+        #sort the Sprite _list according to _sortRule
+        _list.sort _sortRule
+        
+        #return this
+        @
     
     #getter
     get: (what) ->
