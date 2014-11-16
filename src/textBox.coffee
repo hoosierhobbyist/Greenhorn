@@ -130,28 +130,30 @@ class @TextBox extends @Sprite
         #draw text on canvas
         if @_text.length > 1
             for line, i in @_text
-                @_dis.context.fillText line,
-                @_pos.x + xOffset - (@_dis.width / 2),
-                -@_pos.y + yOffset - (@_dis.height / 2) + (@_font.size * 2 * i)
+                @_dis.context.fillText line, xOffset - (@_dis.width / 2), yOffset - (@_dis.height / 2) + (@_font.size * 2 * i)
         else
-            @_dis.context.fillText @_text[0], @_pos.x + xOffset - (@_dis.width / 2), -@_pos.y + yOffset - (@_dis.height / 2)
+            @_dis.context.fillText @_text[0], xOffset - (@_dis.width / 2), yOffset - (@_dis.height / 2)
         return
     _draw: ->
         #save current context
         @_dis.context.save()
         
+        #translate and rotate
+        @_dis.context.translate @_pos.x, -@_pos.y
+        @_dis.context.rotate -@_pos.a
+        
         #draw background
         if @_background.visible
             @_dis.context.fillStyle = @_background.color
             @_dis.context.globalAlpha = @_background.alpha
-            @_dis.context.fillRect @_pos.x - @_dis.width / 2, -@_pos.y - @_dis.height / 2, @_dis.width, @_dis.height
+            @_dis.context.fillRect -@_dis.width / 2, -@_dis.height / 2, @_dis.width, @_dis.height
         
         #draw borders
         if @_border.visible
             @_dis.context.strokeStyle = @_border.color
             @_dis.context.lineWidth = @_border.size
             @_dis.context.globalAlpha = @_border.alpha
-            @_dis.context.strokeRect @_pos.x - (@_dis.width / 2), -@_pos.y - (@_dis.height / 2), @_dis.width, @_dis.height
+            @_dis.context.strokeRect -@_dis.width / 2, -@_dis.height / 2, @_dis.width, @_dis.height
         
         #draw text
         @_writeText()

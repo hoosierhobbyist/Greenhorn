@@ -14,7 +14,7 @@
         
         function init(){
             //initialize textBox
-            textBox = new TextBox();
+            textBox = new TextBox({backgroundColor: "darkgreen"});
             
             //start the engine
             Greenhorn.start();
@@ -36,6 +36,9 @@
             }//end if
             if (keysDown[KEYS.DOWN]) {
                 textBox.change("y", -80);
+            }//end if
+            if (keysDown[KEYS.SPACE]) {
+                textBox.change("a", 1)
             }//end if
             
             Greenhorn.set("leftPanel", "innerHTML", textBox.report());

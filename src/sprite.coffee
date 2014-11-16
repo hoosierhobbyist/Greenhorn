@@ -275,7 +275,7 @@ class @Sprite
     _draw: ->
         @_dis.context.save()
         @_dis.context.translate @_pos.x, -@_pos.y
-        @_dis.context.rotate @_pos.a
+        @_dis.context.rotate -@_pos.a
         @_dis.context.drawImage @_dis.image, 0 - @_dis.width / 2, 0 - @_dis.height / 2, @_dis.width, @_dis.height
         @_dis.context.restore()
     _checkBounds: ->
