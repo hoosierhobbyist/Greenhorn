@@ -46,8 +46,8 @@ _masterUpdate = ->
     #if one is defined
     update?()
     
-    #update all Sprites
-    Sprites._updateAll()
+    #draw all Sprites
+    Sprites._drawAll()
 #end _masterUpdate
 
 #<canvas> tag wrapper class

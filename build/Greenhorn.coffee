@@ -115,8 +115,8 @@ _masterUpdate = ->
     #if one is defined
     update?()
     
-    #update all Sprites
-    Sprites._updateAll()
+    #draw all Sprites
+    Sprites._drawAll()
 #end _masterUpdate
 
 #<canvas> tag wrapper class
@@ -319,7 +319,7 @@ class @Sprite
     
     #Sprite class methods
     @howMany = -> _list.length
-    @_updateAll = -> sp._update() for sp in _list
+    @_drawAll = -> sp._draw() for sp in _list
     #@sortBy = (@_sortRule) -> @resort()
     
     #collective manipulation
@@ -369,7 +369,7 @@ class @Sprite
         @set "config", config
         
         #experimental: setInterval to check bounds
-        setInterval @_checkBounds, Math.ceil 1000 / env.FRAME_RATE
+        setInterval @_update, Math.ceil 1000 / env.FRAME_RATE
         
         #sort the Sprite _list according to _sortRule
         _list.push this
@@ -564,7 +564,7 @@ class @Sprite
         @_dis.context.rotate -@_pos.a
         @_dis.context.drawImage @_dis.image, 0 - @_dis.width / 2, 0 - @_dis.height / 2, @_dis.width, @_dis.height
         @_dis.context.restore()
-    _checkBounds: =>
+    _checkBounds: ->
         #canvas boundaries
         bounds =
             top: Greenhorn.get("canvas", "height") / 2
@@ -644,12 +644,11 @@ class @Sprite
                 if offTop or offBottom or offRight or offLeft
                     @_dis.visible = no
         @_dis.boundAction
-    _update: ->
+    _update: =>
         if @_dis.visible
             @change "motion", @_acc
             @change "position", @_mot
-            #@_checkBounds()
-            @_draw()
+            @_checkBounds()
         this
     
     #debugging
