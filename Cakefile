@@ -29,8 +29,7 @@ clean = (callback) ->
 
 task 'build:library', 'Build lib/Greenhorn.js from src/', ->
     concat ->
-        build ->
-            'build complete'
+        build(-> 'build complete')
 
 task 'clean', 'Clean the build/ and lib/ directories', ->
     clean(-> 'cleaning complete')
