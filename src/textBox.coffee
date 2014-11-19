@@ -46,7 +46,7 @@ class @TextBox extends @Sprite
     
     #generic setter
     set: (what, to) ->
-        else if what is "text"
+        if what is "text"
             @_text = to.split "\n"
         else if what is "align"
             @_dis.context.textAlign = to
@@ -112,26 +112,6 @@ class @TextBox extends @Sprite
             @change "y", Math.abs(@_dis.height - old_height) / 2
         
         return this
-    _writeText: ->
-        #calculate offset
-        xOffset = @_margins.left
-        yOffset = @_margins.top + @_font.size
-        if @_border.visible
-            xOffset += @_border.size
-            yOffset += @_border.size
-        
-        #initialize context
-        @_dis.context._font = "#{@_font.size}px #{@_font.name}"
-        @_dis.context.fillStyle = @_font.color
-        @_dis.context.globalAlpha = @_font.alpha
-        
-        #draw text on canvas
-        if @_text.length > 1
-            for line, i in @_text
-                @_dis.context.fillText line, xOffset - (@_dis.width / 2), yOffset - (@_dis.height / 2) + (@_font.size * 2 * i)
-        else
-            @_dis.context.fillText @_text[0], xOffset - (@_dis.width / 2), yOffset - (@_dis.height / 2)
-        return
     _draw: ->
         #save current context
         @_dis.context.save()
@@ -154,7 +134,23 @@ class @TextBox extends @Sprite
             @_dis.context.strokeRect -@_dis.width / 2, -@_dis.height / 2, @_dis.width, @_dis.height
         
         #draw text
-        @_writeText()
+        xOffset = @_margins.left
+        yOffset = @_margins.top + @_font.size
+        if @_border.visible
+            xOffset += @_border.size
+            yOffset += @_border.size
+        
+        #initialize context
+        @_dis.context._font = "#{@_font.size}px #{@_font.name}"
+        @_dis.context.fillStyle = @_font.color
+        @_dis.context.globalAlpha = @_font.alpha
+        
+        #draw text on canvas
+        if @_text.length > 1
+            for line, i in @_text
+                @_dis.context.fillText line, xOffset - (@_dis.width / 2), yOffset - (@_dis.height / 2) + (@_font.size * 2 * i)
+        else
+            @_dis.context.fillText @_text[0], xOffset - (@_dis.width / 2), yOffset - (@_dis.height / 2)
         
         #restore old context
         @_dis.context.restore()
