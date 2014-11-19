@@ -78,9 +78,9 @@ class @Greenhorn
             when "top"
                 @get("canvas", "height") / 2
             when "bottom"
-                -@get("canvas", "width") / 2
+                -@get("canvas", "height") / 2
             when "right"
-                @get("canvas", "height") / 2
+                @get("canvas", "width") / 2
             when "left"
                 -@get("canvas", "width") / 2
     
