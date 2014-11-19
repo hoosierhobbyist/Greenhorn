@@ -92,7 +92,7 @@ class @Greenhorn
             @_elmnts[elmnt]
     @set = (elmnt, attr, what) ->
         if Object::toString.call(what) is '[object Object]'
-            @_elmnts[elmnt][attr][key] = value for key, value of what
+            @_elmnts[elmnt][attr][key] = value for own key, value of what
         else
             @_elmnts[elmnt][attr] = what
     
