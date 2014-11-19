@@ -10,7 +10,7 @@ class @TextBox extends @Sprite
     constructor: (config = {}) ->
         #add the environment defaults to config,
         #if the user has chosen to omit them
-        for key, value of env.TEXTBOX_DEFAULT_CONFIG
+        for own key, value of env.TEXTBOX_DEFAULT_CONFIG
             config[key] ?= value
         
         #primary objects
@@ -46,8 +46,6 @@ class @TextBox extends @Sprite
     
     #generic setter
     set: (what, to) ->
-        if what is "config"
-            @set k, v for k, v of to
         else if what is "text"
             @_text = to.split "\n"
         else if what is "align"
