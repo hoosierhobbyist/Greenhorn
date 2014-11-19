@@ -4,15 +4,6 @@ sprite.coffee
 The Greenhorn Gaming Engine core class
 ###
 
-#Sprite boundaryAction enumeration
-BOUND_ACTIONS =
-    WRAP: 0
-    BOUNCE: 1
-    SEMIBOUNCE: 2
-    STOP: 3
-    DIE: 4
-    CONTINUE: 5
-
 #generate a sort rule to determine
 #in what order the sprites are drawn
 makeSortRule = (sortBy, order) ->
@@ -34,8 +25,9 @@ class @Sprite
     
     #Sprite class methods
     @howMany = -> _list.length
-    @_drawAll = -> sp._draw() for sp in _list
-    #@sortBy = (@_sortRule) -> @resort()
+    @_drawAll = ->
+        sp._draw() for sp in _list
+        return
     
     #collective manipulation
     @getAll = (what, excep...) ->
@@ -70,20 +62,19 @@ class @Sprite
         @_pos = {}
         @_mot = {}
         @_acc = {}
-        @_borders = {}
         
         #get the context used to draw sprite
         @_dis.context = Greenhorn._elmnts.canvas.getContext "2d"
         
         #add the environment defaults to config,
         #if the user has chosen to omit them
-        for key, value of env.SPRITE_DEFAULT_CONFIG
+        for own key, value of env.SPRITE_DEFAULT_CONFIG
             config[key] ?= value
         
         #set this sprite's configuration
         @set "config", config
         
-        #experimental: setInterval to check bounds
+        #asynchronously calls this._update, so that _masterUpdate doesn't have to
         setInterval @_update, Math.ceil 1000 / env.FRAME_RATE
         
         #sort the Sprite _list according to _sortRule
@@ -91,7 +82,7 @@ class @Sprite
         _list.sort _sortRule
         
         #return this
-        @
+        this
     
     #getter
     get: (what) ->
@@ -104,8 +95,6 @@ class @Sprite
                 @_mot
             when "acceleration"
                 @_acc
-            when "borders"
-                @_borders
             when "imageFile"
                 @_dis.image.src
             when "width", "height", "visible", "boundAction"
@@ -116,8 +105,14 @@ class @Sprite
                 @_mot[what]
             when "ddx", "ddy", "ddz", "dda"
                 @_acc[what]
-            when "top", "bottom", "right", "left"
-                @_borders[what]
+            when "top"
+                @_pos.y + @_dis.height / 2
+            when "bottom"
+                @_pos.y - @_dis.height / 2
+            when "right"
+                @_pos.x + @_dis.width / 2
+            when "left"
+                @_pos.x - @_dis.width / 2
             when "distance"
                 Math.sqrt @_pos.x**2 + @_pos.y**2
             when "speed"
@@ -137,18 +132,14 @@ class @Sprite
     set: (what, to) ->
         switch what
             when "display", "position", "motion", "acceleration", "config"
-                @set k, v for k, v of to
+                @set k, v for own k, v of to
             when "imageFile"
                 @_dis.image ?= new Image()
                 @_dis.image.src = env.IMAGE_PATH.concat to
-            when "boundAction"
-                @_dis.boundAction = BOUND_ACTIONS[to]
-            when "width", "height", "visible"
+            when "width", "height", "visible", "boundAction"
                 @_dis[what] = to
-                @_calcBorders() if what is "width" or what is "height"
             when "x", "y", "z", "a"
                 @_pos[what] = to
-                @_calcBorders() if what is "x" or what is "y"
                 _list.sort _sortRule if what is "z"
             when "dx", "dy", "dz", "da"
                 @_mot[what] = to
@@ -192,13 +183,11 @@ class @Sprite
     change: (what, step) ->
         switch what
             when "display", "position", "motion", "acceleration"
-                @change k.slice(1), v for k, v of step
+                @change k.slice(1), v for own k, v of step
             when "width", "height"
-                @_dis[what] += step
-                @_calcBorders()
+                @_dis[what] += step / env.FRAME_RATE
             when "x", "y", "z", "a"
                 @_pos[what] += step / env.FRAME_RATE
-                @_calcBorders() if what is "x" or what is "y"
                 _list.sort _sortRule if what is "z"
             when "dx", "dy", "dz", "da"
                 @_mot[what] += step / env.FRAME_RATE
@@ -241,19 +230,19 @@ class @Sprite
     #collision routines
     collidesWith: (other) ->
         collision = true
-        if @_dis.visible and other._dis.visible and @_pos.z == other.get "z"
-            if @_borders.bottom > other._borders.top or
-            @_borders.top < other._borders.bottom or
-            @_borders.right < other._borders.left or
-            @_borders.left > other._borders.right
+        if @_dis.visible and other.get("visible") and @_pos.z == other.get("z")
+            if @get("bottom") > other.get("top") or
+            @get("top") < other.get("bottom") or
+            @get("right") < other.get("left") or
+            @get("left") > other.get("right")
                 collision = false
         else collision = false
         collision
     collidesWithMouse: ->
         collision = false
         if @_dis.visible
-            if @_borders.left < Greenhorn.getMouseX() < @_borders.right and
-            @_borders.bottom < Greenhorn.getMouseY() < @_borders.top
+            if @get("left") < Greenhorn.getMouseX() < @get("right") and
+            @get("bottom") < Greenhorn.getMouseY() < @get("top")
                 collision = true
         collision
     distanceTo: (other) ->
@@ -265,19 +254,12 @@ class @Sprite
     angleToMouse: ->
         -Math.atan2 Greenhorn.getMouseY() - @_pos.y, Greenhorn.getMouseX() - @_pos.x
     
-    #internal adjustments
-    _calcBorders: () ->
-        @_borders.left = @_pos.x - @_dis.width / 2
-        @_borders.right = @_pos.x + @_dis.width / 2
-        @_borders.top = @_pos.y + @_dis.height / 2
-        @_borders.bottom = @_pos.y - @_dis.height / 2
-    
     #update routines
     _draw: ->
         @_dis.context.save()
         @_dis.context.translate @_pos.x, -@_pos.y
         @_dis.context.rotate -@_pos.a
-        @_dis.context.drawImage @_dis.image, 0 - @_dis.width / 2, 0 - @_dis.height / 2, @_dis.width, @_dis.height
+        @_dis.context.drawImage @_dis.image, -@_dis.width / 2, -@_dis.height / 2, @_dis.width, @_dis.height
         @_dis.context.restore()
     _checkBounds: ->
         #canvas boundaries
@@ -286,26 +268,21 @@ class @Sprite
             bottom: -Greenhorn.get("canvas", "height") / 2
             right: Greenhorn.get("canvas", "width") / 2
             left: -Greenhorn.get("canvas", "width") / 2
-        borders =
-            top: @_pos.y + @_dis.height / 2
-            bottom: @_pos.y - @_dis.height / 2
-            right: @_pos.x + @_dis.width / 2
-            left: @_pos.x - @_dis.width / 2
         
         #sprite has completely disappeared offscreen
-        offTop = borders.bottom > bounds.top
-        offBottom = borders.top < bounds.bottom
-        offRight = borders.left > bounds.right
-        offLeft = borders.right < bounds.left
+        offTop = @get("bottom") > bounds.top
+        offBottom = @get("top") < bounds.bottom
+        offRight = @get("left") > bounds.right
+        offLeft = @get("right") < bounds.left
         
         #sprite has just come into contact with a boundary
-        hitTop = borders.top >= bounds.top
-        hitBottom = borders.bottom <= bounds.bottom
-        hitRight = borders.right >= bounds.right
-        hitLeft = borders.left <= bounds.left
+        hitTop = @get("top") >= bounds.top
+        hitBottom = @get("bottom") <= bounds.bottom
+        hitRight = @get("right") >= bounds.right
+        hitLeft = @get("left") <= bounds.left
         
         switch @_dis.boundAction
-            when BOUND_ACTIONS.WRAP
+            when "WRAP"
                 if offTop
                     @set "y", bounds.bottom - @_dis.height / 2
                 if offBottom
@@ -314,7 +291,7 @@ class @Sprite
                     @set "x", bounds.left - @_dis.width / 2
                 if offLeft
                     @set "x", bounds.right + @_dis.width / 2
-            when BOUND_ACTIONS.BOUNCE
+            when "BOUNCE"
                 if hitTop
                     @set "y", bounds.top - @_dis.height / 2
                     @_mot.dy *= -1
@@ -327,7 +304,7 @@ class @Sprite
                 if hitLeft
                     @set "x", bounds.left + @_dis.width / 2
                     @_mot.dx *= -1
-            when BOUND_ACTIONS.SEMIBOUNCE
+            when "SEMIBOUNCE"
                 if hitTop
                     @set "y", bounds.top - @_dis.height / 2
                     @_mot.dy *= -.75
@@ -340,7 +317,7 @@ class @Sprite
                 if hitLeft
                     @set "x", bounds.left + @_dis.width / 2
                     @_mot.dx *= -.75
-            when BOUND_ACTIONS.STOP
+            when "STOP"
                 if hitTop or hitBottom or hitRight or hitLeft
                     @_mot.dx = 0
                     @_mot.dy = 0
@@ -355,10 +332,10 @@ class @Sprite
                         @set "x", bounds.right - @_dis.width / 2
                     if hitLeft
                         @set "x", bounds.left + @_dis.width / 2
-            when BOUND_ACTIONS.DIE
+            when "DIE"
                 if offTop or offBottom or offRight or offLeft
                     @_dis.visible = no
-        @_dis.boundAction
+        return
     _update: =>
         if @_dis.visible
             @change "motion", @_acc
