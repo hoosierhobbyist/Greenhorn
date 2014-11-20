@@ -194,7 +194,7 @@ class @Greenhorn
         @set "leftPanel", "innerHTML", env.ENGINE_LEFT_PANEL
         @set "rightPanel", "innerHTML", env.ENGINE_RIGHT_PANEL
         @set "bottomPanel", "innerHTML", env.ENGINE_BOTTOM_PANEL
-        @set "canvas", "innerHTML", env.ENGINE_CANVAS_ERROR
+        @set "canvas", "innerHTML", "your browser does not support the <canvas> tag"
         
         #start running _masterUpdate at env.FRAME_RATE frames/sec
         _masterID = setInterval _masterUpdate, Math.ceil 1000 / env.FRAME_RATE
