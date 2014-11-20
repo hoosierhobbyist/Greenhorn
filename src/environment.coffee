@@ -16,7 +16,6 @@ The Greenhorn Gaming environment object
     ENGINE_BOTTOM_PANEL: "BOTTOM PANEL"
     ENGINE_CANVAS_COLOR: "black"
     ENGINE_BACKGROUND_COLOR: "darkgreen"
-    ENGINE_CANVAS_ERROR: "your web browser does not support the <canvas> tag"
     #default Sprite settings
     IMAGE_PATH: ""
     SPRITE_DEFAULT_CONFIG:
