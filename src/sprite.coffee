@@ -261,86 +261,84 @@ class @Sprite
         @_dis.context.rotate -@_pos.a
         @_dis.context.drawImage @_dis.image, -@_dis.width / 2, -@_dis.height / 2, @_dis.width, @_dis.height
         @_dis.context.restore()
-    _checkBounds: ->
-        #canvas boundaries
-        bounds =
-            top: Greenhorn.get("canvas", "height") / 2
-            bottom: -Greenhorn.get("canvas", "height") / 2
-            right: Greenhorn.get("canvas", "width") / 2
-            left: -Greenhorn.get("canvas", "width") / 2
-        
-        #sprite has completely disappeared offscreen
-        offTop = @get("bottom") > bounds.top
-        offBottom = @get("top") < bounds.bottom
-        offRight = @get("left") > bounds.right
-        offLeft = @get("right") < bounds.left
-        
-        #sprite has just come into contact with a boundary
-        hitTop = @get("top") >= bounds.top
-        hitBottom = @get("bottom") <= bounds.bottom
-        hitRight = @get("right") >= bounds.right
-        hitLeft = @get("left") <= bounds.left
-        
-        switch @_dis.boundAction
-            when "WRAP"
-                if offTop
-                    @set "y", bounds.bottom - @_dis.height / 2
-                if offBottom
-                    @set "y", bounds.top + @_dis.height / 2
-                if offRight
-                    @set "x", bounds.left - @_dis.width / 2
-                if offLeft
-                    @set "x", bounds.right + @_dis.width / 2
-            when "BOUNCE"
-                if hitTop
-                    @set "y", bounds.top - @_dis.height / 2
-                    @_mot.dy *= -1
-                if hitBottom
-                    @set "y", bounds.bottom + @_dis.height / 2
-                    @_mot.dy *= -1
-                if hitRight
-                    @set "x", bounds.right - @_dis.width / 2
-                    @_mot.dx *= -1
-                if hitLeft
-                    @set "x", bounds.left + @_dis.width / 2
-                    @_mot.dx *= -1
-            when "SEMIBOUNCE"
-                if hitTop
-                    @set "y", bounds.top - @_dis.height / 2
-                    @_mot.dy *= -.75
-                if hitBottom
-                    @set "y", bounds.bottom + @_dis.height / 2
-                    @_mot.dy *= -.75
-                if hitRight
-                    @set "x", bounds.right - @_dis.width / 2
-                    @_mot.dx *= -.75
-                if hitLeft
-                    @set "x", bounds.left + @_dis.width / 2
-                    @_mot.dx *= -.75
-            when "STOP"
-                if hitTop or hitBottom or hitRight or hitLeft
-                    @_mot.dx = 0
-                    @_mot.dy = 0
-                    @_acc.ddx = 0
-                    @_acc.ddy = 0
-                    
-                    if hitTop
-                        @set "y", bounds.top - @_dis.height / 2
-                    if hitBottom
-                        @set "y", bounds.bottom + @_dis.height / 2
-                    if hitRight
-                        @set "x", bounds.right - @_dis.width / 2
-                    if hitLeft
-                        @set "x", bounds.left + @_dis.width / 2
-            when "DIE"
-                if offTop or offBottom or offRight or offLeft
-                    @_dis.visible = no
-        return
     _update: =>
         if @_dis.visible
             @change "motion", @_acc
             @change "position", @_mot
-            @_checkBounds()
+            
+            #check boundaries
+            bounds =
+                top: Greenhorn.get("canvas", "height") / 2
+                bottom: -Greenhorn.get("canvas", "height") / 2
+                right: Greenhorn.get("canvas", "width") / 2
+                left: -Greenhorn.get("canvas", "width") / 2
+            
+            #sprite has completely disappeared offscreen
+            offTop = @get("bottom") > bounds.top
+            offBottom = @get("top") < bounds.bottom
+            offRight = @get("left") > bounds.right
+            offLeft = @get("right") < bounds.left
+            
+            #sprite has just come into contact with a boundary
+            hitTop = @get("top") >= bounds.top
+            hitBottom = @get("bottom") <= bounds.bottom
+            hitRight = @get("right") >= bounds.right
+            hitLeft = @get("left") <= bounds.left
+            
+            switch @_dis.boundAction
+                when "WRAP"
+                    if offTop
+                        @set "y", bounds.bottom - @_dis.height / 2
+                    if offBottom
+                        @set "y", bounds.top + @_dis.height / 2
+                    if offRight
+                        @set "x", bounds.left - @_dis.width / 2
+                    if offLeft
+                        @set "x", bounds.right + @_dis.width / 2
+                when "BOUNCE"
+                    if hitTop
+                        @set "y", bounds.top - @_dis.height / 2
+                        @_mot.dy *= -1
+                    if hitBottom
+                        @set "y", bounds.bottom + @_dis.height / 2
+                        @_mot.dy *= -1
+                    if hitRight
+                        @set "x", bounds.right - @_dis.width / 2
+                        @_mot.dx *= -1
+                    if hitLeft
+                        @set "x", bounds.left + @_dis.width / 2
+                        @_mot.dx *= -1
+                when "SEMIBOUNCE"
+                    if hitTop
+                        @set "y", bounds.top - @_dis.height / 2
+                        @_mot.dy *= -.75
+                    if hitBottom
+                        @set "y", bounds.bottom + @_dis.height / 2
+                        @_mot.dy *= -.75
+                    if hitRight
+                        @set "x", bounds.right - @_dis.width / 2
+                        @_mot.dx *= -.75
+                    if hitLeft
+                        @set "x", bounds.left + @_dis.width / 2
+                        @_mot.dx *= -.75
+                when "STOP"
+                    if hitTop or hitBottom or hitRight or hitLeft
+                        @_mot.dx = 0
+                        @_mot.dy = 0
+                        @_acc.ddx = 0
+                        @_acc.ddy = 0
+                        
+                        if hitTop
+                            @set "y", bounds.top - @_dis.height / 2
+                        if hitBottom
+                            @set "y", bounds.bottom + @_dis.height / 2
+                        if hitRight
+                            @set "x", bounds.right - @_dis.width / 2
+                        if hitLeft
+                            @set "x", bounds.left + @_dis.width / 2
+                when "DIE"
+                    if offTop or offBottom or offRight or offLeft
+                        @_dis.visible = no
         this
     
     #debugging
