@@ -72,18 +72,6 @@ class @Greenhorn
     @getMouseX = -> document.mouseX - @get("main", "offsetLeft") - @get("canvas", "offsetLeft") - @get("canvas", "width") / 2
     @getMouseY = -> document.mouseY - @get("main", "offsetTop") - @get("canvas", "offsetTop") - @get("canvas", "height") / 2
     
-    #canvas boundaries
-    @getBound = (side) ->
-        switch side
-            when "top"
-                @get("canvas", "height") / 2
-            when "bottom"
-                -@get("canvas", "height") / 2
-            when "right"
-                @get("canvas", "width") / 2
-            when "left"
-                -@get("canvas", "width") / 2
-    
     #generic element getter/setter
     @get = (elmnt, attr) ->
         if attr
