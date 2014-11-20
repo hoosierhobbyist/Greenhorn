@@ -22,7 +22,6 @@ class @TextBox extends @Sprite
         
         #call Sprite constructor
         super(config)
-        @_fitText()
     
     #generic getter
     get: (what) ->
@@ -62,6 +61,11 @@ class @TextBox extends @Sprite
             @_margins[what.slice(7).toLowerCase()] = to
         else
             super what, to
+        
+        if @_dis.width? and @_dis.height? and @_font.size? and
+        @_margins.left? and @_margins.right? and @_margins.bottom? and
+        @_margins.top? and @_border.visible? and @_border.size?
+            @_fitText()
         this
     
     #style control
@@ -82,11 +86,7 @@ class @TextBox extends @Sprite
     
     #internal control
     _fitText: ->
-        #preserve old data
-        old_width = @_dis.width
-        old_height = @_dis.height
-        
-        #calculate new values
+        #calculate new size
         @_dis.width = 0
         @_dis.height = (@_font.size * @_text.length) + (@_font.size * (@_text.length - 1))
         for line in @_text
@@ -99,17 +99,6 @@ class @TextBox extends @Sprite
         if @_border.visible
             @_dis.width += 2 * @_border.size
             @_dis.height += 2 * @_border.size
-        
-        #keep coordinate (top, left) in same position
-        if @_dis.width < old_width
-            @change "x", -Math.abs(@_dis.width - old_width) / 2
-        else
-            @change "x", Math.abs(@_dis.width - old_width) / 2
-        
-        if @_dis.height < old_height
-            @change "y", -Math.abs(@_dis.height - old_height) / 2
-        else
-            @change "y", Math.abs(@_dis.height - old_height) / 2
         
         return this
     _draw: ->
