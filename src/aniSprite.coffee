@@ -22,12 +22,11 @@ class @AniSprite extends @Sprite
     constructor: (config = {}) ->
         #add environment defaults to config,
         #if the user has chosen to omit them
-        for key, value of env.ANISPRITE_DEFAULT_CONFIG
+        for own key, value of env.ANISPRITE_DEFAULT_CONFIG
             config[key] ?= value
         
-        #create the timer that will
-        #control the animation cycles
-        @_dis.cycle = new Array()
+        #create new attributes
+        @_dis.cycles = new Array()
         @_dis.timer = new Timer(off)
         
         #push provided cycles onto the array
@@ -37,7 +36,7 @@ class @AniSprite extends @Sprite
         super(config)
         
         #return this
-        @
+        this
     
     #getter
     get: (what) ->
