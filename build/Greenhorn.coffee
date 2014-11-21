@@ -16,7 +16,6 @@ The Greenhorn Gaming environment object
     ENGINE_BOTTOM_PANEL: "BOTTOM PANEL"
     ENGINE_CANVAS_COLOR: "black"
     ENGINE_BACKGROUND_COLOR: "darkgreen"
-    ENGINE_CANVAS_ERROR: "your web browser does not support the <canvas> tag"
     #default Sprite settings
     IMAGE_PATH: ""
     SPRITE_DEFAULT_CONFIG:
@@ -65,6 +64,7 @@ The Greenhorn Gaming environment object
     #default button settings
     BUTTON_DEFAULT_LABEL: "Launch the Missiles!"
 #end environment object
+
 
 
 ###
@@ -141,18 +141,6 @@ class @Greenhorn
     @getMouseX = -> document.mouseX - @get("main", "offsetLeft") - @get("canvas", "offsetLeft") - @get("canvas", "width") / 2
     @getMouseY = -> document.mouseY - @get("main", "offsetTop") - @get("canvas", "offsetTop") - @get("canvas", "height") / 2
     
-    #canvas boundaries
-    @getBound = (side) ->
-        switch side
-            when "top"
-                @get("canvas", "height") / 2
-            when "bottom"
-                -@get("canvas", "width") / 2
-            when "right"
-                @get("canvas", "height") / 2
-            when "left"
-                -@get("canvas", "width") / 2
-    
     #generic element getter/setter
     @get = (elmnt, attr) ->
         if attr
@@ -161,7 +149,7 @@ class @Greenhorn
             @_elmnts[elmnt]
     @set = (elmnt, attr, what) ->
         if Object::toString.call(what) is '[object Object]'
-            @_elmnts[elmnt][attr][key] = value for key, value of what
+            @_elmnts[elmnt][attr][key] = value for own key, value of what
         else
             @_elmnts[elmnt][attr] = what
     
@@ -263,7 +251,7 @@ class @Greenhorn
         @set "leftPanel", "innerHTML", env.ENGINE_LEFT_PANEL
         @set "rightPanel", "innerHTML", env.ENGINE_RIGHT_PANEL
         @set "bottomPanel", "innerHTML", env.ENGINE_BOTTOM_PANEL
-        @set "canvas", "innerHTML", env.ENGINE_CANVAS_ERROR
+        @set "canvas", "innerHTML", "your browser does not support the <canvas> tag"
         
         #start running _masterUpdate at env.FRAME_RATE frames/sec
         _masterID = setInterval _masterUpdate, Math.ceil 1000 / env.FRAME_RATE
@@ -283,20 +271,12 @@ class @Greenhorn
 #end class Greenhorn
 
 
+
 ###
 sprite.coffee
 
 The Greenhorn Gaming Engine core class
 ###
-
-#Sprite boundaryAction enumeration
-BOUND_ACTIONS =
-    WRAP: 0
-    BOUNCE: 1
-    SEMIBOUNCE: 2
-    STOP: 3
-    DIE: 4
-    CONTINUE: 5
 
 #generate a sort rule to determine
 #in what order the sprites are drawn
@@ -319,8 +299,9 @@ class @Sprite
     
     #Sprite class methods
     @howMany = -> _list.length
-    @_drawAll = -> sp._draw() for sp in _list
-    #@sortBy = (@_sortRule) -> @resort()
+    @_drawAll = ->
+        sp._draw() for sp in _list
+        return
     
     #collective manipulation
     @getAll = (what, excep...) ->
@@ -355,20 +336,19 @@ class @Sprite
         @_pos = {}
         @_mot = {}
         @_acc = {}
-        @_borders = {}
         
         #get the context used to draw sprite
         @_dis.context = Greenhorn._elmnts.canvas.getContext "2d"
         
         #add the environment defaults to config,
         #if the user has chosen to omit them
-        for key, value of env.SPRITE_DEFAULT_CONFIG
+        for own key, value of env.SPRITE_DEFAULT_CONFIG
             config[key] ?= value
         
         #set this sprite's configuration
         @set "config", config
         
-        #experimental: setInterval to check bounds
+        #asynchronously calls this._update, so that _masterUpdate doesn't have to
         setInterval @_update, Math.ceil 1000 / env.FRAME_RATE
         
         #sort the Sprite _list according to _sortRule
@@ -376,7 +356,7 @@ class @Sprite
         _list.sort _sortRule
         
         #return this
-        @
+        this
     
     #getter
     get: (what) ->
@@ -389,8 +369,6 @@ class @Sprite
                 @_mot
             when "acceleration"
                 @_acc
-            when "borders"
-                @_borders
             when "imageFile"
                 @_dis.image.src
             when "width", "height", "visible", "boundAction"
@@ -401,8 +379,14 @@ class @Sprite
                 @_mot[what]
             when "ddx", "ddy", "ddz", "dda"
                 @_acc[what]
-            when "top", "bottom", "right", "left"
-                @_borders[what]
+            when "top"
+                @_pos.y + @_dis.height / 2
+            when "bottom"
+                @_pos.y - @_dis.height / 2
+            when "right"
+                @_pos.x + @_dis.width / 2
+            when "left"
+                @_pos.x - @_dis.width / 2
             when "distance"
                 Math.sqrt @_pos.x**2 + @_pos.y**2
             when "speed"
@@ -422,18 +406,14 @@ class @Sprite
     set: (what, to) ->
         switch what
             when "display", "position", "motion", "acceleration", "config"
-                @set k, v for k, v of to
+                @set k, v for own k, v of to
             when "imageFile"
                 @_dis.image ?= new Image()
                 @_dis.image.src = env.IMAGE_PATH.concat to
-            when "boundAction"
-                @_dis.boundAction = BOUND_ACTIONS[to]
-            when "width", "height", "visible"
+            when "width", "height", "visible", "boundAction"
                 @_dis[what] = to
-                @_calcBorders() if what is "width" or what is "height"
             when "x", "y", "z", "a"
                 @_pos[what] = to
-                @_calcBorders() if what is "x" or what is "y"
                 _list.sort _sortRule if what is "z"
             when "dx", "dy", "dz", "da"
                 @_mot[what] = to
@@ -477,13 +457,11 @@ class @Sprite
     change: (what, step) ->
         switch what
             when "display", "position", "motion", "acceleration"
-                @change k.slice(1), v for k, v of step
+                @change k.slice(1), v for own k, v of step
             when "width", "height"
-                @_dis[what] += step
-                @_calcBorders()
+                @_dis[what] += step / env.FRAME_RATE
             when "x", "y", "z", "a"
                 @_pos[what] += step / env.FRAME_RATE
-                @_calcBorders() if what is "x" or what is "y"
                 _list.sort _sortRule if what is "z"
             when "dx", "dy", "dz", "da"
                 @_mot[what] += step / env.FRAME_RATE
@@ -526,19 +504,19 @@ class @Sprite
     #collision routines
     collidesWith: (other) ->
         collision = true
-        if @_dis.visible and other._dis.visible and @_pos.z == other.get "z"
-            if @_borders.bottom > other._borders.top or
-            @_borders.top < other._borders.bottom or
-            @_borders.right < other._borders.left or
-            @_borders.left > other._borders.right
+        if @_dis.visible and other.get("visible") and @_pos.z == other.get("z")
+            if @get("bottom") > other.get("top") or
+            @get("top") < other.get("bottom") or
+            @get("right") < other.get("left") or
+            @get("left") > other.get("right")
                 collision = false
         else collision = false
         collision
     collidesWithMouse: ->
         collision = false
         if @_dis.visible
-            if @_borders.left < Greenhorn.getMouseX() < @_borders.right and
-            @_borders.bottom < Greenhorn.getMouseY() < @_borders.top
+            if @get("left") < Greenhorn.getMouseX() < @get("right") and
+            @get("bottom") < Greenhorn.getMouseY() < @get("top")
                 collision = true
         collision
     distanceTo: (other) ->
@@ -550,105 +528,91 @@ class @Sprite
     angleToMouse: ->
         -Math.atan2 Greenhorn.getMouseY() - @_pos.y, Greenhorn.getMouseX() - @_pos.x
     
-    #internal adjustments
-    _calcBorders: () ->
-        @_borders.left = @_pos.x - @_dis.width / 2
-        @_borders.right = @_pos.x + @_dis.width / 2
-        @_borders.top = @_pos.y + @_dis.height / 2
-        @_borders.bottom = @_pos.y - @_dis.height / 2
-    
     #update routines
     _draw: ->
         @_dis.context.save()
         @_dis.context.translate @_pos.x, -@_pos.y
         @_dis.context.rotate -@_pos.a
-        @_dis.context.drawImage @_dis.image, 0 - @_dis.width / 2, 0 - @_dis.height / 2, @_dis.width, @_dis.height
+        @_dis.context.drawImage @_dis.image, -@_dis.width / 2, -@_dis.height / 2, @_dis.width, @_dis.height
         @_dis.context.restore()
-    _checkBounds: ->
-        #canvas boundaries
-        bounds =
-            top: Greenhorn.get("canvas", "height") / 2
-            bottom: -Greenhorn.get("canvas", "height") / 2
-            right: Greenhorn.get("canvas", "width") / 2
-            left: -Greenhorn.get("canvas", "width") / 2
-        borders =
-            top: @_pos.y + @_dis.height / 2
-            bottom: @_pos.y - @_dis.height / 2
-            right: @_pos.x + @_dis.width / 2
-            left: @_pos.x - @_dis.width / 2
-        
-        #sprite has completely disappeared offscreen
-        offTop = borders.bottom > bounds.top
-        offBottom = borders.top < bounds.bottom
-        offRight = borders.left > bounds.right
-        offLeft = borders.right < bounds.left
-        
-        #sprite has just come into contact with a boundary
-        hitTop = borders.top >= bounds.top
-        hitBottom = borders.bottom <= bounds.bottom
-        hitRight = borders.right >= bounds.right
-        hitLeft = borders.left <= bounds.left
-        
-        switch @_dis.boundAction
-            when BOUND_ACTIONS.WRAP
-                if offTop
-                    @set "y", bounds.bottom - @_dis.height / 2
-                if offBottom
-                    @set "y", bounds.top + @_dis.height / 2
-                if offRight
-                    @set "x", bounds.left - @_dis.width / 2
-                if offLeft
-                    @set "x", bounds.right + @_dis.width / 2
-            when BOUND_ACTIONS.BOUNCE
-                if hitTop
-                    @set "y", bounds.top - @_dis.height / 2
-                    @_mot.dy *= -1
-                if hitBottom
-                    @set "y", bounds.bottom + @_dis.height / 2
-                    @_mot.dy *= -1
-                if hitRight
-                    @set "x", bounds.right - @_dis.width / 2
-                    @_mot.dx *= -1
-                if hitLeft
-                    @set "x", bounds.left + @_dis.width / 2
-                    @_mot.dx *= -1
-            when BOUND_ACTIONS.SEMIBOUNCE
-                if hitTop
-                    @set "y", bounds.top - @_dis.height / 2
-                    @_mot.dy *= -.75
-                if hitBottom
-                    @set "y", bounds.bottom + @_dis.height / 2
-                    @_mot.dy *= -.75
-                if hitRight
-                    @set "x", bounds.right - @_dis.width / 2
-                    @_mot.dx *= -.75
-                if hitLeft
-                    @set "x", bounds.left + @_dis.width / 2
-                    @_mot.dx *= -.75
-            when BOUND_ACTIONS.STOP
-                if hitTop or hitBottom or hitRight or hitLeft
-                    @_mot.dx = 0
-                    @_mot.dy = 0
-                    @_acc.ddx = 0
-                    @_acc.ddy = 0
-                    
-                    if hitTop
-                        @set "y", bounds.top - @_dis.height / 2
-                    if hitBottom
-                        @set "y", bounds.bottom + @_dis.height / 2
-                    if hitRight
-                        @set "x", bounds.right - @_dis.width / 2
-                    if hitLeft
-                        @set "x", bounds.left + @_dis.width / 2
-            when BOUND_ACTIONS.DIE
-                if offTop or offBottom or offRight or offLeft
-                    @_dis.visible = no
-        @_dis.boundAction
     _update: =>
         if @_dis.visible
             @change "motion", @_acc
             @change "position", @_mot
-            @_checkBounds()
+            
+            #check boundaries
+            bounds =
+                top: Greenhorn.get("canvas", "height") / 2
+                bottom: -Greenhorn.get("canvas", "height") / 2
+                right: Greenhorn.get("canvas", "width") / 2
+                left: -Greenhorn.get("canvas", "width") / 2
+            
+            #sprite has completely disappeared offscreen
+            offTop = @get("bottom") > bounds.top
+            offBottom = @get("top") < bounds.bottom
+            offRight = @get("left") > bounds.right
+            offLeft = @get("right") < bounds.left
+            
+            #sprite has just come into contact with a boundary
+            hitTop = @get("top") >= bounds.top
+            hitBottom = @get("bottom") <= bounds.bottom
+            hitRight = @get("right") >= bounds.right
+            hitLeft = @get("left") <= bounds.left
+            
+            switch @_dis.boundAction
+                when "WRAP"
+                    if offTop
+                        @set "y", bounds.bottom - @_dis.height / 2
+                    if offBottom
+                        @set "y", bounds.top + @_dis.height / 2
+                    if offRight
+                        @set "x", bounds.left - @_dis.width / 2
+                    if offLeft
+                        @set "x", bounds.right + @_dis.width / 2
+                when "BOUNCE"
+                    if hitTop
+                        @set "y", bounds.top - @_dis.height / 2
+                        @_mot.dy *= -1
+                    if hitBottom
+                        @set "y", bounds.bottom + @_dis.height / 2
+                        @_mot.dy *= -1
+                    if hitRight
+                        @set "x", bounds.right - @_dis.width / 2
+                        @_mot.dx *= -1
+                    if hitLeft
+                        @set "x", bounds.left + @_dis.width / 2
+                        @_mot.dx *= -1
+                when "SEMIBOUNCE"
+                    if hitTop
+                        @set "y", bounds.top - @_dis.height / 2
+                        @_mot.dy *= -.75
+                    if hitBottom
+                        @set "y", bounds.bottom + @_dis.height / 2
+                        @_mot.dy *= -.75
+                    if hitRight
+                        @set "x", bounds.right - @_dis.width / 2
+                        @_mot.dx *= -.75
+                    if hitLeft
+                        @set "x", bounds.left + @_dis.width / 2
+                        @_mot.dx *= -.75
+                when "STOP"
+                    if hitTop or hitBottom or hitRight or hitLeft
+                        @_mot.dx = 0
+                        @_mot.dy = 0
+                        @_acc.ddx = 0
+                        @_acc.ddy = 0
+                        
+                        if hitTop
+                            @set "y", bounds.top - @_dis.height / 2
+                        if hitBottom
+                            @set "y", bounds.bottom + @_dis.height / 2
+                        if hitRight
+                            @set "x", bounds.right - @_dis.width / 2
+                        if hitLeft
+                            @set "x", bounds.left + @_dis.width / 2
+                when "DIE"
+                    if offTop or offBottom or offRight or offLeft
+                        @_dis.visible = no
         this
     
     #debugging
@@ -685,6 +649,7 @@ class @Sprite
 @Sprites = @Sprite
 
 
+
 ###
 textBox.coffee
 
@@ -697,7 +662,7 @@ class @TextBox extends @Sprite
     constructor: (config = {}) ->
         #add the environment defaults to config,
         #if the user has chosen to omit them
-        for key, value of env.TEXTBOX_DEFAULT_CONFIG
+        for own key, value of env.TEXTBOX_DEFAULT_CONFIG
             config[key] ?= value
         
         #primary objects
@@ -709,7 +674,6 @@ class @TextBox extends @Sprite
         
         #call Sprite constructor
         super(config)
-        @_fitText()
     
     #generic getter
     get: (what) ->
@@ -733,9 +697,7 @@ class @TextBox extends @Sprite
     
     #generic setter
     set: (what, to) ->
-        if what is "config"
-            @set k, v for k, v of to
-        else if what is "text"
+        if what is "text"
             @_text = to.split "\n"
         else if what is "align"
             @_dis.context.textAlign = to
@@ -751,6 +713,11 @@ class @TextBox extends @Sprite
             @_margins[what.slice(7).toLowerCase()] = to
         else
             super what, to
+        
+        if @_dis.width? and @_dis.height? and @_font.size? and
+        @_margins.left? and @_margins.right? and @_margins.bottom? and
+        @_margins.top? and @_border.visible? and @_border.size?
+            @_fitText()
         this
     
     #style control
@@ -771,11 +738,7 @@ class @TextBox extends @Sprite
     
     #internal control
     _fitText: ->
-        #preserve old data
-        old_width = @_dis.width
-        old_height = @_dis.height
-        
-        #calculate new values
+        #calculate new size
         @_dis.width = 0
         @_dis.height = (@_font.size * @_text.length) + (@_font.size * (@_text.length - 1))
         for line in @_text
@@ -789,38 +752,7 @@ class @TextBox extends @Sprite
             @_dis.width += 2 * @_border.size
             @_dis.height += 2 * @_border.size
         
-        #keep coordinate (top, left) in same position
-        if @_dis.width < old_width
-            @change "x", -Math.abs(@_dis.width - old_width) / 2
-        else
-            @change "x", Math.abs(@_dis.width - old_width) / 2
-        
-        if @_dis.height < old_height
-            @change "y", -Math.abs(@_dis.height - old_height) / 2
-        else
-            @change "y", Math.abs(@_dis.height - old_height) / 2
-        
         return this
-    _writeText: ->
-        #calculate offset
-        xOffset = @_margins.left
-        yOffset = @_margins.top + @_font.size
-        if @_border.visible
-            xOffset += @_border.size
-            yOffset += @_border.size
-        
-        #initialize context
-        @_dis.context._font = "#{@_font.size}px #{@_font.name}"
-        @_dis.context.fillStyle = @_font.color
-        @_dis.context.globalAlpha = @_font.alpha
-        
-        #draw text on canvas
-        if @_text.length > 1
-            for line, i in @_text
-                @_dis.context.fillText line, xOffset - (@_dis.width / 2), yOffset - (@_dis.height / 2) + (@_font.size * 2 * i)
-        else
-            @_dis.context.fillText @_text[0], xOffset - (@_dis.width / 2), yOffset - (@_dis.height / 2)
-        return
     _draw: ->
         #save current context
         @_dis.context.save()
@@ -843,12 +775,29 @@ class @TextBox extends @Sprite
             @_dis.context.strokeRect -@_dis.width / 2, -@_dis.height / 2, @_dis.width, @_dis.height
         
         #draw text
-        @_writeText()
+        xOffset = @_margins.left
+        yOffset = @_margins.top + @_font.size
+        if @_border.visible
+            xOffset += @_border.size
+            yOffset += @_border.size
+        
+        #initialize context
+        @_dis.context._font = "#{@_font.size}px #{@_font.name}"
+        @_dis.context.fillStyle = @_font.color
+        @_dis.context.globalAlpha = @_font.alpha
+        
+        #draw text on canvas
+        if @_text.length > 1
+            for line, i in @_text
+                @_dis.context.fillText line, xOffset - (@_dis.width / 2), yOffset - (@_dis.height / 2) + (@_font.size * 2 * i)
+        else
+            @_dis.context.fillText @_text[0], xOffset - (@_dis.width / 2), yOffset - (@_dis.height / 2)
         
         #restore old context
         @_dis.context.restore()
         return
 #end class TextBox
+
 
 
 ###
