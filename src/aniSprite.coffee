@@ -7,16 +7,11 @@ The Greenhorn Gaming Engine animated Sprite class
 class AniCycle
     #constructor
     constructor: (data) ->
-        #throw errors if proper data isn't supplied
-        throw new Error "name must be supplied" unless data.name?
-        throw new Error "startRow must be supplied" unless data.startRow?
-        throw new Error "numFrames must be supplied" unless data.numFrames?
-        
         #extract data
-        @name = data.name
-        @startRow = data.startRow
-        @numFrames = data.numFrames
         @frame = 1
+        @name = data.name
+        @row = data.row
+        @numFrames = data.numFrames
 
 class @AniSprite extends @Sprite
     #constructor
@@ -31,33 +26,50 @@ class @AniSprite extends @Sprite
         @_dis.timer = new Timer()
         
         #push provided cycles onto the array
+        i = 0
         for own key, value of config when key.indexOf("cycle") is 0
             key.name ?= key.slice 5
-            @_dis.cycles.push(new AniCycle(value)) 
+            key.row ?= i += 1
+            key.numFrames ?= config.sheetWidth / config.cellWidth
+            @_dis.cycles.push(new AniCycle(value))
         
         #call Sprite constructor
         super(config)
+        @_dis.current ?= @_dis.cycles[0]
         
         #return this
         this
     
     #getter
     get: (what) ->
-        #add later
+        switch what
+            when "sheetWidth", "sheetHeight", "cellWidth", "cellHeight", "frameRate"
+                @_dis[what]
+            when "current"
+                @_dis.current.name
+            else
+                super what
     
     #setter
     set: (what, to) ->
-        #add later
-    
-    #changer
-    change: (what, step) ->
-        #add later
+        switch what
+            when "sheetWidth", "sheetHeight", "cellWidth", "cellHeight", "frameRate"
+                @_dis[what] = to
+            when "current"
+                @_dis.current.frame = 1
+                for cycle in @_dis.cycles when cycle.name is to
+                    @_dis.current = cycle
+            else
+                super what, to
+        this
     
     #animation control
     play: ->
         @_dis.timer.start()
+        this
     pause: ->
         @_dis.timer.pause()
+        this
     
     #update routines
     _draw: ->
@@ -68,21 +80,26 @@ class @AniSprite extends @Sprite
         @_dis.translate @_pos.x, -@_pos.y
         @_dis.rotate -@_pos.a
         
-        #find current frame
-        sx = (@_dis.cycles[@_dis.current].frame - 1) * @_dis.cellWidth
-        sy = (@_dis.cycles[@_dis.current].startRow - 1) * @_dis.cellHeight
-        
         #draw frame
-        @_dis.context.drawImage @_dis.image, sx, sy, @_dis.cellWidth, @_dis.cellHeight, -@_dis.width / 2, -@_dis.height / 2, @_dis.width, @_dis.height
+        @_dis.context.drawImage( 
+            @_dis.image, #spritesheet
+            (@_dis.current.frame - 1) * @_dis.cellWidth, #sx
+            (@_dis.current.row - 1) * @_dis.cellHeight, #sy
+            @_dis.cellWidth, #swidth
+            @_dis.cellHeight, #sheight
+            -@_dis.width / 2, #x
+            -@_dis.height / 2, #y
+            @_dis.width, #width
+            @_dis.height) #height
         
         #restore context
         @_dis.context.restore()
     _update: =>
-        if @_dis.timer.getElapsedTime() >= Math.ceil(1000 / @_dis.frameRate)
-            if @_dis.cycles[@_dis.current].frame < @_dis.cycles[@_dis.current].numFrames
-                @_dis.cycle[@_dis.current].frame += 1
+        if @_dis.timer.getElapsedTime() >= (1000 / @_dis.frameRate)
+            if @_dis.current.frame < @_dis.current.numFrames
+                @_dis.current.frame += 1
             else
-                @_dis.cycles[@_dis.current].frame = 1
+                @_dis.current.frame = 1
             @_dis.timer.restart()
         super()
 #end class AniSprite
