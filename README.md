@@ -6,6 +6,12 @@ I had previously worked with Andy Harris' simpleGame.js (included in history/)
 and I decided to rewrite it in CS. It quickly became an obsession, and now I am
 publishing it here, in the hopes that it will continue to grow into something amazing.
 
+Working Examples
+================
+
+For the time being you can check out a few working examples at https://cs.iupui.edu/~sedabull.
+I hope to have a more permanent website with demonstrations soon!
+
 Using the Engine
 ================
 
