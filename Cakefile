@@ -4,7 +4,7 @@ fs = require 'fs'
 {spawn, exec} = require 'child_process'
 
 concat = (callback) ->
-    exec '(while read file; do cat ./src/$file; echo "\n\n"; done < ./src/index.txt;) > ./build/Greenhorn.coffee', (error) ->
+    exec '(while read file; do cat ./src/$file; echo "\n\n"; done < ./src/.index.txt;) > ./build/Greenhorn.coffee', (error) ->
         if error?
             console.log "exec error: #{error}"
         else
