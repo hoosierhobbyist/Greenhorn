@@ -3,4 +3,5 @@ greenhorn.coffee
 sprite.coffee
 textBox.coffee
 timer.coffee
+aniSprite.coffee
 sound.coffee

@@ -56,6 +56,12 @@ The Greenhorn Gaming environment object
         marginsBottom: 5
         marginsRight: 5
         marginsLeft: 5
+    ANISPRITE_DEFAULT_CONFIG:
+        sheetWidth: 256
+        sheetHeight: 256
+        cellWidth: 64
+        cellHeight: 64
+        frameRate: 20
     #default sound settings
     SOUND_PATH: ""
     SOUND_DEFAULT_URL: ""
