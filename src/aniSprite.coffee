@@ -18,27 +18,11 @@ class @AniSprite extends @Sprite
     constructor: (config = {}) ->
         #add environment defaults to config,
         #if the user has chosen to omit them
-        for own key, value of env.ANISPRITE_DEFAULT_CONFIG
+        for own key, value of env.ANISPRITE_DEFAULT_CONFIG when key isnt "numFrames"
             config[key] ?= value
         
-        #create new attributes
-        @_dis.cycles = new Array()
-        @_dis.timer = new Timer()
-        
-        #push provided cycles onto the array
-        i = 0
-        for own key, value of config when key.indexOf("cycle") is 0
-            key.name ?= key.slice 5
-            key.row ?= i += 1
-            key.numFrames ?= config.sheetWidth / config.cellWidth
-            @_dis.cycles.push(new AniCycle(value))
-        
-        #call Sprite constructor
+        #call the Sprite constructor
         super(config)
-        @_dis.current ?= @_dis.cycles[0]
-        
-        #return this
-        this
     
     #getter
     get: (what) ->
@@ -52,15 +36,28 @@ class @AniSprite extends @Sprite
     
     #setter
     set: (what, to) ->
-        switch what
-            when "sheetWidth", "sheetHeight", "cellWidth", "cellHeight", "frameRate"
-                @_dis[what] = to
-            when "current"
-                @_dis.current.frame = 1
-                for cycle in @_dis.cycles when cycle.name is to
-                    @_dis.current = cycle
-            else
-                super what, to
+        if what is "sheetWidth" or
+        what is "sheetHeight" or
+        what is "cellWidth" or
+        what is"cellHeight" or
+        what is"frameRate"
+            @_dis[what] = to
+        else if what is "current"
+            @_dis.current.frame = 1
+            for cycle in @_dis.cycles when cycle.name is to
+                @_dis.current = cycle
+        else if what.indexOf("cycle") is 0
+            @_dis.cycles ?= new Array()
+            @_dis.timer ?= new Timer()
+            
+            i = 0
+            to.name ?= what.slice 5
+            to.row ?= i += 1
+            to.numFrames ?= env.ANISPRITE_DEFAULT_CONFIG.numFrames
+            @_dis.cycles.push(new AniCycle(to))
+            @_dis.current ?= to
+        else
+            super what, to
         this
     
     #animation control
@@ -77,8 +74,8 @@ class @AniSprite extends @Sprite
         @_dis.context.save()
         
         #translate and rotate
-        @_dis.translate @_pos.x, -@_pos.y
-        @_dis.rotate -@_pos.a
+        @_dis.context.translate @_pos.x, -@_pos.y
+        @_dis.context.rotate -@_pos.a
         
         #draw frame
         @_dis.context.drawImage( 

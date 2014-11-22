@@ -59,9 +59,10 @@ The Greenhorn Gaming environment object
     ANISPRITE_DEFAULT_CONFIG:
         sheetWidth: 256
         sheetHeight: 256
-        cellWidth: 64
-        cellHeight: 64
-        frameRate: 20
+        cellWidth: 32
+        cellHeight: 32
+        frameRate: 5
+        numFrames: 8
     #default sound settings
     SOUND_PATH: ""
     SOUND_DEFAULT_URL: ""

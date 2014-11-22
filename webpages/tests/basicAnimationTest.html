@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>Basic Animation Test</title>
+    <script type="text/javascript"
+            src ="../../lib/Greenhorn.js"></script>
+    <script type="text/javascript">
+        //adjust Game Enviorment here
+        env.IMAGE_PATH = "../images/";
+        env.SPRITE_DEFAULT_CONFIG.imageFile = "greenCrystal.png";
+        env.ANISPRITE_DEFAULT_CONFIG.sheetHeight = 32;
+        
+        //name Sprites as globally avaliable
+        //var sprite1, sprite2, ... spriteN
+        var crystal;
+        
+        function init(){
+            //initialize Sprites
+            //sprite1 = new Sprite("path/to/image.png", width, height), etc.
+            aniConfig = {
+                width: 32,
+                height: 32,
+                frameRate: 10,
+                cycleSPIN: {
+                    row: 1
+                }
+            }
+            crystal = new AniSprite(aniConfig);
+            
+            //do any page specific setup here
+            
+            //start the glblScene
+            Greenhorn.start();
+        }//end init
+        
+        //create an update function that will be called once per frame
+        //inbetween the screen being cleared and the sprites being redrawn
+        function update(){
+            //handle game specific events here
+            //e.g. win or lose conditions
+            Greenhorn.set("leftPanel", "innerHTML", crystal.report());
+        }//end update
+    </script>
+</head>
+<body onload = "init()"></body>
+</html>

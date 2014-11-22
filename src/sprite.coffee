@@ -80,9 +80,6 @@ class @Sprite
         #sort the Sprite _list according to _sortRule
         _list.push this
         _list.sort _sortRule
-        
-        #return this
-        this
     
     #getter
     get: (what) ->
