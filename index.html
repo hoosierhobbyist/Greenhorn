@@ -8,15 +8,15 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
 
-    <title>Greenhorn by sedabull</title>
+    <title>The Greenhorn Gaming Engine</title>
   </head>
 
   <body>
 
     <header>
       <div class="container">
-        <h1>Greenhorn</h1>
-        <h2>An HTML5 canvas based gaming engine written in CoffeeScript.</h2>
+        <h1>The Greenhorn Gaming Engine</h1>
+        <h2>A simple, easy to use HTML5 canvas based gaming engine written in CoffeeScript by Seth David Bullock.</h2>
 
         <section id="downloads">
           <a href="https://github.com/sedabull/Greenhorn/zipball/master" class="btn">Download as .zip</a>
@@ -29,71 +29,70 @@
     <div class="container">
       <section id="main_content">
         <h1>
-<a id="greenhorn-gaming-engine" class="anchor" href="#greenhorn-gaming-engine" aria-hidden="true"><span class="octicon octicon-link"></span></a>Greenhorn Gaming Engine</h1>
+          <a id="greenhorn-gaming-engine" class="anchor" href="#greenhorn-gaming-engine" aria-hidden="true">
+            <span class="octicon octicon-link"></span>
+          </a>
+          History and Inspiration
+        </h1>
 
-<p>This project started out as a simple excersise in learning CoffeeScript.
-I had previously worked with Andy Harris' simpleGame.js (included in history/)
-and I decided to rewrite it in CS. It quickly became an obsession, and now I am
-publishing it here, in the hopes that it will continue to grow into something amazing.</p>
+        <p>
+          This project is inspired and draws heavily from Andy Harris'
+          <a href="http://aharrisbooks.net/h5g">simpleGame.js</a>.
+          Andy was my introductory Computer Science professor at
+          <a href="http://iupui.edu">IUPUI</a>. Over the course of
+          a semester I had an opportunity to work with Andy along
+          with some of my fellow students using his simpleGame.js engine.
+          I have played video games all my life, but never had any
+          experience writing them. It was so much fun that I bought
+          his book and worked all the way through it over the course
+          of just a few weeks. I am the kind of person who has to
+          do something by hand in order to truly understand it.
+          Which is why when I discovered <a href="http://coffeescript.org">CoffeeScript</a>
+          this past October I decided that the best way to learn it
+          and at the same time get to write some video games was to take
+          simpleGame.js completely apart and put it all back together again in this new language.
+        </p>
 
-<h1>
-<a id="working-examples" class="anchor" href="#working-examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Working Examples</h1>
+        <h1>
+          <a id="working-examples" class="anchor" href="#working-examples" aria-hidden="true">
+            <span class="octicon octicon-link"></span>
+          </a>
+          Working Examples
+        </h1>
 
-<p>
-  <a href="./examples/basicAnimationTest.html">Animation</a><br>
-  <a href="./examples/basicMotionTest.html">Linear Motion</a><br>
-  <a href="./examples/basicSpinTest.html">Angular Motion</a><br>
-  <a href="./examples/basicVectorTest.html">Aritifical Forces</a><br>
-  <a href="./examples/mouseCollisionTest.html">Mouse Collision Detection</a><br>
-  <a href="./examples/spriteCollisionTest.html">Sprite to Sprite Collision Detection</a><br>
-  <a href="./examples/textBoxTest.html">TextBox Demonstration</a><br>
-</p>
+        <p>
+          This project is still very much in it's infancy. Included here are
+          a few basic proofs of concept. This engine is by no means complete
+          and I gladly welcome any and all comments/criticizms/collaborations.<br>
+          <a href="./examples/basicAnimationTest.html">Animation Demonstration</a><br>
+          <a href="./examples/basicMotionTest.html">Linear Motion Demonstration</a><br>
+          <a href="./examples/basicSpinTest.html">Angular Motion Demonstration</a><br>
+          <a href="./examples/basicVectorTest.html">Aritifical Forces Demonstration</a><br>
+          <a href="./examples/textBoxTest.html">TextBox Demonstration</a><br>
+          <a href="./examples/mouseCollisionTest.html">Mouse Collision Detection</a><br>
+          <a href="./examples/spriteCollisionTest.html">Sprite Collision Detection</a><br>
+        </p>
 
-<h1>
-<a id="using-the-engine" class="anchor" href="#using-the-engine" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using the Engine</h1>
+        <h1>
+          <a id="using-the-engine" class="anchor" href="#using-the-engine" aria-hidden="true">
+            <span class="octicon octicon-link"></span>
+          </a>
+          Using the Engine
+        </h1>
 
-<p>If you would like to use the Greenhorn Gaming Engine to create your own games, all you must do
-is download the file Greenhorn/lib/Greenhorn.js and include it in your webpage like this:</p>
+        <p>
+          If you would like to use the Greenhorn Gaming Engine to create your own games, all you must do
+          is download the file lib/Greenhorn.js and include it in your webpage like this:
+        </p>
 
-<pre><code>&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-  &lt;head&gt;
-    &lt;script type="text/javascript" src="path/to/Greenhorn.js"&gt;&lt;/script&gt;
-    &lt;script type="text/javascript"&gt;
-      //set up the environment
-      env.IMAGE_PATH = "path/to/images/"; //etc.
-
-      //name your objects as globally available
-      var sprite1, sprite2, textbox1; //etc.
-
-      //the init function is called by the body onload
-      function init() {
-        //initialize objects
-        sp1 = new Sprite(); //etc
-
-        //do any document specific setup
-        myDiv = document.getElementById("myDiv"); //etc
-
-        //start the engine (very important)
-        Greenhorn.start();
-      }//end init
-
-      //your own personal update function is called once per frame
-      function update() {
-        //handle events here
-        if(keyDown[KEYS.UP]) {
-          //do something
-        }//end if
-        if(sprite1.collidesWith(sprite2)) {
-          //do something
-        }//end if
-        //etc.
-  &lt;/head&gt;
-  &lt;body onload="init()"&gt;
-    &lt;div id="myDiv"&gt;&lt;/div&gt;
-  &lt;/body&gt;
-&lt;/html&gt;
-</code></pre>
+        <code>&lt;script type="text/javascript" src="path/to/Greenhorn.js"&gt;&lt;/script&gt;</code>
+        
+        <p>
+          Some rough documentation can be found
+          <a href="https://github.com/sedabull/Greenhorn/wiki/API">here</a>.
+          Please forgive it's incompleteness, just like this library, it's
+          still a work-in-progress.
+        </p>
       </section>
     </div>
 
