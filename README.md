@@ -1,59 +1,19 @@
 Greenhorn Gaming Engine
 =======================
 
-This project started out as a simple excersise in learning CoffeeScript.
-I had previously worked with Andy Harris' simpleGame.js (included in history/)
-and I decided to rewrite it in CS. It quickly became an obsession, and now I am
-publishing it here, in the hopes that it will continue to grow into something amazing.
+So why Greenhorn? A *greenhorn* is an untrained or inexperienced person, and that's exactly who this library is written for. I myself am a greenhorn when it comes to both game programming and CoffeeScript (the language this library is written in), so it only seemed natural to call a gaming library written by a greenhorn for other greenhorns **The Greenhorn Gaming Engine** (creative I know). The idea here is that anyone with very minimal web design knowledge should be able to sit down and in just a few hours create their very own video game. The philosophy and design of this library are borrowed directly from the author of the [simpleGame.js](http://aharrisbooks.net/h5g) gaming engine, Andy Harris. Andy is the introductory Computer Science professor at [IUPUI](http://iupui.edu), where I attend classes. If you'd like to understand how I got started on this project, you should check out his book *HTML5 Game Development for Dummies*. It's a great introductory resource and is foundation upon which I've built this engine.
 
 Working Examples
 ================
 
-For the time being you can check out a few working examples at https://cs.iupui.edu/~sedabull.
-I hope to have a more permanent website with demonstrations soon!
+The official website can be found [here](http://sedabull.github.io/Greenhorn). There are several working examples up and running, and I hope to have a few full fledged games up as well as soon as is humanly possible.
 
 Using the Engine
 ================
 
 If you would like to use the Greenhorn Gaming Engine to create your own games, all you must do
-is download the file Greenhorn/lib/Greenhorn.js and include it in your webpage like this:
+is download the file lib/Greenhorn.js and include it in your webpage like this:
+```html
+<script type="text/javascript" src="path/to/Greenhorn.js"></script>
 ```
-<!DOCTYPE html>
-<html>
-  <head>
-    <script type="text/javascript" src="path/to/Greenhorn.js"></script>
-    <script type="text/javascript">
-      //set up the environment
-      env.IMAGE_PATH = "path/to/images/"; //etc.
-      
-      //name your objects as globally available
-      var sprite1, sprite2, textbox1; //etc.
-      
-      //the init function is called by the body onload
-      function init() {
-        //initialize objects
-        sp1 = new Sprite(); //etc
-        
-        //do any document specific setup
-        myDiv = document.getElementById("myDiv"); //etc
-        
-        //start the engine (very important)
-        Greenhorn.start();
-      }//end init
-      
-      //your own personal update function is called once per frame
-      function update() {
-        //handle events here
-        if(keyDown[KEYS.UP]) {
-          //do something
-        }//end if
-        if(sprite1.collidesWith(sprite2)) {
-          //do something
-        }//end if
-        //etc.
-  </head>
-  <body onload="init()">
-    <div id="myDiv"></div>
-  </body>
-</html>
-```
+Some rough documentation can be found [here](http://github.com/sedabull/Greenhorn/wiki/API). Please keep in mind though that the documentation, along with everything else about this library, is still very much a work in progress.
