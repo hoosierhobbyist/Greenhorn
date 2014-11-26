@@ -65,7 +65,10 @@ The Greenhorn Gaming environment object
         numFrames: 8
     #default sound settings
     SOUND_PATH: ""
-    SOUND_DEFAULT_URL: ""
+    USE_AUDIO_TAG: false
+    SOUND_DEFAULT_CONFIG:
+        url: ""
+        playOnLoad: false
     #default timer settings
     TIMER_START_ON_CONSTRUCTION: yes
     #default button settings
