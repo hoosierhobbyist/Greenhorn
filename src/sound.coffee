@@ -13,20 +13,21 @@ _audioContext = new AudioContext()
 #simple sound class
 class @Sound
     #constructor
-    constructor: (url = env.SOUND_DEFAULT_URL) ->
+    constructor: (url = env.SOUND_DEFAULT_URL, playOnLoad = false) ->
         #instance variables
+        @_buffer = null
+        @_source = null
         @_url = env.SOUND_PATH.concat url
-        @_source = _audioContext.createBufferSource()
         
         #request setup
         request = new XMLHttpRequest()
-        request.responseType = 'arraybuffer'
         request.open 'GET', @_url, true
+        request.responseType = 'arraybuffer'
         
         #request event handlers
         request.successCallback = (buffer) =>
-            @_source.buffer = buffer
-            @_source.connect _audioContext.destination
+            @_buffer = buffer
+            @play() if playOnLoad
         request.errorCallback = ->
             throw new Error "AudioContext Error"
         request.onload = ->
@@ -37,7 +38,10 @@ class @Sound
     
     #sound control
     play: (opt = {}) ->
+        @_source = _audioContext.createBufferSource()
+        @_source.buffer = @_buffer
         @_source.loop = opt.loop ? false
+        @_source.connect _audioContext.destination
         @_source.start 0
     stop: ->
         @_source.stop 0
