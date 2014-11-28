@@ -87,9 +87,13 @@ class @Sound
     play: (opt = {}) ->
         if env.USE_AUDIO_TAG
             @_audio.loop = opt.loop ? false
+            @_audio.volume = opt.volume ? 1.0
             @_audio.play()
         else
             if @_isEnded
+                gainNode = _audioContext.createGain()
+                gainNode.gain.value = opt.volume ? 1.0
+                
                 @_isEnded = false
                 @_source = _audioContext.createBufferSource()
                 @_source.buffer = @_buffer
@@ -97,7 +101,8 @@ class @Sound
                     @_isEnded = true
                 
                 @_source.loop = opt.loop ? false
-                @_source.connect _audioContext.destination
+                @_source.connect gainNode
+                gainNode.connect _audioContext.destination
                 @_source.start()
     stop: ->
         if env.USE_AUDIO_TAG
