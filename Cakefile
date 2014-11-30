@@ -4,7 +4,7 @@ fs = require 'fs'
 {spawn, exec} = require 'child_process'
 
 compile = (source, destination, callback) ->
-    coffee = spawn 'coffee', [-c, -o, "#{destination}", "#{source}"]
+    coffee = spawn 'coffee', ['-c', '-b', '-o', "#{destination}", "#{source}"]
     
     coffee.stderr.on 'data', (data) ->
         process.stderr.write data.toString()
@@ -19,8 +19,8 @@ makeHTML = (source) ->
     <html lang='en-US'>
       <head>
         <meta charset='UTF-8'>
-        <script type='text/javascript' src='../lib/Greenhorn.js'>
-        <script type='text/javascript' src='#{source}'>
+        <script type='text/javascript' src='../lib/Greenhorn.js'></script>
+        <script type='text/javascript' src='#{source}'></script>
       </head>
       <body onload='init()'>
       </body>
