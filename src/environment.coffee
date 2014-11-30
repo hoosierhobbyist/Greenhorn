@@ -10,7 +10,7 @@ The Greenhorn Gaming environment object
     #document body settings
     BODY_BACKGROUND_COLOR: "goldenrod"
     #default engine settings
-    ENGINE_TITLE: document.title
+    ENGINE_TITLE: ""
     ENGINE_LEFT_PANEL: "LEFT PANEL"
     ENGINE_RIGHT_PANEL: "RIGHT PANEL"
     ENGINE_BOTTOM_PANEL: "BOTTOM PANEL"

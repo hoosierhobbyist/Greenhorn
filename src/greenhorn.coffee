@@ -178,7 +178,7 @@ class @Greenhorn
         @_elmnts.canvas.getContext("2d").translate(@get("canvas", "width") / 2, @get("canvas", "height") / 2)
         
         #set the innerHTML of each element
-        @set "title", "innerHTML", env.ENGINE_TITLE
+        @set "title", "innerHTML", env.ENGINE_TITLE ? document.title
         @set "leftPanel", "innerHTML", env.ENGINE_LEFT_PANEL
         @set "rightPanel", "innerHTML", env.ENGINE_RIGHT_PANEL
         @set "bottomPanel", "innerHTML", env.ENGINE_BOTTOM_PANEL
