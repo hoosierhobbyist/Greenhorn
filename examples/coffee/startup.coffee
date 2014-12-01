@@ -25,3 +25,5 @@ init = ->
 #define update() to be called once per frame
 update = ->
     #handle any game specific events here
+    
+#end update
