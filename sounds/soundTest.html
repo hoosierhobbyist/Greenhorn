@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>Sound Test</title>
+    <script type="text/javascript"
+            src ="../lib/Greenhorn.js"></script>
+    <script type="text/javascript">
+        //adjust Game Enviorment here
+        //env.IMAGE_PATH = "path/to/images/", etc.
+        env.USE_AUDIO_TAG = false;
+        env.SOUND_PATH = "./sounds/";
+        
+        //name Sprites as globally avaliable
+        //var sprite1, sprite2, ... spriteN
+        var test, soundFX;
+        
+        function init(){
+            //initialize Sprites
+            //sprite1 = new Sprite("path/to/image.png", width, height), etc.
+            test = new Sound({url: "heroic_minority.mp3", playOnLoad: true});
+            soundFX = new Sound({url: "jalastram/SFX_Pickup_20.wav"});
+            
+            //do any page specific setup here
+            
+            //start the glblScene
+            Greenhorn.start();
+        }//end init
+        
+        //create an update function that will be called once per frame
+        //inbetween the screen being cleared and the sprites being redrawn
+        function update(){
+            //handle game specific events here
+            //e.g. win or lose conditions
+            if (keysDown[KEYS.SPACE]) {
+                soundFX.play({volume: .1, loop: true});
+            }//end if
+        }//end update
+    </script>
+</head>
+<body onload = "init()"></body>
+</html>
