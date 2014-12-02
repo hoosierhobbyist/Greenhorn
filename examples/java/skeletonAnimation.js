@@ -5,41 +5,65 @@ skeletonAnimation.coffee
 
 a simple example of the AniSprite class
  */
-var bones, init, update;
+var bones, crystals, init, update;
 
 document.title = 'Skeleton Animation';
 
 env.IMAGE_PATH = '../images/';
 
-env.ANISPRITE_DEFAULT_CONFIG.numFrames = 9;
+env.ANISPRITE_DEFAULT_CONFIG.frameRate = 10;
+
+env.ENGINE_BOTTOM_PANEL = 'Use the arrow keys to control bones and collect the crystals';
+
+env.ENGINE_RIGHT_PANEL = '<ul>\n<li id="blue">blue: </li>\n<li id="green">green: </li>\n<li id="grey">grey: </li>\n<li id="orange">orange: </li>\n<li id="pink">pink: </li>\n<li id="yellow">yellow: </li>';
 
 bones = null;
 
+crystals = {};
+
 init = function() {
+  var color, colors, _i, _len;
+  colors = ['blue', 'green', 'grey', 'orange', 'pink', 'yellow'];
+  for (_i = 0, _len = colors.length; _i < _len; _i++) {
+    color = colors[_i];
+    crystals[color] = new AniSprite({
+      imageFile: "" + color + "Crystal.png",
+      x: Math.random() * 400 - 200,
+      y: Math.random() * 300 - 150,
+      width: 32,
+      height: 32,
+      cycleSPIN: {
+        row: 1
+      }
+    });
+  }
   bones = new AniSprite({
     imageFile: 'skeleton.png',
-    frameRate: 8,
-    sheetWidth: 576,
-    sheetHeight: 256,
+    boundAction: 'STOP',
     cellWidth: 64,
     cellHeight: 64,
     cycleUP: {
-      row: 9
+      row: 9,
+      numFrames: 9
     },
     cycleLEFT: {
-      row: 10
+      row: 10,
+      numFrames: 9
     },
     cycleDOWN: {
-      row: 11
+      row: 11,
+      numFrames: 9
     },
     cycleRIGHT: {
-      row: 12
+      row: 12,
+      numFrames: 9
     }
   });
   return Greenhorn.start();
 };
 
 update = function() {
+  var color, crystal;
   if (keysDown[KEYS.UP]) {
     bones.change('y', 50);
     bones.set('current', 'UP');
@@ -60,5 +84,12 @@ update = function() {
     bones.set('current', 'DOWN');
     bones.pause();
   }
-  return Greenhorn.set('bottomPanel', 'innerHTML', bones._dis.timer.getElapsedTime());
+  for (color in crystals) {
+    crystal = crystals[color];
+    if (bones.collidesWith(crystal)) {
+      crystal.set('visible', false);
+      document.getElementById(color).innerHTML = "" + color + ": FOUND!";
+    }
+  }
+  return Greenhorn.set('leftPanel', 'innerHTML', bones.report());
 };

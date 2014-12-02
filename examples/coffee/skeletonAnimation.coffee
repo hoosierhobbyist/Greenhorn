@@ -9,29 +9,55 @@ document.title = 'Skeleton Animation'
 
 #setup the environment
 env.IMAGE_PATH = '../images/'
-env.ANISPRITE_DEFAULT_CONFIG.numFrames = 9
+env.ANISPRITE_DEFAULT_CONFIG.frameRate = 10
+env.ENGINE_BOTTOM_PANEL = 'Use the arrow keys to control bones and collect the crystals'
+env.ENGINE_RIGHT_PANEL =
+    '''
+    <ul>
+    <li id="blue">blue: </li>
+    <li id="green">green: </li>
+    <li id="grey">grey: </li>
+    <li id="orange">orange: </li>
+    <li id="pink">pink: </li>
+    <li id="yellow">yellow: </li>
+    '''
 
 #declare global variables
 bones = null
+crystals = {}
 
 #define init() to be called by body.onload
 init = ->
     #initialize variables
+    colors = ['blue', 'green', 'grey', 'orange', 'pink', 'yellow']
+    for color in colors
+        crystals[color] = new AniSprite({
+            imageFile: "#{color}Crystal.png"
+            x: Math.random() * 400 - 200
+            y: Math.random() * 300 - 150
+            width: 32
+            height: 32
+            cycleSPIN:
+                row: 1
+        })
+    
     bones = new AniSprite({
         imageFile: 'skeleton.png'
-        frameRate: 8
-        sheetWidth: 576
-        sheetHeight: 256
+        boundAction: 'STOP'
         cellWidth: 64
         cellHeight: 64
         cycleUP:
             row: 9
+            numFrames: 9
         cycleLEFT:
             row: 10
+            numFrames: 9
         cycleDOWN:
             row: 11
+            numFrames: 9
         cycleRIGHT:
             row: 12
+            numFrames: 9
     })
     
     #document specific setup
@@ -63,5 +89,10 @@ update = ->
         bones.set 'current', 'DOWN'
         bones.pause()
     
-    Greenhorn.set 'bottomPanel', 'innerHTML', bones._dis.timer.getElapsedTime()
+    for color, crystal of crystals
+        if bones.collidesWith crystal
+            crystal.set 'visible', off
+            document.getElementById(color).innerHTML = "#{color}: FOUND!"
+    
+    Greenhorn.set 'leftPanel', 'innerHTML', bones.report()
 #end update
