@@ -56,8 +56,6 @@ The Greenhorn Gaming environment object
         marginsRight: 5
         marginsLeft: 5
     ANISPRITE_DEFAULT_CONFIG:
-        sheetWidth: 256
-        sheetHeight: 256
         cellWidth: 32
         cellHeight: 32
         frameRate: 5

@@ -27,7 +27,7 @@ class @AniSprite extends @Sprite
     #getter
     get: (what) ->
         switch what
-            when "sheetWidth", "sheetHeight", "cellWidth", "cellHeight", "frameRate"
+            when "cellWidth", "cellHeight", "frameRate"
                 @_dis[what]
             when "current"
                 @_dis.current.name
@@ -36,14 +36,13 @@ class @AniSprite extends @Sprite
     
     #setter
     set: (what, to) ->
-        if what is "sheetWidth" or
-        what is "sheetHeight" or
-        what is "cellWidth" or
+        if what is "cellWidth" or
         what is"cellHeight" or
         what is"frameRate"
             @_dis[what] = to
         else if what is "current"
-            @_dis.current.frame = 1
+            if to isnt @_dis.current.name
+                @_dis.current.frame = 1
             for cycle in @_dis.cycles when cycle.name is to
                 @_dis.current = cycle
         else if what.indexOf("cycle") is 0
