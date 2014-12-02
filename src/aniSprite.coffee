@@ -69,33 +69,35 @@ class @AniSprite extends @Sprite
     
     #update routines
     _draw: ->
-        #save current context
-        @_dis.context.save()
-        
-        #translate and rotate
-        @_dis.context.translate @_pos.x, -@_pos.y
-        @_dis.context.rotate -@_pos.a
-        
-        #draw frame
-        @_dis.context.drawImage( 
-            @_dis.image, #spritesheet
-            (@_dis.current.frame - 1) * @_dis.cellWidth, #sx
-            (@_dis.current.row - 1) * @_dis.cellHeight, #sy
-            @_dis.cellWidth, #swidth
-            @_dis.cellHeight, #sheight
-            -@_dis.width / 2, #x
-            -@_dis.height / 2, #y
-            @_dis.width, #width
-            @_dis.height) #height
-        
-        #restore context
-        @_dis.context.restore()
+        if @_dis.visible
+            #save current context
+            @_dis.context.save()
+            
+            #translate and rotate
+            @_dis.context.translate @_pos.x, -@_pos.y
+            @_dis.context.rotate -@_pos.a
+            
+            #draw frame
+            @_dis.context.drawImage( 
+                @_dis.image, #spritesheet
+                (@_dis.current.frame - 1) * @_dis.cellWidth, #sx
+                (@_dis.current.row - 1) * @_dis.cellHeight, #sy
+                @_dis.cellWidth, #swidth
+                @_dis.cellHeight, #sheight
+                -@_dis.width / 2, #x
+                -@_dis.height / 2, #y
+                @_dis.width, #width
+                @_dis.height) #height
+            
+            #restore context
+            @_dis.context.restore()
     _update: =>
-        if @_dis.timer.getElapsedTime() >= (1000 / @_dis.frameRate)
-            if @_dis.current.frame < @_dis.current.numFrames
-                @_dis.current.frame += 1
-            else
-                @_dis.current.frame = 1
-            @_dis.timer.restart()
-        super()
+        if @_dis.visible
+            if @_dis.timer.getElapsedTime() >= (1000 / @_dis.frameRate)
+                if @_dis.current.frame < @_dis.current.numFrames
+                    @_dis.current.frame += 1
+                else
+                    @_dis.current.frame = 1
+                @_dis.timer.restart()
+            super()
 #end class AniSprite

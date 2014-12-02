@@ -253,11 +253,12 @@ class @Sprite
     
     #update routines
     _draw: ->
-        @_dis.context.save()
-        @_dis.context.translate @_pos.x, -@_pos.y
-        @_dis.context.rotate -@_pos.a
-        @_dis.context.drawImage @_dis.image, -@_dis.width / 2, -@_dis.height / 2, @_dis.width, @_dis.height
-        @_dis.context.restore()
+        if @_dis.visible
+            @_dis.context.save()
+            @_dis.context.translate @_pos.x, -@_pos.y
+            @_dis.context.rotate -@_pos.a
+            @_dis.context.drawImage @_dis.image, -@_dis.width / 2, -@_dis.height / 2, @_dis.width, @_dis.height
+            @_dis.context.restore()
     _update: =>
         if @_dis.visible
             @change "motion", @_acc
