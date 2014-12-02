@@ -16,6 +16,8 @@ env.USE_AUDIO_TAG = true;
 
 env.ENGINE_BOTTOM_PANEL = 'Press the space bar to hear a random sound';
 
+env.ENGINE_LEFT_PANEL = '<p>\nFull credit for these\nsound effects goes to\n<a href="http://opengameart.org/users/jalastram">jalastram</a>\n</p>';
+
 init = function() {
   return Greenhorn.start();
 };

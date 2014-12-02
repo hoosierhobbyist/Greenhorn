@@ -10,7 +10,17 @@ var init, update;
 
 document.title = 'Startup Page';
 
+env.SOUND_PATH = '../sounds/';
+
+env.USE_AUDIO_TAG = true;
+
+env.ENGINE_BOTTOM_PANEL = 'I found this background track <a href="http://opengameart.org/content/heroic-minority">here</a>.';
+
 init = function() {
+  new Sound({
+    url: 'heroic_minority.mp3',
+    playOnLoad: true
+  });
   return Greenhorn.start();
 };
 

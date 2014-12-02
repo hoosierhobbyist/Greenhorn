@@ -12,6 +12,14 @@ document.title = 'Pickup Sounds'
 env.SOUND_PATH = '../sounds/'
 env.USE_AUDIO_TAG = true
 env.ENGINE_BOTTOM_PANEL = 'Press the space bar to hear a random sound'
+env.ENGINE_LEFT_PANEL =
+    '''
+    <p>
+    Full credit for these
+    sound effects goes to
+    <a href="http://opengameart.org/users/jalastram">jalastram</a>
+    </p>
+    '''
 
 #declare global variables
 

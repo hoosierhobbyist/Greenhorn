@@ -5,11 +5,13 @@ skeletonAnimation.coffee
 
 a simple example of the AniSprite class
  */
-var bones, crystals, init, update;
+var bones, crystals, init, pickup, update;
 
-document.title = 'Skeleton Animation';
+document.title = 'Mr. Bones\' Crystal Pickup';
 
 env.IMAGE_PATH = '../images/';
+
+env.SOUND_PATH = '../sounds/';
 
 env.ANISPRITE_DEFAULT_CONFIG.frameRate = 10;
 
@@ -19,10 +21,15 @@ env.ENGINE_RIGHT_PANEL = '<ul>\n<li id="blue">blue: </li>\n<li id="green">green:
 
 bones = null;
 
+pickup = null;
+
 crystals = {};
 
 init = function() {
   var color, colors, _i, _len;
+  pickup = new Sound({
+    url: 'jalastram/SFX_Pickup_20.wav'
+  });
   colors = ['blue', 'green', 'grey', 'orange', 'pink', 'yellow'];
   for (_i = 0, _len = colors.length; _i < _len; _i++) {
     color = colors[_i];
@@ -87,6 +94,7 @@ update = function() {
   for (color in crystals) {
     crystal = crystals[color];
     if (bones.collidesWith(crystal)) {
+      pickup.play();
       crystal.set('visible', false);
       document.getElementById(color).innerHTML = "" + color + ": FOUND!";
     }

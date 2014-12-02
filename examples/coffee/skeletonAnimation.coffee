@@ -5,10 +5,11 @@ a simple example of the AniSprite class
 ###
 
 #name the document
-document.title = 'Skeleton Animation'
+document.title = 'Mr. Bones\' Crystal Pickup'
 
 #setup the environment
 env.IMAGE_PATH = '../images/'
+env.SOUND_PATH = '../sounds/'
 env.ANISPRITE_DEFAULT_CONFIG.frameRate = 10
 env.ENGINE_BOTTOM_PANEL = 'Use the arrow keys to control bones and collect the crystals'
 env.ENGINE_RIGHT_PANEL =
@@ -24,11 +25,16 @@ env.ENGINE_RIGHT_PANEL =
 
 #declare global variables
 bones = null
+pickup = null
 crystals = {}
 
 #define init() to be called by body.onload
 init = ->
     #initialize variables
+    pickup = new Sound({
+        url: 'jalastram/SFX_Pickup_20.wav'
+    })
+    
     colors = ['blue', 'green', 'grey', 'orange', 'pink', 'yellow']
     for color in colors
         crystals[color] = new AniSprite({
@@ -91,6 +97,7 @@ update = ->
     
     for color, crystal of crystals
         if bones.collidesWith crystal
+            pickup.play()
             crystal.set 'visible', off
             document.getElementById(color).innerHTML = "#{color}: FOUND!"
     
