@@ -24,6 +24,8 @@ primarily inspired by Andy Harris'
 @keysDown = (key = false for key in (new Array(256)))
 
 #document event handlers
+document.onreadystatechange = ->
+    if document.readystate is 'complete' then init?()
 document.onkeydown = (e) ->
     e.preventDefault()
     keysDown[e.keyCode] = true
