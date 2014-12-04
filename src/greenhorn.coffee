@@ -25,7 +25,7 @@ primarily inspired by Andy Harris'
 
 #document event handlers
 document.onreadystatechange = ->
-    if document.readystate is 'complete' then init?()
+    if document.readyState is 'interactive' then init?()
 document.onkeydown = (e) ->
     e.preventDefault()
     keysDown[e.keyCode] = true
