@@ -226,30 +226,41 @@ class @Sprite
     
     #collision routines
     collidesWith: (other) ->
-        collision = true
-        if @_dis.visible and other.get("visible") and @_pos.z == other.get("z")
-            if @get("bottom") > other.get("top") or
-            @get("top") < other.get("bottom") or
-            @get("right") < other.get("left") or
-            @get("left") > other.get("right")
-                collision = false
-        else collision = false
         collision
-    collidesWithMouse: ->
-        collision = false
-        if @_dis.visible
-            if @get("left") < Greenhorn.getMouseX() < @get("right") and
-            @get("bottom") < Greenhorn.getMouseY() < @get("top")
-                collision = true
+        if other is 'mouse'
+            collision = false
+            if @_dis.visible
+                if @get("left") < Greenhorn.getMouseX() < @get("right") and
+                @get("bottom") < Greenhorn.getMouseY() < @get("top")
+                    collision = true
+        else
+            collision = true
+            if @_dis.visible and other.get("visible") and @_pos.z == other.get("z")
+                if @get("bottom") > other.get("top") or
+                @get("top") < other.get("bottom") or
+                @get("right") < other.get("left") or
+                @get("left") > other.get("right")
+                    collision = false
+            else collision = false
         collision
     distanceTo: (other) ->
-        Math.sqrt (@_pos.x - other.get("x"))**2 + (@_pos.y - other.get("y"))**2
-    distanceToMouse: ->
-        Math.sqrt (@_pos.x - Greenhorn.getMouseX())**2 + (@_pos.y - Greenhorn.getMouseY())**2
+        otherX = otherY = 0
+        if other is 'mouse'
+            otherX = Greenhorn.getMouseX()
+            otherY = Greenhorn.getMouseY()
+        else
+            otherX = other.get 'x'
+            otherY = other.get 'y'
+        Math.sqrt (@_pos.x - otherX)**2 + (@_pos.y - otherY)**2
     angleTo: (other) ->
-        -Math.atan2 other.get("y") - @_pos.y, other.get("x") - @_pos.x
-    angleToMouse: ->
-        -Math.atan2 Greenhorn.getMouseY() - @_pos.y, Greenhorn.getMouseX() - @_pos.x
+        otherX = otherY = 0
+        if other is 'mouse'
+            otherX = Greenhorn.getMouseX()
+            otherY = Greenhorn.getMouseY()
+        else
+            otherX = other.get 'x'
+            otherY = other.get 'y'
+        -Math.atan2 otherY - @_pos.y, otherX - @_pos.x
     
     #update routines
     _draw: ->
