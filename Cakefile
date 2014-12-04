@@ -22,7 +22,7 @@ makeHTML = (source) ->
         <script type='text/javascript' src='../lib/Greenhorn.js'></script>
         <script type='text/javascript' src='#{source}'></script>
       </head>
-      <body onload='init()'>
+      <body>
       </body>
     </html>
     """
