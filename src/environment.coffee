@@ -8,7 +8,7 @@ The Greenhorn Gaming environment object
     #miscellaneous
     FRAME_RATE: 25
     #document body settings
-    BODY_BACKGROUND_COLOR: "goldenrod"
+    BODY_BACKGROUND_COLOR: "black"
     #default engine settings
     ENGINE_LEFT_PANEL: "LEFT PANEL"
     ENGINE_RIGHT_PANEL: "RIGHT PANEL"
@@ -69,5 +69,9 @@ The Greenhorn Gaming environment object
     #default timer settings
     TIMER_START_ON_CONSTRUCTION: yes
     #default button settings
-    BUTTON_DEFAULT_LABEL: "Launch the Missiles!"
+    BUTTON_DEFAULT_CONFIG:
+        style: {}
+        onclick: ->
+        elmnt: 'bottomPanel'
+        label: "Launch the Missiles!"
 #end environment object
