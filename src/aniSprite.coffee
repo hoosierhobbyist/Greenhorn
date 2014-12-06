@@ -47,7 +47,7 @@ class @AniSprite extends @Sprite
                 @_dis.current = cycle
         else if what.indexOf("cycle") is 0
             @_dis.cycles ?= new Array()
-            @_dis.timer ?= new Timer()
+            @_dis.timer ?= new Timer(true)
             
             i = 0
             to.name ?= what.slice 5
