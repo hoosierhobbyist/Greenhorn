@@ -26,16 +26,20 @@ key = false for key in @isDown
 
 #document event handlers
 document.onreadystatechange = ->
-    if @readyState is 'interactive' then (init ? Greenhorn.start).call()
+    if @readyState is 'interactive' then (init ? Greenhorn.start)()
+    return
 document.onkeydown = (e) ->
     e.preventDefault()
     isDown[e.keyCode] = true
+    return
 document.onkeyup = (e) ->
     e.preventDefault()
     isDown[e.keyCode] = false
+    return
 document.onmousemove = (e) ->
     @mouseX = e.pageX
     @mouseY = e.pageY
+    return
 
 #integer ID used to start and stop _masterUpdate
 _masterID = null
@@ -57,27 +61,35 @@ _masterUpdate = ->
 class @Greenhorn
     #create Engine elements
     _elmnts =
-        main: document.createElement("div")
-        title: document.createElement("h1")
-        leftPanel: document.createElement("div")
-        canvas: document.createElement("canvas")
-        rightPanel: document.createElement("div")
-        bottomPanel: document.createElement("div")
+        main: document.createElement('div')
+        title: document.createElement('h1')
+        leftPanel: document.createElement('div')
+        leftPanelHeader: document.createElement('h3')
+        canvas: document.createElement('canvas')
+        rightPanel: document.createElement('div')
+        rightPanelHeader: document.createElement('h3')
+        bottomPanel: document.createElement('div')
     
     #give id's to all elements
-    _elmnts.main.id = 'Greenhorn'
+    _elmnts.main.id = 'gh-main'
     _elmnts.title.id = 'gh-title'
     _elmnts.leftPanel.id = 'gh-left-panel'
+    _elmnts.leftPanelHeader.id = 'gh-left-panel-header'
     _elmnts.canvas.id = 'gh-canvas'
     _elmnts.rightPanel.id = 'gh-right-panel'
+    _elmnts.rightPanelHeader.id = 'gh-right-panel-header'
     _elmnts.bottomPanel.id = 'gh-bottom-panel'
     
-    #append all children to @_main
+    #append all primary children to main div
     _elmnts.main.appendChild _elmnts.title
     _elmnts.main.appendChild _elmnts.leftPanel
     _elmnts.main.appendChild _elmnts.canvas
     _elmnts.main.appendChild _elmnts.rightPanel
     _elmnts.main.appendChild _elmnts.bottomPanel
+    
+    #append headers to panels
+    _elmnts.leftPanel.appendChild _elmnts.leftPanelHeader
+    _elmnts.rightPanel.appendChild _elmnts.rightPanelHeader
     
     #mouse position
     @getMouseX = -> document.mouseX - @get("main", "offsetLeft") - @get("canvas", "offsetLeft") - @get("canvas", "width") / 2
@@ -102,7 +114,7 @@ class @Greenhorn
         
         #add environment defaults to config
         #if the user has chosen to omit them
-        for own key, value of env.BUTTON_DEFAULT_CONFIG when key isnt style
+        for own key, value of env.BUTTON_DEFAULT_CONFIG when key isnt 'style'
             config[key] ?= value
         for own key, value of env.BUTTON_DEFAULT_CONFIG.style
             config.style ?= {}
@@ -112,14 +124,14 @@ class @Greenhorn
         button = document.createElement "button"
         
         #set values
-        button.id = "gh-button#{_buttonID}"
+        button.id = "gh-button-#{_buttonID}"
         button.setAttribute "type", "button"
         button.innerHTML = config.label
-        button.style = config.style
         button.onclick = config.onclick
+        button.style[key] = value for own key, value of config.style
         
         #append to an element
-        _elmnts[config.elmnt].appendChild button
+        _elmnts[config.parent].appendChild button
     
     #game control
     @start = =>
@@ -127,7 +139,7 @@ class @Greenhorn
         document.body.appendChild _elmnts.main
         
         #change the document body's backgroundColor
-        document.body.style.backgroundColor = env.BODY_BACKGROUND_COLOR
+        document.body.style.backgroundColor = env.ENGINE.backgroundColor
         
         #basic style formatting for elements
         mainStyle =
@@ -136,10 +148,10 @@ class @Greenhorn
             display: 'inline-block'
             marginTop: '5%'
             marginLeft: '13%'
-            border: '5px solid silver'
+            border: "5px solid #{env.ENGINE.accentColor}"
             borderRadius: '15px'
             fontFamily: 'Tahoma, Geneva, sans-serif'
-            backgroundColor: env.ENGINE_BACKGROUND_COLOR
+            backgroundColor: env.ENGINE.foregroundColor
         titleStyle =
             width: '100%'
             textAlign: 'center'
@@ -150,38 +162,30 @@ class @Greenhorn
             marginBottom: '0px'
             paddingBottom: '1%'
             borderRadius: 'inherit'
-            borderBottom: '1px solid silver'
-            backgroundColor: 'inherit'
-        leftPanelStyle =
+            borderBottom: "1px solid #{env.ENGINE.accentColor}"
+        panelStyle =
             width: '15%'
             height: '78%'
             cssFloat: 'left'
-            clear: 'left'
             display: 'initial'
             margin: '1%'
             overflow: 'auto'
             whiteSpace: 'pre'
             fontSize: '.75em'
-            backgroundColor: 'inherit'
+        panelHeaderStyle =
+            textAlign: 'center'
+            marginTop: '0'
+            marginBottom: '5px'
+            paddingBottom: '2px'
+            borderBottom: "2px solid #{env.ENGINE.backgroundColor}"
         canvasStyle =
             width: '65%'
             height: '78%'
             display: 'initial'
             cssFloat: 'left'
-            borderRight: '1px solid silver'
-            borderLeft: '1px solid silver'
-            backgroundColor: env.ENGINE_CANVAS_COLOR
-        rightPanelStyle =
-            width: '15%'
-            height: '78%'
-            display: 'initial'
-            cssFloat: 'left'
-            clear: 'right'
-            margin: '1%'
-            overflow: 'auto'
-            whiteSpace: 'pre'
-            fontSize: '.75em'
-            backgroundColor: 'inherit'
+            borderRight: "1px solid #{env.ENGINE.accentColor}"
+            borderLeft: "1px solid #{env.ENGINE.accentColor}"
+            backgroundColor: env.ENGINE.backgroundColor
         bottomPanelStyle =
             width: '100%'
             display: 'initial'
@@ -191,16 +195,17 @@ class @Greenhorn
             paddingTop: '1%'
             marginBottom: '1%'
             borderRadius: 'inherit'
-            borderTop: '1px solid silver'
+            borderTop: "1px solid #{env.ENGINE.accentColor}"
             fontSize: '1em'
-            backgroundColor: 'inherit'
         
         #set the style of each element
         @set "main", "style", mainStyle
         @set "title", "style", titleStyle
-        @set "leftPanel", "style", leftPanelStyle
+        @set "leftPanel", "style", panelStyle
+        @set "leftPanelHeader", "style", panelHeaderStyle
         @set "canvas", "style", canvasStyle
-        @set "rightPanel", "style", rightPanelStyle
+        @set "rightPanel", "style", panelStyle
+        @set "rightPanelHeader", "style", panelHeaderStyle
         @set "bottomPanel", "style", bottomPanelStyle
         
         #set the actual size of the canvas to prevent distortion
@@ -214,9 +219,9 @@ class @Greenhorn
         
         #set the innerHTML of each element
         @set "title", "innerHTML", document.title
-        @set "leftPanel", "innerHTML", env.ENGINE_LEFT_PANEL
-        @set "rightPanel", "innerHTML", env.ENGINE_RIGHT_PANEL
-        @set "bottomPanel", "innerHTML", env.ENGINE_BOTTOM_PANEL
+        @set "leftPanelHeader", "innerHTML", env.ENGINE.leftHeader
+        @set "rightPanelHeader", "innerHTML", env.ENGINE.rightHeader
+        @set "bottomPanel", "innerHTML", env.ENGINE.footer
         @set "canvas", "innerHTML", "your browser does not support the <canvas> tag"
         
         #start running _masterUpdate at env.FRAME_RATE frames/sec
@@ -225,7 +230,12 @@ class @Greenhorn
     @stop = ->
         clearInterval _masterID
     @clear = ->
-        _elmnts.canvas.getContext("2d").clearRect(-@get("canvas", "width") / 2, -@get("canvas", "height") / 2, @get("canvas", "width"), @get("canvas", "height"))
+        _elmnts.canvas.getContext("2d")
+        .clearRect(
+            -@get("canvas", "width") / 2,
+            -@get("canvas", "height") / 2,
+            @get("canvas", "width"),
+            @get("canvas", "height"))
     @hide = ->
         @set "main", "style", {"display": "none"}
     @show = ->

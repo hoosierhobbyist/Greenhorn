@@ -5,16 +5,17 @@ The Greenhorn Gaming environment object
 ###
 
 @env =
-    #miscellaneous
+    _env: this
+    #frame rate
     FRAME_RATE: 25
-    #document body settings
-    BODY_BACKGROUND_COLOR: "black"
-    #default engine settings
-    ENGINE_LEFT_PANEL: "LEFT PANEL"
-    ENGINE_RIGHT_PANEL: "RIGHT PANEL"
-    ENGINE_BOTTOM_PANEL: "BOTTOM PANEL"
-    ENGINE_CANVAS_COLOR: "black"
-    ENGINE_BACKGROUND_COLOR: "darkgreen"
+    #Greenhorn engine style
+    ENGINE:
+        accentColor: 'silver'
+        backgroundColor: 'black'
+        foregroundColor: 'darkgreen'
+        footer: 'BOTTOM PANEL'
+        leftHeader: 'LEFT PANEL'
+        rightHeader: 'RIGHT PANEL'
     #default Sprite settings
     IMAGE_PATH: ""
     SPRITE_DEFAULT_CONFIG:
@@ -70,8 +71,15 @@ The Greenhorn Gaming environment object
     TIMER_START_ON_CONSTRUCTION: yes
     #default button settings
     BUTTON_DEFAULT_CONFIG:
-        style: {}
-        onclick: ->
-        elmnt: 'bottomPanel'
-        label: "Launch the Missiles!"
+        onclick: undefined
+        parent: 'rightPanel'
+        label: 'Launch the Missiles!'
+        style:
+            clear: 'left'
+            cssFloat: 'left'
+            width: '98%'
+            color: 'black'
+            margin: '1%'
+            fontSize: 'small'
+            backgroundColor: 'silver'
 #end environment object
