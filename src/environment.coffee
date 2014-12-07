@@ -16,6 +16,11 @@ The Greenhorn Gaming environment object
         footer: 'BOTTOM PANEL'
         leftHeader: 'LEFT PANEL'
         rightHeader: 'RIGHT PANEL'
+    #The Startup display
+    STARTUP:
+        size: 50
+        font: 'sans-serif'
+        text: 'Click here to Start'
     #default Sprite settings
     IMAGE_PATH: ""
     SPRITE_DEFAULT_CONFIG:
@@ -48,8 +53,9 @@ The Greenhorn Gaming environment object
         borderColor: "white"
         borderAlpha: 1.0
         borderVisible: yes
-        fontName: "Arial"
+        fontName: "sans-serif"
         fontSize: 8
+        fontSpacing: 4
         fontColor: "white"
         fontAlpha: 1.0
         marginsTop: 5
@@ -66,6 +72,8 @@ The Greenhorn Gaming environment object
     USE_AUDIO_TAG: false
     SOUND_DEFAULT_CONFIG:
         url: ""
+        loop: false
+        volume: 1.0
         playOnLoad: false
     #default timer settings
     TIMER_START_ON_CONSTRUCTION: yes
@@ -83,3 +91,62 @@ The Greenhorn Gaming environment object
             fontSize: 'small'
             backgroundColor: 'silver'
 #end environment object
+
+#the Greenhorn engine style object
+_style =
+    main:
+        width: '74%'
+        height: '60%'
+        display: 'inline-block'
+        marginTop: '5%'
+        marginLeft: '13%'
+        border: "5px solid #{env.ENGINE.accentColor}"
+        borderRadius: '15px'
+        fontFamily: 'Tahoma, Geneva, sans-serif'
+        backgroundColor: env.ENGINE.foregroundColor
+    title:
+        width: '100%'
+        textAlign: 'center'
+        cssFloat: 'left'
+        clear: 'both'
+        display: 'initial'
+        marginTop: '1%'
+        marginBottom: '0px'
+        paddingBottom: '1%'
+        borderRadius: 'inherit'
+        borderBottom: "1px solid #{env.ENGINE.accentColor}"
+    panel:
+        width: '15%'
+        height: '78%'
+        cssFloat: 'left'
+        display: 'initial'
+        margin: '1%'
+        overflow: 'auto'
+        whiteSpace: 'pre'
+        fontSize: '.70em'
+    panelHeader:
+        textAlign: 'center'
+        marginTop: '0'
+        marginBottom: '5px'
+        paddingBottom: '2px'
+        borderBottom: "2px solid #{env.ENGINE.backgroundColor}"
+    canvas:
+        width: '65%'
+        height: '78%'
+        display: 'initial'
+        cssFloat: 'left'
+        borderRight: "1px solid #{env.ENGINE.accentColor}"
+        borderLeft: "1px solid #{env.ENGINE.accentColor}"
+        backgroundColor: env.ENGINE.backgroundColor
+    footer:
+        width: '100%'
+        display: 'initial'
+        textAlign: 'center'
+        cssFloat: 'left'
+        clear: 'both'
+        paddingTop: '1%'
+        marginBottom: '1%'
+        borderRadius: 'inherit'
+        borderTop: "1px solid #{env.ENGINE.accentColor}"
+        fontSize: '1em'
+#end _style object
