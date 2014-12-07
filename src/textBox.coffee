@@ -13,7 +13,7 @@ class @TextBox extends @Sprite
         for own key, value of env.TEXTBOX_DEFAULT_CONFIG
             config[key] ?= value
         
-        #primary objects
+        #create primary objects
         @_text = []
         @_background = {}
         @_border = {}
@@ -57,15 +57,12 @@ class @TextBox extends @Sprite
             @_border[what.slice(6).toLowerCase()] = to
         else if what.indexOf("font") is 0
             @_font[what.slice(4).toLowerCase()] = to
+            if @_font.size? and @_font.name?
+                @_dis.context.font = "#{@_font.size}px #{@_font.name}"
         else if what.indexOf("margins") is 0
             @_margins[what.slice(7).toLowerCase()] = to
         else
             super what, to
-        
-        if @_dis.width? and @_dis.height? and @_font.size? and
-        @_margins.left? and @_margins.right? and @_margins.bottom? and
-        @_margins.top? and @_border.visible? and @_border.size?
-            @_fitText()
         this
     
     #style control
@@ -75,26 +72,10 @@ class @TextBox extends @Sprite
         @_background.visible = no
     showBorder: ->
         @_border.visible = yes
-        @_fitText()
     hideBorder: ->
         @_border.visible = no
-        @_fitText()
     
     #internal control
-    _fitText: ->
-        #calculate new size
-        @_dis.width = 0
-        @_dis.height = (@_font.size * @_text.length) + (@_font.size * (@_text.length - 1))
-        for line in @_text
-            len = @_dis.context.measureText(line).width
-            @_dis.width = len if @_dis.width < len
-        
-        #adjust for margins and border
-        @_dis.width += @_margins.left + @_margins.right
-        @_dis.height += @_margins.top + @_margins.bottom
-        if @_border.visible
-            @_dis.width += 2 * @_border.size
-            @_dis.height += 2 * @_border.size
     _draw: ->
         if @_dis.visible
             #save current context
@@ -108,34 +89,64 @@ class @TextBox extends @Sprite
             if @_background.visible
                 @_dis.context.fillStyle = @_background.color
                 @_dis.context.globalAlpha = @_background.alpha
-                @_dis.context.fillRect -@_dis.width / 2, -@_dis.height / 2, @_dis.width, @_dis.height
+                @_dis.context.fillRect(
+                    -@_dis.width / 2,
+                    -@_dis.height / 2,
+                    @_dis.width,
+                    @_dis.height)
             
             #draw borders
             if @_border.visible
                 @_dis.context.strokeStyle = @_border.color
                 @_dis.context.lineWidth = @_border.size
                 @_dis.context.globalAlpha = @_border.alpha
-                @_dis.context.strokeRect -@_dis.width / 2, -@_dis.height / 2, @_dis.width, @_dis.height
+                @_dis.context.strokeRect(
+                    -@_dis.width / 2,
+                    -@_dis.height / 2,
+                    @_dis.width,
+                    @_dis.height)
             
-            #draw text
+            #calculate text offset
             xOffset = @_margins.left
-            yOffset = @_margins.top + @_font.size
+            yOffset = @_margins.top
             if @_border.visible
                 xOffset += @_border.size
                 yOffset += @_border.size
             
             #initialize context
-            @_dis.context._font = "#{@_font.size}px #{@_font.name}"
             @_dis.context.fillStyle = @_font.color
             @_dis.context.globalAlpha = @_font.alpha
             
             #draw text on canvas
             if @_text.length > 1
                 for line, i in @_text
-                    @_dis.context.fillText line, xOffset - (@_dis.width / 2), yOffset - (@_dis.height / 2) + (@_font.size * 2 * i)
+                    @_dis.context.fillText(
+                        line,
+                        xOffset - (@_dis.width / 2),
+                        yOffset - (@_dis.height / 2) + (@_font.size * i) + (if i isnt 0 then @_font.spacing else 0))
             else
-                @_dis.context.fillText @_text[0], xOffset - (@_dis.width / 2), yOffset - (@_dis.height / 2)
+                @_dis.context.fillText(
+                    @_text[0],
+                    xOffset - (@_dis.width / 2),
+                    yOffset - (@_dis.height / 2))
             
             #restore old context
             @_dis.context.restore()
+    _update: ->
+        #calculate new size
+        @_dis.width = 0
+        @_dis.height = (@_font.size * @_text.length) + (@_font.spacing * (@_text.length - 1))
+        for line in @_text
+            len = @_dis.context.measureText(line).width
+            @_dis.width = len if @_dis.width < len
+        
+        #adjust for margins and border
+        @_dis.width += @_margins.left + @_margins.right
+        @_dis.height += @_margins.top + @_margins.bottom
+        if @_border.visible
+            @_dis.width += 2 * @_border.size
+            @_dis.height += 2 * @_border.size
+        
+        #call Sprite update
+        super()
 #end class TextBox
