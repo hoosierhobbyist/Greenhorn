@@ -5,22 +5,39 @@ Greenhorn Gaming Engine Sound class
 ###
 
 #determine what kind of AudioContext is avaliable
-if @AudioContext? or @webkitAudioContext?
-    AudioContext = @AudioContext ? @webkitAudioContext
+if window.AudioContext? or window.webkitAudioContext?
+    AudioContext = window.AudioContext ? window.webkitAudioContext
     _audioContext = new AudioContext()
 else
     env.USE_AUDIO_TAG = true
 
 #simple sound class
 class @Sound
+    #<---CLASS LEVEL--->
+    #used to track all Sound instances
+    _list = []
+    
+    #Sound class methods
+    @_playAll = ->
+        for snd in _list
+            if snd._config.playOnLoad
+                snd.play()
+            else
+                snd.play {volume: 0}
+                setTimeout snd.stop, 50
+    @_stopAll = ->
+        snd.stop() for snd in _list
+        return
+    
+    #<---INSTANCE LEVEL--->
     #constructor
-    constructor: (config = {}) ->
+    constructor: (@_config = {}) ->
         #assign default values if they have been omitted
         for own key, value of env.SOUND_DEFAULT_CONFIG
-            config[key] ?= value
+            @_config[key] ?= value
         
         #prefix the environment sound path
-        config.url = env.SOUND_PATH.concat config.url
+        @_config.url = env.SOUND_PATH.concat @_config.url
         
         #if the user has chosen to use the audio tag
         #or the current browser doesn't support the web audio api (IE)
@@ -39,17 +56,17 @@ class @Sound
             
             #assign proper srcs
             if config.url.indexOf('.mp3') isnt -1
-                mp3_src.src = config.url
-                ogg_src.src = config.url.replace '.mp3', '.ogg'
-                wav_src.src = config.url.replace '.mp3', '.wav'
+                mp3_src.src = @_config.url
+                ogg_src.src = @_config.url.replace '.mp3', '.ogg'
+                wav_src.src = @_config.url.replace '.mp3', '.wav'
             else if config.url.indexOf('.ogg') isnt -1
-                ogg_src.src = config.url
-                mp3_src.src = config.url.replace '.ogg', '.mp3'
-                wav_src.src = config.url.replace '.ogg', '.wav'
+                ogg_src.src = @_config.url
+                mp3_src.src = @_config.url.replace '.ogg', '.mp3'
+                wav_src.src = @_config.url.replace '.ogg', '.wav'
             else if config.url.indexOf('.wav') isnt -1
-                wav_src.src = config.url
-                mp3_src.src = config.url.replace '.wav', '.mp3'
-                ogg_src.src = config.url.replace '.wav', '.ogg'
+                wav_src.src = @_config.url
+                mp3_src.src = @_config.url.replace '.wav', '.mp3'
+                ogg_src.src = @_config.url.replace '.wav', '.ogg'
             else
                 throw new Error "Only .mp3, .ogg, and .wav file extensions are supported by the audio tag"
             
@@ -58,8 +75,11 @@ class @Sound
             @_audio.appendChild ogg_src
             @_audio.appendChild wav_src
             
-            if config.playOnLoad then @_audio.autoplay = true
+            #set autoplay if approprite
+            if Greenhorn.isRunning() and @_config.playOnLoad
+                @_audio.autoplay = true
         
+        #web audio API is supported
         else
             #instance variables
             @_buffer = null
@@ -68,41 +88,54 @@ class @Sound
             
             #request setup
             request = new XMLHttpRequest()
-            request.open 'GET', config.url, true
+            request.open 'GET', @_config.url, true
             request.responseType = 'arraybuffer'
             
             #request event handlers
             request.successCallback = (buffer) =>
                 @_buffer = buffer
-                if config.playOnLoad then @play()
+                if config.playOnLoad and Greenhorn.isRunning()
+                    @play()
             request.errorCallback = ->
-                throw new Error "Web Audio API Error"
+                throw new Error "AJAX request Error"
             request.onload = ->
                 _audioContext.decodeAudioData @response, @successCallback, @errorCallback
             
             #send request
             request.send()
+        
+        #add this to Sound list
+        _list.push this
     
     #sound control
     play: (opt = {}) ->
         if env.USE_AUDIO_TAG
-            @_audio.loop = opt.loop ? false
-            @_audio.volume = opt.volume ? 1.0
+            @_audio.loop = opt.loop ? @_config.loop
+            @_audio.volume = opt.volume ? @_config.volume
             @_audio.play()
         else
             if @_isEnded
-                gainNode = _audioContext.createGain()
-                gainNode.gain.value = opt.volume ? 1.0
-                
+                #set isEnded to false
                 @_isEnded = false
+                
+                #create audio nodes
+                gainNode = _audioContext.createGain()
                 @_source = _audioContext.createBufferSource()
+                
+                #set values on source node
                 @_source.buffer = @_buffer
+                @_source.loop = opt.loop ? @_config.loop
                 @_source.onended = =>
                     @_isEnded = true
                 
-                @_source.loop = opt.loop ? false
+                #set value on gain node
+                gainNode.gain.value = opt.volume ? @_config.volume
+                
+                #connect nodes
                 @_source.connect gainNode
                 gainNode.connect _audioContext.destination
+                
+                #start playing
                 @_source.start()
     stop: ->
         if env.USE_AUDIO_TAG
@@ -111,3 +144,6 @@ class @Sound
         else
             @_source.stop()
 #end class Sound
+
+#more natural alias for calling class methods
+@Sounds = @Sound

@@ -61,14 +61,14 @@ _masterUpdate = ->
 class @Greenhorn
     #create Engine elements
     _elmnts =
-        main: document.createElement('div')
-        title: document.createElement('h1')
-        leftPanel: document.createElement('div')
-        leftPanelHeader: document.createElement('h3')
-        canvas: document.createElement('canvas')
-        rightPanel: document.createElement('div')
-        rightPanelHeader: document.createElement('h3')
-        bottomPanel: document.createElement('div')
+        main: document.createElement 'div'
+        title: document.createElement 'h1'
+        leftPanel: document.createElement 'div'
+        leftPanelHeader: document.createElement 'h3'
+        canvas: document.createElement 'canvas'
+        rightPanel: document.createElement 'div'
+        rightPanelHeader: document.createElement 'h3'
+        bottomPanel: document.createElement 'div'
     
     #give id's to all elements
     _elmnts.main.id = 'gh-main'
@@ -91,9 +91,9 @@ class @Greenhorn
     _elmnts.leftPanel.appendChild _elmnts.leftPanelHeader
     _elmnts.rightPanel.appendChild _elmnts.rightPanelHeader
     
-    #mouse position
-    @getMouseX = -> document.mouseX - @get("main", "offsetLeft") - @get("canvas", "offsetLeft") - @get("canvas", "width") / 2
-    @getMouseY = -> document.mouseY - @get("main", "offsetTop") - @get("canvas", "offsetTop") - @get("canvas", "height") / 2
+    #mouse position getters
+    @getMouseX = -> document.mouseX - @get('main', 'offsetLeft') - @get('canvas', 'offsetLeft') - @get('canvas', 'width') / 2
+    @getMouseY = -> document.mouseY - @get('main', 'offsetTop') - @get('canvas', 'offsetTop') - @get('canvas', 'height') / 2
     
     #generic element getter/setter
     @get = (elmnt, attr) ->
@@ -103,6 +103,16 @@ class @Greenhorn
             _elmnts[elmnt][attr] = what
         else
             _elmnts[elmnt][attr][key] = value for own key, value of what
+    
+    #set the style of each element
+    @set 'main', 'style', _style.main
+    @set 'title', 'style', _style.title
+    @set 'leftPanel', 'style', _style.panel
+    @set 'leftPanelHeader', 'style', _style.panelHeader
+    @set 'canvas', 'style', _style.canvas
+    @set 'rightPanel', 'style', _style.panel
+    @set 'rightPanelHeader', 'style', _style.panelHeader
+    @set 'bottomPanel', 'style', _style.footer
     
     #unique id for each button created
     _buttonID = 0
@@ -121,11 +131,11 @@ class @Greenhorn
             config.style[key] ?= value
         
         #create element
-        button = document.createElement "button"
+        button = document.createElement 'button'
         
         #set values
         button.id = "gh-button-#{_buttonID}"
-        button.setAttribute "type", "button"
+        button.setAttribute 'type', 'button'
         button.innerHTML = config.label
         button.onclick = config.onclick
         button.style[key] = value for own key, value of config.style
@@ -133,115 +143,90 @@ class @Greenhorn
         #append to an element
         _elmnts[config.parent].appendChild button
     
+    #start all asynchronous functions
+    _startEverything = ->
+        _masterID = setInterval _masterID, 1000 / env.FRAME_RATE
+        Sprites._startAll()
+        return
+    
+    #used to keep engine from doing
+    #unnessecary things more than once
+    _firstTime = true
+    
     #game control
     @start = =>
-        #add engine to document body
-        document.body.appendChild _elmnts.main
+        if _firstTime
+            #add engine to a user defined '#GREENHORN' div or the document body
+            (document.querySelector('#GREENHORN') ? document.body).appendChild _elmnts.main
+            
+            #change the document body's backgroundColor
+            _elmnts.main.parentNode.style.backgroundColor = env.ENGINE.backgroundColor
+            
+            #set the actual size of the canvas to prevent distortion
+            correctWidth = @get 'canvas', 'offsetWidth'
+            correctHeight = @get 'canvas', 'offsetHeight'
+            @set 'canvas', 'width', correctWidth
+            @set 'canvas', 'height', correctHeight
+            
+            #center the canvas origin point
+            _elmnts.canvas.getContext('2d')
+            .translate(
+                _elmnts.canvas.width / 2,
+                _elmnts.canvas.height / 2)
+            
+            #set the innerHTML of each element
+            @set 'title', 'innerHTML', document.title
+            @set 'leftPanelHeader', 'innerHTML', env.ENGINE.leftHeader
+            @set 'rightPanelHeader', 'innerHTML', env.ENGINE.rightHeader
+            @set 'bottomPanel', 'innerHTML', env.ENGINE.footer
+            @set 'canvas', 'innerHTML', 'your browser does not support the <canvas> tag'
+            
+            #draw the start screen
+            _ctx = _elmnts.canvas.getContext '2d'
+            _ctx.save()
+            _ctx.globalAlpha = 1.0
+            _ctx.font = "#{env.STARTUP.size}px #{env.STARTUP.font}"
+            _ctx.fillStyle = "#{env.ENGINE.foregroundColor}"
+            _ctx.fillText(
+                env.STARTUP.text,
+                -_ctx.measureText(env.STARTUP.text).width / 2,
+                env.STARTUP.size / 2)
+            _ctx.restore()
+            
+            #make the entire canvas a button
+            #that preloads all sounds and
+            #launches all asynchronous updates
+            _elmnts.canvas.onclick = ->
+                Sounds._playAll()
+                _startEverything()
+                _elmnts.canvas.onclick = undefined
+            
+            #set _firstTime to false to avoid unnessecary
+            #code being run if the game is stopped then restarted
+            _firstTime = false
         
-        #change the document body's backgroundColor
-        document.body.style.backgroundColor = env.ENGINE.backgroundColor
-        
-        #basic style formatting for elements
-        mainStyle =
-            width: '74%'
-            height: '60%'
-            display: 'inline-block'
-            marginTop: '5%'
-            marginLeft: '13%'
-            border: "5px solid #{env.ENGINE.accentColor}"
-            borderRadius: '15px'
-            fontFamily: 'Tahoma, Geneva, sans-serif'
-            backgroundColor: env.ENGINE.foregroundColor
-        titleStyle =
-            width: '100%'
-            textAlign: 'center'
-            cssFloat: 'left'
-            clear: 'both'
-            display: 'initial'
-            marginTop: '1%'
-            marginBottom: '0px'
-            paddingBottom: '1%'
-            borderRadius: 'inherit'
-            borderBottom: "1px solid #{env.ENGINE.accentColor}"
-        panelStyle =
-            width: '15%'
-            height: '78%'
-            cssFloat: 'left'
-            display: 'initial'
-            margin: '1%'
-            overflow: 'auto'
-            whiteSpace: 'pre'
-            fontSize: '.75em'
-        panelHeaderStyle =
-            textAlign: 'center'
-            marginTop: '0'
-            marginBottom: '5px'
-            paddingBottom: '2px'
-            borderBottom: "2px solid #{env.ENGINE.backgroundColor}"
-        canvasStyle =
-            width: '65%'
-            height: '78%'
-            display: 'initial'
-            cssFloat: 'left'
-            borderRight: "1px solid #{env.ENGINE.accentColor}"
-            borderLeft: "1px solid #{env.ENGINE.accentColor}"
-            backgroundColor: env.ENGINE.backgroundColor
-        bottomPanelStyle =
-            width: '100%'
-            display: 'initial'
-            textAlign: 'center'
-            cssFloat: 'left'
-            clear: 'both'
-            paddingTop: '1%'
-            marginBottom: '1%'
-            borderRadius: 'inherit'
-            borderTop: "1px solid #{env.ENGINE.accentColor}"
-            fontSize: '1em'
-        
-        #set the style of each element
-        @set "main", "style", mainStyle
-        @set "title", "style", titleStyle
-        @set "leftPanel", "style", panelStyle
-        @set "leftPanelHeader", "style", panelHeaderStyle
-        @set "canvas", "style", canvasStyle
-        @set "rightPanel", "style", panelStyle
-        @set "rightPanelHeader", "style", panelHeaderStyle
-        @set "bottomPanel", "style", bottomPanelStyle
-        
-        #set the actual size of the canvas to prevent distortion
-        correctWidth = @get "canvas", "offsetWidth"
-        correctHeight = @get "canvas", "offsetHeight"
-        @set "canvas", "width", correctWidth
-        @set "canvas", "height", correctHeight
-        
-        #center the canvas origin point
-        _elmnts.canvas.getContext("2d").translate(@get("canvas", "width") / 2, @get("canvas", "height") / 2)
-        
-        #set the innerHTML of each element
-        @set "title", "innerHTML", document.title
-        @set "leftPanelHeader", "innerHTML", env.ENGINE.leftHeader
-        @set "rightPanelHeader", "innerHTML", env.ENGINE.rightHeader
-        @set "bottomPanel", "innerHTML", env.ENGINE.footer
-        @set "canvas", "innerHTML", "your browser does not support the <canvas> tag"
-        
-        #start running _masterUpdate at env.FRAME_RATE frames/sec
-        _masterID = setInterval _masterUpdate, Math.ceil 1000 / env.FRAME_RATE
-        return
+        else
+            _startEverything()
     @stop = ->
+        Sprites._stopAll()
+        Sounds._stopAll()
         clearInterval _masterID
+        _masterID = null
+    @isRunning = ->
+        _masterID?
     @clear = ->
-        _elmnts.canvas.getContext("2d")
+        _elmnts.canvas.getContext('2d')
         .clearRect(
-            -@get("canvas", "width") / 2,
-            -@get("canvas", "height") / 2,
-            @get("canvas", "width"),
-            @get("canvas", "height"))
+            -@get('canvas', 'width') / 2,
+            -@get('canvas', 'height') / 2,
+            @get('canvas', 'width'),
+            @get('canvas', 'height'))
     @hide = ->
-        @set "main", "style", {"display": "none"}
+        @set 'main', 'style', {'display': 'none'}
     @show = ->
-        @set "main", "style", {"display": "inline-block"}
+        @set 'main', 'style', {'display': 'inline-block'}
     @hideCursor = ->
-        @set "canvas", "style", {"cursor": "none"}
+        @set 'canvas', 'style', {'cursor': 'none'}
     @showCursor = ->
-        @set "canvas", "style", {"cursor": "default"}
+        @set 'canvas', 'style', {'cursor': 'default'}
 #end class Greenhorn

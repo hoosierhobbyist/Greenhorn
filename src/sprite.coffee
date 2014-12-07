@@ -19,7 +19,7 @@ makeSortRule = (sortBy, order) ->
 #core engine class
 class @Sprite
     #<---CLASS-LEVEL--->
-    #state values
+    #used to track all Sprite instances
     _list = []
     _sortRule = makeSortRule "z", "ascending"
     
@@ -27,6 +27,12 @@ class @Sprite
     @howMany = -> _list.length
     @_drawAll = ->
         sp._draw() for sp in _list
+        return
+    @_startAll = ->
+        sp._start() for sp in _list
+        return
+    @_stopAll = ->
+        sp._stop() for sp in _list
         return
     
     #collective manipulation
@@ -57,14 +63,18 @@ class @Sprite
         #throw an error if a forbidden key is provided in the configuration
         throw new Error "#{key} is a forbidden config value" for key in forbidden when config[key]?
         
+        #used to track asynchronous _update
+        @_updateID = null
+        
         #create primary objects
         @_dis = {}
         @_pos = {}
         @_mot = {}
         @_acc = {}
         
-        #get the context used to draw sprite
-        @_dis.context = Greenhorn._elmnts.canvas.getContext "2d"
+        #create secondary objects
+        @_dis.image = new Image()
+        @_dis.context = document.querySelector('#gh-canvas').getContext('2d')
         
         #add the environment defaults to config,
         #if the user has chosen to omit them
@@ -72,14 +82,23 @@ class @Sprite
             config[key] ?= value
         
         #set this sprite's configuration
-        @set "config", config
+        @set 'config', config
         
-        #asynchronously calls this._update, so that _masterUpdate doesn't have to
-        setInterval @_update, Math.ceil 1000 / env.FRAME_RATE
+        #start updating if the engine is already running
+        if Greenhorn.isRunning() then @_start()
         
         #sort the Sprite _list according to _sortRule
         _list.push this
         _list.sort _sortRule
+    
+    #start and stop _update function
+    _start: ->
+        @_updateID = setInterval _update, 1000 / env.FRAME_RATE
+    _stop: ->
+        clearInterval @_updateID
+        @_updateID = null
+    isRunning: ->
+        @_updateID?
     
     #getter
     get: (what) ->
@@ -131,7 +150,6 @@ class @Sprite
             when "display", "position", "motion", "acceleration", "config"
                 @set k, v for own k, v of to
             when "imageFile"
-                @_dis.image ?= new Image()
                 @_dis.image.src = env.IMAGE_PATH.concat to
             when "width", "height", "visible", "boundAction"
                 @_dis[what] = to
@@ -226,7 +244,6 @@ class @Sprite
     
     #collision routines
     collidesWith: (other) ->
-        collision
         if other is 'mouse'
             collision = false
             if @_dis.visible
