@@ -91,7 +91,7 @@ class @AniSprite extends @Sprite
             
             #restore context
             @_dis.context.restore()
-    _update: =>
+    _update: ->
         if @_dis.visible
             if @_dis.timer.getElapsedTime() >= (1000 / @_dis.frameRate)
                 if @_dis.current.frame < @_dis.current.numFrames
