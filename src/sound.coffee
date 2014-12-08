@@ -21,9 +21,12 @@ class @Sound
     @_playAll = ->
         for snd in _list
             if snd._config.playOnLoad
-                snd.play()
+                if env.USE_AUDIO_TAG
+                    snd._audio.autoplay = true
+                else 
+                    snd.play()
             else
-                snd.play {volume: 0}
+                snd.play {volume: 0, loop: false}
                 setTimeout snd.stop, 50
     @_stopAll = ->
         snd.stop() for snd in _list
@@ -55,15 +58,15 @@ class @Sound
             wav_src.type = 'audio/wav'
             
             #assign proper srcs
-            if config.url.indexOf('.mp3') isnt -1
+            if @_config.url.match /.mp3$/
                 mp3_src.src = @_config.url
                 ogg_src.src = @_config.url.replace '.mp3', '.ogg'
                 wav_src.src = @_config.url.replace '.mp3', '.wav'
-            else if config.url.indexOf('.ogg') isnt -1
+            else if @_config.url.match /.ogg$/
                 ogg_src.src = @_config.url
                 mp3_src.src = @_config.url.replace '.ogg', '.mp3'
                 wav_src.src = @_config.url.replace '.ogg', '.wav'
-            else if config.url.indexOf('.wav') isnt -1
+            else if @_config.url.match /.wav$/
                 wav_src.src = @_config.url
                 mp3_src.src = @_config.url.replace '.wav', '.mp3'
                 ogg_src.src = @_config.url.replace '.wav', '.ogg'
@@ -82,8 +85,8 @@ class @Sound
         #web audio API is supported
         else
             #instance variables
-            @_buffer = null
             @_source = null
+            @_buffer = null
             @_isEnded = true
             
             #request setup
@@ -94,7 +97,7 @@ class @Sound
             #request event handlers
             request.successCallback = (buffer) =>
                 @_buffer = buffer
-                if config.playOnLoad and Greenhorn.isRunning()
+                if Greenhorn.isRunning() and @_config.playOnLoad
                     @play()
             request.errorCallback = ->
                 throw new Error "AJAX request Error"
