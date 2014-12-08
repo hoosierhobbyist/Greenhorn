@@ -5,7 +5,6 @@ The Greenhorn Gaming environment object
 ###
 
 @env =
-    _env: this
     #frame rate
     FRAME_RATE: 25
     #Greenhorn engine style
