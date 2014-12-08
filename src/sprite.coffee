@@ -93,7 +93,7 @@ class @Sprite
     
     #start and stop _update function
     _start: ->
-        @_updateID = setInterval _update, 1000 / env.FRAME_RATE
+        @_updateID = setInterval @_update, 1000 / env.FRAME_RATE
     _stop: ->
         clearInterval @_updateID
         @_updateID = null

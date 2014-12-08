@@ -145,7 +145,7 @@ class @Greenhorn
     
     #start all asynchronous functions
     _startEverything = ->
-        _masterID = setInterval _masterID, 1000 / env.FRAME_RATE
+        _masterID = setInterval _masterUpdate, 1000 / env.FRAME_RATE
         Sprites._startAll()
         return
     

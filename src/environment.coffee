@@ -55,7 +55,6 @@ The Greenhorn Gaming environment object
         borderVisible: yes
         fontName: "sans-serif"
         fontSize: 8
-        fontSpacing: 4
         fontColor: "white"
         fontAlpha: 1.0
         marginsTop: 5

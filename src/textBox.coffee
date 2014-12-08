@@ -78,6 +78,7 @@ class @TextBox extends @Sprite
     #internal control
     _draw: ->
         if @_dis.visible
+            
             #save current context
             @_dis.context.save()
             
@@ -107,13 +108,22 @@ class @TextBox extends @Sprite
                     @_dis.height)
             
             #calculate text offset
-            xOffset = @_margins.left
-            yOffset = @_margins.top
-            if @_border.visible
-                xOffset += @_border.size
-                yOffset += @_border.size
+            yOffset = @_font.size / 4 * @_text.length
+            if @_text.length > 2
+                yOffset += @_font.size / 2 * (@_text.length - 2)
             
-            #initialize context
+            if @get('align').toLowerCase() is 'center'
+                xOffset = 0
+            else if @get('align').toLowerCase() is 'left'
+                xOffset = -@_dis.width / 2 + @_margins.left
+                if @_border.visible
+                    xOffset += @_border.size
+            else if @get('align').toLowerCase() is 'right'
+                xOffset = @_dis.width / 2 - @_margins.right
+                if @_border.visible
+                    xOffset -= @_border.size
+            
+            #initialize context for text
             @_dis.context.fillStyle = @_font.color
             @_dis.context.globalAlpha = @_font.alpha
             
@@ -122,20 +132,20 @@ class @TextBox extends @Sprite
                 for line, i in @_text
                     @_dis.context.fillText(
                         line,
-                        xOffset - (@_dis.width / 2),
-                        yOffset - (@_dis.height / 2) + (@_font.size * i) + (if i isnt 0 then @_font.spacing else 0))
+                        xOffset,
+                        @_font.size * 1.5 * i - yOffset)
             else
                 @_dis.context.fillText(
                     @_text[0],
-                    xOffset - (@_dis.width / 2),
-                    yOffset - (@_dis.height / 2))
+                    xOffset,
+                    yOffset)
             
             #restore old context
             @_dis.context.restore()
     _update: ->
         #calculate new size
         @_dis.width = 0
-        @_dis.height = (@_font.size * @_text.length) + (@_font.spacing * (@_text.length - 1))
+        @_dis.height = @_font.size * 1.5 * @_text.length
         for line in @_text
             len = @_dis.context.measureText(line).width
             @_dis.width = len if @_dis.width < len
