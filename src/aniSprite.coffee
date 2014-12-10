@@ -61,7 +61,7 @@ class @AniSprite extends @Sprite
             to.stop ?= to.start + env.ANICYCLE_DEFAULT_CONFIG.numFrames - 1
             to.name ?= if what.slice(5) then what.slice(5) else env.ANICYCLE_DEFAULT_CONFIG.name
             @_ani.cycles.push(new AniCycle(to))
-            @_ani.current ?= to
+            @_ani.current ?= @_ani.cycles[0]
         else
             super what, to
         this
