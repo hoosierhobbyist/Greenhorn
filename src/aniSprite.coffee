@@ -4,9 +4,9 @@ aniSprite.coffee
 The Greenhorn Gaming Engine animated Sprite class
 ###
 
+#private helper class
 class AniCycle
     constructor: (data) ->
-        #extract data
         @frame = data.start
         @index = data.index
         @start = data.start
@@ -21,6 +21,13 @@ class @AniSprite extends @Sprite
         for own key, value of env.ANISPRITE_DEFAULT_CONFIG
             config[key] ?= value
         
+        #create primary object
+        @_ani = {}
+        
+        #create secondary objects
+        @_ani.cycles = []
+        @_ani.timer = new Timer(true)
+        
         #call the Sprite constructor
         super(config)
     
@@ -28,9 +35,9 @@ class @AniSprite extends @Sprite
     get: (what) ->
         switch what
             when 'cellWidth', 'cellHeight', 'frameRate'
-                @_dis[what]
+                @_ani[what]
             when 'current', 'animation', 'cycle'
-                @_dis.current.name
+                @_ani.current.name
             else
                 super what
     
@@ -39,40 +46,36 @@ class @AniSprite extends @Sprite
         if what is 'cellWidth' or
         what is 'cellHeight' or
         what is 'frameRate'
-            @_dis[what] = to
+            @_ani[what] = to
         else if what is 'current' or
             what is 'animation' or
             what is 'cycle'
-                if to isnt @_dis.current.name
-                    @_dis.current.frame = 1
-                    for cycle in @_dis.cycles when cycle.name is to
-                        @_dis.current = cycle
-                        return
-        else if what.match /^cycle/
-            @_dis.cycles ?= new Array()
-            @_dis.timer ?= new Timer(true)
-            
+                if to isnt @_ani.current.name
+                    @_ani.current.frame = @_ani.current.start
+                    for cycle in @_ani.cycles when cycle.name is to
+                        @_ani.current = cycle
+        else if what.match /^cycle/i
             i = 0
             to.index ?= i += 1
             to.start ?= 1
             to.stop ?= to.start + env.ANICYCLE_DEFAULT_CONFIG.numFrames - 1
             to.name ?= if what.slice(5) then what.slice(5) else env.ANICYCLE_DEFAULT_CONFIG.name
-            @_dis.cycles.push(new AniCycle(to))
-            @_dis.current ?= to
+            @_ani.cycles.push(new AniCycle(to))
+            @_ani.current ?= to
         else
             super what, to
         this
     
     #animation control
     play: ->
-        @_dis.timer.start()
+        @_ani.timer.start()
         this
     pause: ->
-        @_dis.timer.pause()
+        @_ani.timer.pause()
         this
     stop: ->
-        @_dis.timer.stop()
-        @_dis.current.frame = 1
+        @_ani.timer.stop()
+        @_ani.current.frame = @_ani.current.start
         this
     
     #update routines
@@ -85,13 +88,21 @@ class @AniSprite extends @Sprite
             @_dis.context.translate @_pos.x, -@_pos.y
             @_dis.context.rotate -@_pos.a
             
+            #determine slicing index
+            if env.SPRITESHEET_ORIENTATION.toLowerCase() is 'horizontal'
+                sliceX = @_ani.current.frame - 1
+                sliceY = @_ani.current.index - 1
+            else if env.SPRITESHEET_ORIENTATION.toLowerCase() is 'vertical'
+                sliceX = @_ani.current.index - 1
+                sliceY = @_ani.current.frame - 1
+            
             #draw frame
             @_dis.context.drawImage( 
                 @_dis.image, #spritesheet
-                (@_dis.current.frame - 1) * @_dis.cellWidth, #sx
-                (@_dis.current.index - 1) * @_dis.cellHeight, #sy
-                @_dis.cellWidth, #swidth
-                @_dis.cellHeight, #sheight
+                @_ani.cellWidth * sliceX, #sx
+                @_ani.cellHeight * sliceY, #sy
+                @_ani.cellWidth, #swidth
+                @_ani.cellHeight, #sheight
                 -@_dis.width / 2, #x
                 -@_dis.height / 2, #y
                 @_dis.width, #width
@@ -101,11 +112,11 @@ class @AniSprite extends @Sprite
             @_dis.context.restore()
     _update: ->
         if @_dis.visible
-            if @_dis.timer.getElapsedTime() >= (1000 / @_dis.frameRate)
-                if @_dis.current.frame < @_dis.current.stop
-                    @_dis.current.frame += 1
+            if @_ani.timer.getElapsedTime() >= (1000 / @_ani.frameRate)
+                if @_ani.current.frame < @_ani.current.stop
+                    @_ani.current.frame += 1
                 else
-                    @_dis.current.frame = @_dis.current.start
-                @_dis.timer.restart()
+                    @_ani.current.frame = @_ani.current.start
+                @_ani.timer.restart()
             super()
 #end class AniSprite
