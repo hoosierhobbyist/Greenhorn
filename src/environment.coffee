@@ -60,11 +60,15 @@ The Greenhorn Gaming environment object
         marginsBottom: 5
         marginsRight: 5
         marginsLeft: 5
+    #default aniSprite settings
+    SPRITESHEET_ALIGNMENT: 'HORIZONTAL'
+    ANICYCLE_DEFAULT_CONFIG:
+        name: 'UNDEFINED'
+        numFrames: 8
     ANISPRITE_DEFAULT_CONFIG:
         cellWidth: 32
         cellHeight: 32
-        frameRate: 5
-        numFrames: 8
+        frameRate: 10
     #default sound settings
     SOUND_PATH: ""
     USE_AUDIO_TAG: false

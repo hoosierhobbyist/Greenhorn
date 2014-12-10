@@ -5,20 +5,20 @@ The Greenhorn Gaming Engine animated Sprite class
 ###
 
 class AniCycle
-    #constructor
     constructor: (data) ->
         #extract data
-        @frame = 1
+        @frame = data.start
+        @index = data.index
+        @start = data.start
+        @stop = data.stop
         @name = data.name
-        @row = data.row
-        @numFrames = data.numFrames
 
 class @AniSprite extends @Sprite
     #constructor
     constructor: (config = {}) ->
         #add environment defaults to config,
         #if the user has chosen to omit them
-        for own key, value of env.ANISPRITE_DEFAULT_CONFIG when key isnt "numFrames"
+        for own key, value of env.ANISPRITE_DEFAULT_CONFIG
             config[key] ?= value
         
         #call the Sprite constructor
@@ -27,32 +27,36 @@ class @AniSprite extends @Sprite
     #getter
     get: (what) ->
         switch what
-            when "cellWidth", "cellHeight", "frameRate"
+            when 'cellWidth', 'cellHeight', 'frameRate'
                 @_dis[what]
-            when "current"
+            when 'current', 'animation', 'cycle'
                 @_dis.current.name
             else
                 super what
     
     #setter
     set: (what, to) ->
-        if what is "cellWidth" or
-        what is"cellHeight" or
-        what is"frameRate"
+        if what is 'cellWidth' or
+        what is 'cellHeight' or
+        what is 'frameRate'
             @_dis[what] = to
-        else if what is "current"
-            if to isnt @_dis.current.name
-                @_dis.current.frame = 1
-            for cycle in @_dis.cycles when cycle.name is to
-                @_dis.current = cycle
-        else if what.indexOf("cycle") is 0
+        else if what is 'current' or
+            what is 'animation' or
+            what is 'cycle'
+                if to isnt @_dis.current.name
+                    @_dis.current.frame = 1
+                    for cycle in @_dis.cycles when cycle.name is to
+                        @_dis.current = cycle
+                        return
+        else if what.match /^cycle/
             @_dis.cycles ?= new Array()
             @_dis.timer ?= new Timer(true)
             
             i = 0
-            to.name ?= what.slice 5
-            to.row ?= i += 1
-            to.numFrames ?= env.ANISPRITE_DEFAULT_CONFIG.numFrames
+            to.index ?= i += 1
+            to.start ?= 1
+            to.stop ?= to.start + env.ANICYCLE_DEFAULT_CONFIG.numFrames - 1
+            to.name ?= if what.slice(5) then what.slice(5) else env.ANICYCLE_DEFAULT_CONFIG.name
             @_dis.cycles.push(new AniCycle(to))
             @_dis.current ?= to
         else
@@ -65,6 +69,10 @@ class @AniSprite extends @Sprite
         this
     pause: ->
         @_dis.timer.pause()
+        this
+    stop: ->
+        @_dis.timer.stop()
+        @_dis.current.frame = 1
         this
     
     #update routines
@@ -81,7 +89,7 @@ class @AniSprite extends @Sprite
             @_dis.context.drawImage( 
                 @_dis.image, #spritesheet
                 (@_dis.current.frame - 1) * @_dis.cellWidth, #sx
-                (@_dis.current.row - 1) * @_dis.cellHeight, #sy
+                (@_dis.current.index - 1) * @_dis.cellHeight, #sy
                 @_dis.cellWidth, #swidth
                 @_dis.cellHeight, #sheight
                 -@_dis.width / 2, #x
@@ -94,10 +102,10 @@ class @AniSprite extends @Sprite
     _update: ->
         if @_dis.visible
             if @_dis.timer.getElapsedTime() >= (1000 / @_dis.frameRate)
-                if @_dis.current.frame < @_dis.current.numFrames
+                if @_dis.current.frame < @_dis.current.stop
                     @_dis.current.frame += 1
                 else
-                    @_dis.current.frame = 1
+                    @_dis.current.frame = @_dis.current.start
                 @_dis.timer.restart()
             super()
 #end class AniSprite
