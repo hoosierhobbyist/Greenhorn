@@ -61,7 +61,7 @@ The Greenhorn Gaming environment object
         marginsRight: 5
         marginsLeft: 5
     #default aniSprite settings
-    SPRITESHEET_ALIGNMENT: 'HORIZONTAL'
+    SPRITESHEET_ORIENTATION: 'HORIZONTAL'
     ANICYCLE_DEFAULT_CONFIG:
         name: 'UNDEFINED'
         numFrames: 8
