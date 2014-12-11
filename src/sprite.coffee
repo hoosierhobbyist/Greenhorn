@@ -4,27 +4,22 @@ sprite.coffee
 The Greenhorn Gaming Engine core class
 ###
 
-#generate a sort rule to determine
-#in what order the sprites are drawn
-makeSortRule = (sortBy, order) ->
-    if order is "ascending"
-        (sp1, sp2) ->
-            sp1.get(sortBy) - sp2.get(sortBy)
-    else if order is "decending"
-        (sp1, sp2) ->
-            sp2.get(sortBy) - sp1.get(sortBy)
-    else
-        throw new Error "order must be ascending or decending"
-
 #core engine class
 class @Sprite
     #<---CLASS-LEVEL--->
     #used to track all Sprite instances
     _list = []
-    _sortRule = makeSortRule "z", "ascending"
+    _sortRule = (sp1, sp2) ->
+        sp1._dis.level - sp2._dis.level
     
-    #Sprite class methods
+    #collective manipulation
     @howMany = -> _list.length
+    @getAll = (what, excep...) ->
+        sp.get what for sp in _list when sp not in excep
+    @setAll = (what, to, excep...) ->
+        sp.set what, to for sp in _list when sp not in excep
+    @changeAll = (what, step, excep...) ->
+        sp.change what, step for sp in _list when sp not in excep
     @_drawAll = ->
         sp._draw() for sp in _list
         return
@@ -35,23 +30,10 @@ class @Sprite
         sp._stop() for sp in _list
         return
     
-    #collective manipulation
-    @getAll = (what, excep...) ->
-        sp.get what for sp in _list when sp not in excep
-    @setAll = (what, to, excep...) ->
-        sp.set what, to for sp in _list when sp not in excep
-    @changeAll = (what, step, excep...) ->
-        sp.change what, step for sp in _list when sp not in excep
-    
     #<---INSTANCE-LEVEL--->
     #constructor
     constructor: (config = {}) ->
         forbidden = [
-            "display"
-            "position"
-            "motion"
-            "acceleration"
-            "config"
             "distance"
             "speed"
             "rate"
@@ -62,6 +44,11 @@ class @Sprite
         
         #throw an error if a forbidden key is provided in the configuration
         throw new Error "#{key} is a forbidden config value" for key in forbidden when config[key]?
+        
+        #add the environment defaults to config,
+        #if the user has chosen to omit them
+        for own key, value of env.SPRITE_DEFAULT_CONFIG
+            config[key] ?= value
         
         #used to track asynchronous _update
         @_updateID = null
@@ -76,12 +63,8 @@ class @Sprite
         @_dis.image = new Image()
         @_dis.context = document.querySelector('#gh-canvas').getContext('2d')
         
-        #add the environment defaults to config,
-        #if the user has chosen to omit them
-        for own key, value of env.SPRITE_DEFAULT_CONFIG
-            config[key] ?= value
-        
         #set this sprite's configuration
+        #calls child's set method in derived classes
         @set 'config', config
         
         #start updating if the engine is already running
@@ -103,23 +86,15 @@ class @Sprite
     #getter
     get: (what) ->
         switch what
-            when "display"
-                @_dis
-            when "position"
-                @_pos
-            when "motion"
-                @_mot
-            when "acceleration"
-                @_acc
             when "imageFile"
                 @_dis.image.src
-            when "width", "height", "visible", "boundAction"
+            when "level", "width", "height", "visible", "boundAction"
                 @_dis[what]
-            when "x", "y", "z", "a"
+            when "x", "y", "a"
                 @_pos[what]
-            when "dx", "dy", "dz", "da"
+            when "dx", "dy", "da"
                 @_mot[what]
-            when "ddx", "ddy", "ddz", "dda"
+            when "ddx", "ddy", "dda"
                 @_acc[what]
             when "top"
                 @_pos.y + @_dis.height / 2
@@ -151,14 +126,14 @@ class @Sprite
                 @set k, v for own k, v of to
             when "imageFile"
                 @_dis.image.src = env.IMAGE_PATH.concat to
-            when "width", "height", "visible", "boundAction"
+            when "level", "width", "height", "visible", "boundAction"
                 @_dis[what] = to
-            when "x", "y", "z", "a"
+                _list.sort _sortRule if what is "level"
+            when "x", "y", "a"
                 @_pos[what] = to
-                _list.sort _sortRule if what is "z"
-            when "dx", "dy", "dz", "da"
+            when "dx", "dy", "da"
                 @_mot[what] = to
-            when "ddx", "ddy", "ddz", "dda"
+            when "ddx", "ddy", "dda"
                 @_acc[what] = to
             when "distance"
                 proxy =
@@ -199,14 +174,13 @@ class @Sprite
         switch what
             when "display", "position", "motion", "acceleration"
                 @change k.slice(1), v for own k, v of step
-            when "width", "height"
+            when "level", "width", "height"
                 @_dis[what] += step / env.FRAME_RATE
-            when "x", "y", "z", "a"
+            when "x", "y", "a"
                 @_pos[what] += step / env.FRAME_RATE
-                _list.sort _sortRule if what is "z"
-            when "dx", "dy", "dz", "da"
+            when "dx", "dy", "da"
                 @_mot[what] += step / env.FRAME_RATE
-            when "ddx", "ddy", "ddz", "dda"
+            when "ddx", "ddy", "dda"
                 @_acc[what] += step / env.FRAME_RATE
             when "distance"
                 proxy =
@@ -252,7 +226,7 @@ class @Sprite
                     collision = true
         else
             collision = true
-            if @_dis.visible and other.get("visible") and @_pos.z == other.get("z")
+            if @_dis.visible and other.get("visible") and @_dis.level == other.get("level")
                 if @get("bottom") > other.get("top") or
                 @get("top") < other.get("bottom") or
                 @get("right") < other.get("left") or
@@ -277,18 +251,29 @@ class @Sprite
         else
             otherX = other.get 'x'
             otherY = other.get 'y'
-        -Math.atan2 otherY - @_pos.y, otherX - @_pos.x
+        Math.atan2 @_pos.y - otherY, @_pos.x - otherX
     
     #update routines
     _draw: ->
         if @_dis.visible
             @_dis.context.save()
+            
+            #translate and rotate
             @_dis.context.translate @_pos.x, -@_pos.y
             @_dis.context.rotate -@_pos.a
-            @_dis.context.drawImage @_dis.image, -@_dis.width / 2, -@_dis.height / 2, @_dis.width, @_dis.height
+            
+            #draw image
+            @_dis.context.drawImage(
+                @_dis.image, #imageFile
+                -@_dis.width / 2, #x
+                -@_dis.height / 2, #y
+                @_dis.width, #width
+                @_dis.height) #height
+            
             @_dis.context.restore()
     _update: =>
         if @_dis.visible
+            #accelerate and move
             @change "motion", @_acc
             @change "position", @_mot
             
@@ -311,6 +296,7 @@ class @Sprite
             hitRight = @get("right") >= bounds.right
             hitLeft = @get("left") <= bounds.left
             
+            #determine how to behave at boundaries
             switch @_dis.boundAction
                 when "WRAP"
                     if offTop
@@ -371,28 +357,26 @@ class @Sprite
     report: ->
         """
         display:
+            level: #{Math.round @_dis.level}
             width: #{Math.round @_dis.width}
             height: #{Math.round @_dis.height}
             visible: #{@_dis.visible}
             boundAction: #{@_dis.boundAction}
         position:
-            x: #{@_pos.x.toFixed 3}
-            y: #{@_pos.y.toFixed 3}
-            z: #{@_pos.z.toFixed 3}
-            a: #{@_pos.a.toFixed 3}
+            x: #{@_pos.x.toFixed 2}
+            y: #{@_pos.y.toFixed 2}
+            a: #{@_pos.a.toFixed 2}
         motion:
-            dx: #{@_mot.dx.toFixed 3}
-            dy: #{@_mot.dy.toFixed 3}
-            dz: #{@_mot.dz.toFixed 3}
-            da: #{@_mot.da.toFixed 3}
+            dx: #{@_mot.dx.toFixed 2}
+            dy: #{@_mot.dy.toFixed 2}
+            da: #{@_mot.da.toFixed 2}
         acceleration:
-            ddx: #{@_acc.ddx.toFixed 3}
-            ddy: #{@_acc.ddy.toFixed 3}
-            ddz: #{@_acc.ddz.toFixed 3}
-            dda: #{@_acc.dda.toFixed 3}
+            ddx: #{@_acc.ddx.toFixed 2}
+            ddy: #{@_acc.ddy.toFixed 2}
+            dda: #{@_acc.dda.toFixed 2}
         """
     log: ->
-        console?.log @report()
+        console.log @report()
         return
 #end class Sprite
 
