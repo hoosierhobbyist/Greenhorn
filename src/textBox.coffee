@@ -1,7 +1,7 @@
 ###
 textBox.coffee
-
-The Greenhorn Gaming TextBox class
+Written by Seth Bullock
+sedabull@gmail.com
 ###
 
 class @TextBox extends @Sprite

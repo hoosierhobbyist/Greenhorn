@@ -1,3 +1,18 @@
+###
+Greenhorn Cakefile
+Written by Seth Bullock
+sedabull@gmail.com
+
+In order to build a single .js file from many
+.coffee files, a file called src/.index.txt
+indicates the order in which to concatenate
+all src/*.coffee files into one large file
+called src/Greenhorn.coffee. That one large
+file is then feed to the coffeeScript compiler
+which creates lib/Greenhorn.js. Afterwards,
+the temporary file src/Greenhorn.coffee is removed.
+###
+
 fs = require 'fs'
 
 {print} = require 'sys'
@@ -31,4 +46,4 @@ task 'build:library', 'Build lib/Greenhorn.js from src/', ->
     concat ->
         build ->
             clean ->
-                console.log 'successfully built library'
+                console.log 'Built library successfully'

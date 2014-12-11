@@ -1,7 +1,7 @@
 ###
 environment.coffee
-
-The Greenhorn Gaming environment object
+Written by Seth Bullock
+sedabull@gmail.com
 ###
 
 @env =
@@ -42,22 +42,26 @@ The Greenhorn Gaming environment object
     TEXTBOX_DEFAULT_CONFIG:
         level: -1
         text: "*-TextBox-*"
-        align: "center"
-        backgroundColor: "black"
-        backgroundAlpha: 1.0
-        backgroundVisible: yes
+        fontSize: 8
+        fontAlpha: 1.0
+        fontColor: "white"
+        fontAlign: "left"
+        fontName: "sans-serif"
         borderSize: 5
-        borderColor: "white"
         borderAlpha: 1.0
         borderVisible: yes
-        fontName: "sans-serif"
-        fontSize: 8
-        fontColor: "white"
-        fontAlpha: 1.0
+        borderColor: "white"
+        outlineSize: 1
+        outlineAlpha: 1.0
+        outlineVisible: no
+        outlineColor: "grey"
         marginsTop: 5
         marginsBottom: 5
         marginsRight: 5
         marginsLeft: 5
+        backgroundAlpha: 1.0
+        backgroundVisible: yes
+        backgroundColor: "black"
     #default aniSprite settings
     ANICYCLE_DEFAULT_CONFIG:
         name: 'UNDEFINED'

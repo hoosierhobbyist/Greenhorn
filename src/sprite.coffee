@@ -1,7 +1,7 @@
 ###
 sprite.coffee
-
-The Greenhorn Gaming Engine core class
+Written by Seth Bullock
+sedabull@gmail.com
 ###
 
 #core engine class

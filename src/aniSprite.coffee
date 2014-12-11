@@ -1,7 +1,7 @@
 ###
 aniSprite.coffee
-
-The Greenhorn Gaming Engine animated Sprite class
+Written by Seth Bullock
+sedabull@gmail.com
 ###
 
 #private helper class

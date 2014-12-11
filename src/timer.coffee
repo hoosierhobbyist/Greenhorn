@@ -1,7 +1,7 @@
 ###
 timer.coffee
-
-The Greenhorn Gaming Timer class
+Written by Seth Bullock
+sedabull@gmail.com
 ###
 
 #simple timer class

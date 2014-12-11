@@ -1,7 +1,7 @@
 ###
 sound.coffee
-
-Greenhorn Gaming Engine Sound class
+Written by Seth Bullock
+sedabull@gmail.com
 ###
 
 #determine what kind of AudioContext is avaliable

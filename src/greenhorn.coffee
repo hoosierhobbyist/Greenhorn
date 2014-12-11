@@ -1,11 +1,7 @@
 ###
 greenhorn.coffee
-by Seth Bullock
-
-***THE GREENHORN GAMING ENGINE***
-
-primarily inspired by Andy Harris'
-(aharrisbooks.net) simpleGame.js gaming engine
+Written by Seth Bullock
+sedabull@gmail.com
 ###
 
 #keyboard input tracking array
