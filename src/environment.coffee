@@ -25,24 +25,22 @@ The Greenhorn Gaming environment object
     SPRITE_DEFAULT_CONFIG:
         x: 0
         y: 0
-        z: 0
         a: 0
         dx: 0
         dy: 0
-        dz: 0
         da: 0
         ddx: 0
         ddy: 0
-        ddz: 0
         dda: 0
+        level: 0
         width: 64
         height: 64
-        imageFile: ""
         visible: yes
+        imageFile: ""
         boundAction: "WRAP"
     #default TextBox settings
     TEXTBOX_DEFAULT_CONFIG:
-        z: -1
+        level: -1
         text: "*-TextBox-*"
         align: "center"
         backgroundColor: "black"
@@ -61,7 +59,6 @@ The Greenhorn Gaming environment object
         marginsRight: 5
         marginsLeft: 5
     #default aniSprite settings
-    SPRITESHEET_ORIENTATION: 'HORIZONTAL'
     ANICYCLE_DEFAULT_CONFIG:
         name: 'UNDEFINED'
         numFrames: 8
@@ -69,6 +66,7 @@ The Greenhorn Gaming environment object
         cellWidth: 32
         cellHeight: 32
         frameRate: 10
+        orientation: 'horizontal'
     #default sound settings
     SOUND_PATH: ""
     USE_AUDIO_TAG: false

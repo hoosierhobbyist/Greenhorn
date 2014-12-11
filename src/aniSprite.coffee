@@ -34,7 +34,7 @@ class @AniSprite extends @Sprite
     #getter
     get: (what) ->
         switch what
-            when 'cellWidth', 'cellHeight', 'frameRate'
+            when 'cellWidth', 'cellHeight', 'frameRate', 'orientation'
                 @_ani[what]
             when 'current', 'animation', 'cycle'
                 @_ani.current.name
@@ -45,7 +45,8 @@ class @AniSprite extends @Sprite
     set: (what, to) ->
         if what is 'cellWidth' or
         what is 'cellHeight' or
-        what is 'frameRate'
+        what is 'frameRate' or
+        what is 'orientation'
             @_ani[what] = to
         else if what is 'current' or
             what is 'animation' or
@@ -60,6 +61,7 @@ class @AniSprite extends @Sprite
             to.start ?= 1
             to.stop ?= to.start + env.ANICYCLE_DEFAULT_CONFIG.numFrames - 1
             to.name ?= if what.slice(5) then what.slice(5) else env.ANICYCLE_DEFAULT_CONFIG.name
+            
             @_ani.cycles.push(new AniCycle(to))
             @_ani.current ?= @_ani.cycles[0]
         else
@@ -89,10 +91,10 @@ class @AniSprite extends @Sprite
             @_dis.context.rotate -@_pos.a
             
             #determine slicing index
-            if env.SPRITESHEET_ORIENTATION.toLowerCase() is 'horizontal'
+            if @_ani.orientation.toLowerCase() is 'horizontal'
                 sliceX = @_ani.current.frame - 1
                 sliceY = @_ani.current.index - 1
-            else if env.SPRITESHEET_ORIENTATION.toLowerCase() is 'vertical'
+            else if @_ani.orientation.toLowerCase() is 'vertical'
                 sliceX = @_ani.current.index - 1
                 sliceY = @_ani.current.frame - 1
             
