@@ -9,6 +9,12 @@ sedabull@gmail.com
     FRAME_RATE: 25
     #Greenhorn engine style
     ENGINE:
+        canvasWidth: 800
+        canvasHeight: 450
+        leftPanelWidth: 150
+        rightPanelWidth: 150
+        titleHeight: 50
+        footerHeight: 25
         bounceDecay: 0
         accentColor: 'silver'
         backgroundColor: 'black'
@@ -100,58 +106,66 @@ sedabull@gmail.com
 #the Greenhorn engine style object
 _style =
     main:
-        width: '74%'
-        height: '60%'
-        display: 'inline-block'
-        marginTop: '5%'
-        marginLeft: '13%'
-        border: "5px solid #{env.ENGINE.accentColor}"
+        margin: '2.5% auto'
         borderRadius: '15px'
         fontFamily: 'Tahoma, Geneva, sans-serif'
         backgroundColor: env.ENGINE.foregroundColor
+        border: "5px solid #{env.ENGINE.accentColor}"
+        minHeight: "#{env.ENGINE.canvasHeight + env.ENGINE.titleHeight + env.ENGINE.footerHeight + 40}px"
+        minWidth: "#{env.ENGINE.canvasWidth + env.ENGINE.leftPanelWidth + env.ENGINE.rightPanelWidth + 40}px"
+        maxHeight: "#{env.ENGINE.canvasHeight + env.ENGINE.titleHeight + env.ENGINE.footerHeight + 40}px"
+        maxWidth: "#{env.ENGINE.canvasWidth + env.ENGINE.leftPanelWidth + env.ENGINE.rightPanelWidth + 40}px"
     title:
         width: '100%'
-        textAlign: 'center'
-        cssFloat: 'left'
+        margin: '0px'
         clear: 'both'
-        display: 'initial'
-        marginTop: '1%'
-        marginBottom: '0px'
-        paddingBottom: '1%'
-        borderRadius: 'inherit'
-        borderBottom: "1px solid #{env.ENGINE.accentColor}"
-    panel:
-        width: '15%'
-        height: '78%'
         cssFloat: 'left'
-        display: 'initial'
-        margin: '1%'
+        marginTop: '10px'
+        textAlign: 'center'
+        paddingBottom: '9px'
+        borderRadius: 'inherit'
+        height: "#{env.ENGINE.titleHeight}px"
+        borderBottom: "1px solid #{env.ENGINE.accentColor}"
+    leftPanel:
+        margin: '10px'
+        cssFloat: 'left'
         overflow: 'auto'
         whiteSpace: 'pre'
         fontSize: '.70em'
+        marginRight: '9px'
+        width: "#{env.ENGINE.leftPanelWidth}px"
+        height: "#{env.ENGINE.canvasHeight - 20}px"
+    rightPanel:
+        margin: '10px'
+        cssFloat: 'left'
+        overflow: 'auto'
+        whiteSpace: 'pre'
+        fontSize: '.70em'
+        marginLeft: '9px'
+        width: "#{env.ENGINE.rightPanelWidth}px"
+        height: "#{env.ENGINE.canvasHeight - 20}px"
     panelHeader:
-        textAlign: 'center'
         marginTop: '0'
+        textAlign: 'center'
         marginBottom: '5px'
         paddingBottom: '2px'
         borderBottom: "2px solid #{env.ENGINE.backgroundColor}"
     canvas:
-        width: '65%'
-        height: '78%'
-        display: 'initial'
         cssFloat: 'left'
-        borderRight: "1px solid #{env.ENGINE.accentColor}"
-        borderLeft: "1px solid #{env.ENGINE.accentColor}"
+        width: "#{env.ENGINE.canvasWidth}px"
+        height: "#{env.ENGINE.canvasHeight}px"
         backgroundColor: env.ENGINE.backgroundColor
+        borderLeft: "1px solid #{env.ENGINE.accentColor}"
+        borderRight: "1px solid #{env.ENGINE.accentColor}"
     footer:
         width: '100%'
-        display: 'initial'
-        textAlign: 'center'
-        cssFloat: 'left'
         clear: 'both'
-        paddingTop: '1%'
-        marginBottom: '1%'
-        borderRadius: 'inherit'
-        borderTop: "1px solid #{env.ENGINE.accentColor}"
         fontSize: '1em'
+        cssFloat: 'left'
+        paddingTop: '9px'
+        textAlign: 'center'
+        marginBottom: '10px'
+        borderRadius: 'inherit'
+        height: "#{env.ENGINE.footerHeight}px"
+        borderTop: "1px solid #{env.ENGINE.accentColor}"
 #end _style object

@@ -44,11 +44,11 @@ _masterID = null
 _masterUpdate = ->
     #clear previous frame
     Greenhorn.clear()
-    
+
     #call user's update
     #if one is defined
     update?()
-    
+
     #draw all Sprites
     Sprites._drawAll()
 #end _masterUpdate
@@ -64,8 +64,8 @@ class @Greenhorn
         canvas: document.createElement 'canvas'
         rightPanel: document.createElement 'div'
         rightPanelHeader: document.createElement 'h3'
-        bottomPanel: document.createElement 'div'
-    
+        footer: document.createElement 'div'
+
     #give id's to all elements
     _elmnts.main.id = 'gh-main'
     _elmnts.title.id = 'gh-title'
@@ -74,23 +74,23 @@ class @Greenhorn
     _elmnts.canvas.id = 'gh-canvas'
     _elmnts.rightPanel.id = 'gh-right-panel'
     _elmnts.rightPanelHeader.id = 'gh-right-panel-header'
-    _elmnts.bottomPanel.id = 'gh-bottom-panel'
-    
+    _elmnts.footer.id = 'gh-footer'
+
     #append all primary children to main div
     _elmnts.main.appendChild _elmnts.title
     _elmnts.main.appendChild _elmnts.leftPanel
     _elmnts.main.appendChild _elmnts.canvas
     _elmnts.main.appendChild _elmnts.rightPanel
-    _elmnts.main.appendChild _elmnts.bottomPanel
-    
+    _elmnts.main.appendChild _elmnts.footer
+
     #append headers to panels
     _elmnts.leftPanel.appendChild _elmnts.leftPanelHeader
     _elmnts.rightPanel.appendChild _elmnts.rightPanelHeader
-    
+
     #mouse position getters
     @getMouseX = -> document.mouseX - @get('main', 'offsetLeft') - @get('canvas', 'offsetLeft') - @get('canvas', 'width') / 2
     @getMouseY = -> document.mouseY - @get('main', 'offsetTop') - @get('canvas', 'offsetTop') - @get('canvas', 'height') / 2
-    
+
     #generic element getter/setter
     @get = (elmnt, attr) ->
         _elmnts[elmnt][attr]
@@ -99,25 +99,25 @@ class @Greenhorn
             _elmnts[elmnt][attr] = what
         else
             _elmnts[elmnt][attr][key] = value for own key, value of what
-    
+
     #set the style of each element
     @set 'main', 'style', _style.main
     @set 'title', 'style', _style.title
-    @set 'leftPanel', 'style', _style.panel
+    @set 'leftPanel', 'style', _style.leftPanel
     @set 'leftPanelHeader', 'style', _style.panelHeader
     @set 'canvas', 'style', _style.canvas
-    @set 'rightPanel', 'style', _style.panel
+    @set 'rightPanel', 'style', _style.rightPanel
     @set 'rightPanelHeader', 'style', _style.panelHeader
-    @set 'bottomPanel', 'style', _style.footer
-    
+    @set 'footer', 'style', _style.footer
+
     #unique id for each button created
     _buttonID = 0
-    
+
     #add button to one of the panels
     @addButton = (config = {}) ->
         #increment _buttonID
         _buttonID += 1
-        
+
         #add environment defaults to config
         #if the user has chosen to omit them
         for own key, value of env.BUTTON_DEFAULT_CONFIG when key isnt 'style'
@@ -125,70 +125,67 @@ class @Greenhorn
         for own key, value of env.BUTTON_DEFAULT_CONFIG.style
             config.style ?= {}
             config.style[key] ?= value
-        
+
         #create element
         button = document.createElement 'button'
-        
+
         #set values
         button.id = "gh-button-#{_buttonID}"
         button.setAttribute 'type', 'button'
         button.innerHTML = config.label
         button.onclick = config.onclick
         button.style[key] = value for own key, value of config.style
-        
+
         #append to an element
         _elmnts[config.parent].appendChild button
-    
+
     #start all asynchronous functions
     _startEverything = ->
         _masterID = setInterval _masterUpdate, 1000 / env.FRAME_RATE
         Sprites._startAll()
         return
-    
-    #used to keep engine from doing
-    #unnessecary things more than once
+
+    #used to keep engine from
+    #reinitializing on restart
     _firstTime = true
-    
+
     #game control
     @start = =>
         if _firstTime
             #add engine to a user defined '#GREENHORN' div or the document body
             (document.querySelector('#GREENHORN') ? document.body).appendChild _elmnts.main
-            
-            #change the document body's backgroundColor
+
+            #change the engine's parent's backgroundColor
             _elmnts.main.parentNode.style.backgroundColor = env.ENGINE.backgroundColor
-            
-            #set the actual size of the canvas to prevent distortion
-            correctWidth = @get 'canvas', 'offsetWidth'
-            correctHeight = @get 'canvas', 'offsetHeight'
-            @set 'canvas', 'width', correctWidth
-            @set 'canvas', 'height', correctHeight
-            
+
+            #set the size of the canvas
+            @set 'canvas', 'width', env.ENGINE.canvasWidth
+            @set 'canvas', 'height', env.ENGINE.canvasHeight
+
             #center the canvas origin point
             _elmnts.canvas.getContext('2d')
             .translate(
                 _elmnts.canvas.width / 2,
                 _elmnts.canvas.height / 2)
-            
+
             #set the innerHTML of each element
             @set 'title', 'innerHTML', document.title
             @set 'leftPanelHeader', 'innerHTML', env.ENGINE.leftHeader
             @set 'rightPanelHeader', 'innerHTML', env.ENGINE.rightHeader
-            @set 'bottomPanel', 'innerHTML', env.ENGINE.footer
+            @set 'footer', 'innerHTML', env.ENGINE.footer
             @set 'canvas', 'innerHTML', 'your browser does not support the <canvas> tag'
-            
+
             #draw the start screen
             _ctx = _elmnts.canvas.getContext '2d'
             _ctx.save()
             _ctx.globalAlpha = 1.0
+            _ctx.textAlign = 'center'
+            _ctx.textBaseline = 'middle'
             _ctx.font = "#{env.STARTUP.size}px #{env.STARTUP.font}"
             _ctx.fillStyle = "#{env.ENGINE.foregroundColor}"
-            _ctx.fillText(
-                env.STARTUP.text,
-                -_ctx.measureText(env.STARTUP.text).width / 2,
-                env.STARTUP.size / 2)
+            _ctx.fillText env.STARTUP.text, 0, 0
             _ctx.restore()
-            
+
             #make the entire canvas a button
             #that preloads all sounds and
             #launches all asynchronous updates
@@ -196,11 +193,11 @@ class @Greenhorn
                 Sounds._playAll()
                 _startEverything()
                 _elmnts.canvas.onclick = undefined
-            
+
             #set _firstTime to false to avoid unnessecary
             #code being run if the game is stopped then restarted
             _firstTime = false
-        
+
         else
             _startEverything()
     @stop = ->
