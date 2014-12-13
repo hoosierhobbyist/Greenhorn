@@ -32,11 +32,11 @@ class @Sprite
         return
     @_startAll = ->
         for sp in _list
-            sp.start()
+            sp._start()
         return
     @_stopAll = ->
         for sp in _list
-            sp.stop()
+            sp._stop()
         return
 
     #<---INSTANCE-LEVEL--->
