@@ -13,8 +13,6 @@ which creates lib/Greenhorn.js. Afterwards,
 the temporary file src/Greenhorn.coffee is removed.
 ###
 
-fs = require 'fs'
-
 {print} = require 'sys'
 {spawn, exec} = require 'child_process'
 
