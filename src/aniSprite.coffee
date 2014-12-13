@@ -16,58 +16,65 @@ class AniCycle
 class @AniSprite extends @Sprite
     #constructor
     constructor: (config = {}) ->
-        #add environment defaults to config,
-        #if the user has chosen to omit them
+        #forbidden key regex
+        forbidden = /(^current$|^animation$|^cycle$)/i
+
+        #throw an error if a forbidden key is provided in the configuration
+        for own key of config when key.match forbidden
+            throw new Error "#{key} is a forbidden config value"
+
+        #add missing keys to config
         for own key, value of env.ANISPRITE_DEFAULT_CONFIG
             config[key] ?= value
-        
+
         #create primary object
         @_ani = {}
-        
+
         #create secondary objects
         @_ani.cycles = []
         @_ani.timer = new Timer(true)
-        
+
         #call the Sprite constructor
         super(config)
-    
+
     #getter
     get: (what) ->
-        switch what
-            when 'cellWidth', 'cellHeight', 'frameRate', 'orientation'
-                @_ani[what]
-            when 'current', 'animation', 'cycle'
-                @_ani.current.name
-            else
-                super what
-    
+        if what.match /(^current$|^animation$|^cycle$)/i
+            @_ani.current.name
+        else if what.match /(^cellWidth$|^cellHeight$|^frameRate$|^orientation$)/
+            @_ani[what]
+        else
+            super what
+
     #setter
     set: (what, to) ->
-        if what is 'cellWidth' or
-        what is 'cellHeight' or
-        what is 'frameRate' or
-        what is 'orientation'
+        if what.match /(^current$|^animation$|^cycle$)/i
+            if to isnt @_ani.current.name
+                @_ani.current.frame = @_ani.current.start
+                for cycle in @_ani.cycles when cycle.name is to
+                    @_ani.current = cycle
+        else if what.match /(^cellWidth$|^cellHeight$|^frameRate$|^orientation$)/
             @_ani[what] = to
-        else if what is 'current' or
-            what is 'animation' or
-            what is 'cycle'
-                if to isnt @_ani.current.name
-                    @_ani.current.frame = @_ani.current.start
-                    for cycle in @_ani.cycles when cycle.name is to
-                        @_ani.current = cycle
         else if what.match /^cycle/i
             i = 0
             to.index ?= i += 1
             to.start ?= 1
             to.stop ?= to.start + env.ANICYCLE_DEFAULT_CONFIG.numFrames - 1
             to.name ?= if what.slice(5) then what.slice(5) else env.ANICYCLE_DEFAULT_CONFIG.name
-            
+
             @_ani.cycles.push(new AniCycle(to))
             @_ani.current ?= @_ani.cycles[0]
         else
             super what, to
         this
-    
+
+    #changer
+    change: (what, step) ->
+        if what.match /^frameRate$/i
+            @_ani.frameRate += step
+        else
+            super what, step
+
     #animation control
     play: ->
         @_ani.timer.start()
@@ -79,17 +86,17 @@ class @AniSprite extends @Sprite
         @_ani.timer.stop()
         @_ani.current.frame = @_ani.current.start
         this
-    
+
     #update routines
     _draw: ->
         if @_dis.visible
             #save current context
             @_dis.context.save()
-            
+
             #translate and rotate
             @_dis.context.translate @_pos.x, -@_pos.y
             @_dis.context.rotate -@_pos.a
-            
+
             #determine slicing index
             if @_ani.orientation.toLowerCase() is 'horizontal'
                 sliceX = @_ani.current.frame - 1
@@ -97,28 +104,34 @@ class @AniSprite extends @Sprite
             else if @_ani.orientation.toLowerCase() is 'vertical'
                 sliceX = @_ani.current.index - 1
                 sliceY = @_ani.current.frame - 1
-            
+
             #draw frame
-            @_dis.context.drawImage( 
+            @_dis.context.drawImage(
                 @_dis.image, #spritesheet
                 @_ani.cellWidth * sliceX, #sx
                 @_ani.cellHeight * sliceY, #sy
                 @_ani.cellWidth, #swidth
                 @_ani.cellHeight, #sheight
-                -@_dis.width / 2, #x
-                -@_dis.height / 2, #y
+                -@_dis.width / 2, #left
+                -@_dis.height / 2, #top
                 @_dis.width, #width
                 @_dis.height) #height
-            
+
             #restore context
             @_dis.context.restore()
     _update: ->
         if @_dis.visible
+            #determine if it's time to change frames
             if @_ani.timer.getElapsedTime() >= (1000 / @_ani.frameRate)
+                #determine next frame in animation loop
                 if @_ani.current.frame < @_ani.current.stop
                     @_ani.current.frame += 1
                 else
                     @_ani.current.frame = @_ani.current.start
+
+                #restart the timer
                 @_ani.timer.restart()
+
+            #call Sprite _update
             super()
 #end class AniSprite

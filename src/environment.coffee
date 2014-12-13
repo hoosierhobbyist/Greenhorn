@@ -9,6 +9,7 @@ sedabull@gmail.com
     FRAME_RATE: 25
     #Greenhorn engine style
     ENGINE:
+        bounceDecay: 0
         accentColor: 'silver'
         backgroundColor: 'black'
         foregroundColor: 'darkgreen'

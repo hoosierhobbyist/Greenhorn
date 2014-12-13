@@ -11,70 +11,72 @@ class @Sprite
     _list = []
     _sortRule = (sp1, sp2) ->
         sp1._dis.level - sp2._dis.level
-    
+
     #collective manipulation
-    @howMany = -> _list.length
+    @howMany = ->
+        _list.length
     @getAll = (what, excep...) ->
-        sp.get what for sp in _list when sp not in excep
+        for sp in _list when sp not in excep
+            sp.get what
     @setAll = (what, to, excep...) ->
-        sp.set what, to for sp in _list when sp not in excep
+        for sp in _list when sp not in excep
+            sp.set what, to
+        return
     @changeAll = (what, step, excep...) ->
-        sp.change what, step for sp in _list when sp not in excep
+        for sp in _list when sp not in excep
+            sp.change what, step
+        return
     @_drawAll = ->
-        sp._draw() for sp in _list
+        for sp in _list
+            sp._draw()
         return
     @_startAll = ->
-        sp._start() for sp in _list
+        for sp in _list
+            sp.start()
         return
     @_stopAll = ->
-        sp._stop() for sp in _list
+        for sp in _list
+            sp.stop()
         return
-    
+
     #<---INSTANCE-LEVEL--->
-    #constructor
     constructor: (config = {}) ->
-        forbidden = [
-            "distance"
-            "speed"
-            "rate"
-            "posAngle"
-            "motAngle"
-            "accAngle"
-        ]#end forbidden config keys
-        
+        #forbidden key regex
+        forbidden = /(^ditance$|^speed$|^rate$|^posAngle$|^motAngle$|^accAngle$)/i
+
         #throw an error if a forbidden key is provided in the configuration
-        throw new Error "#{key} is a forbidden config value" for key in forbidden when config[key]?
-        
-        #add the environment defaults to config,
-        #if the user has chosen to omit them
+        for own key of config when key.match forbidden
+            throw new Error "#{key} is a forbidden config value"
+
+        #add missing keys to config
         for own key, value of env.SPRITE_DEFAULT_CONFIG
             config[key] ?= value
-        
+
         #used to track asynchronous _update
         @_updateID = null
-        
+
         #create primary objects
         @_dis = {}
         @_pos = {}
         @_mot = {}
         @_acc = {}
-        
+
         #create secondary objects
         @_dis.image = new Image()
         @_dis.context = document.querySelector('#gh-canvas').getContext('2d')
-        
+
         #set this sprite's configuration
-        #calls child's set method in derived classes
+        #"virtually" calls child's set method in derived classes
         @set 'config', config
-        
+
         #start updating if the engine is already running
         if Greenhorn.isRunning() then @_start()
-        
-        #sort the Sprite _list according to _sortRule
+
+        #add to Sprite _list and sort by level
         _list.push this
         _list.sort _sortRule
-    
-    #start and stop _update function
+
+    #_update control
     _start: ->
         @_updateID = setInterval @_update, 1000 / env.FRAME_RATE
     _stop: ->
@@ -82,155 +84,160 @@ class @Sprite
         @_updateID = null
     isRunning: ->
         @_updateID?
-    
+
     #getter
     get: (what) ->
-        switch what
-            when "imageFile"
-                @_dis.image.src
-            when "level", "width", "height", "visible", "boundAction"
-                @_dis[what]
-            when "x", "y", "a"
-                @_pos[what]
-            when "dx", "dy", "da"
-                @_mot[what]
-            when "ddx", "ddy", "dda"
-                @_acc[what]
-            when "top"
-                @_pos.y + @_dis.height / 2
-            when "bottom"
-                @_pos.y - @_dis.height / 2
-            when "right"
-                @_pos.x + @_dis.width / 2
-            when "left"
-                @_pos.x - @_dis.width / 2
-            when "distance"
-                Math.sqrt @_pos.x**2 + @_pos.y**2
-            when "speed"
-                Math.sqrt @_mot.dx**2 + @_mot.dy**2
-            when "rate"
-                Math.sqrt @_acc.ddx**2 + @_acc.ddy**2
-            when "posAngle"
-                Math.atan2 @_pos.y, @_pos.x
-            when "motAngle"
-                Math.atan2 @_mot.dy, @_mot.dx
-            when "accAngle"
-                Math.atan2 @_acc.ddy, @_acc.ddx
-            else
-                throw new Error "#{what} is not a get-able Sprite attribute"
-    
+        if what.match /^imageFile$/i
+            @_dis.image.src
+        else if what.match /(^x$|^y$|^a$)/i
+            @_pos[what.toLowerCase()]
+        else if what.match /(^dx$|^dy$|^da$)/i
+            @_mot[what.toLowerCase()]
+        else if what.match /(^ddx$|^ddy$|^dda$)/i
+            @_acc[what.toLowerCase()]
+        else if what.match /^top$/i
+            @_pos.y + @_dis.height / 2
+        else if what.match /^bottom$/i
+            @_pos.y - @_dis.height / 2
+        else if what.match /^right$/i
+            @_pos.x + @_dis.width / 2
+        else if what.match /^left$/i
+            @_pos.x - @_dis.width / 2
+        else if what.match /^distance$/i
+            Math.sqrt @_pos.x**2 + @_pos.y**2
+        else if what.match /^speed$/i
+            Math.sqrt @_mot.dx**2 + @_mot.dy**2
+        else if what.match /^rate$/i
+            Math.sqrt @_acc.ddx**2 + @_acc.ddy**2
+        else if what.match /^posAngle$/i
+            Math.atan2 -@_pos.y, @_pos.x
+        else if what.match /^motAngle$/i
+            Math.atan2 -@_mot.dy, @_mot.dx
+        else if what.match /^accAngle$/i
+            Math.atan2 -@_acc.ddy, @_acc.ddx
+        else if what.match /(^level$|^width$|^height$|^visible$|^boundAction$)/
+            @_dis[what]
+        else
+            throw new Error "#{what} is not a get-able Sprite attribute"
+
     #setter
     set: (what, to) ->
-        switch what
-            when "display", "position", "motion", "acceleration", "config"
-                @set k, v for own k, v of to
-            when "imageFile"
-                @_dis.image.src = env.IMAGE_PATH.concat to
-            when "level", "width", "height", "visible", "boundAction"
-                @_dis[what] = to
-                _list.sort _sortRule if what is "level"
-            when "x", "y", "a"
-                @_pos[what] = to
-            when "dx", "dy", "da"
-                @_mot[what] = to
-            when "ddx", "ddy", "dda"
-                @_acc[what] = to
-            when "distance"
-                proxy =
-                    x: to * Math.cos @get "posAngle"
-                    y: to * Math.sin @get "posAngle"
-                @set "position", proxy
-            when "speed"
-                proxy =
-                    dx: to * Math.cos @get "motAngle"
-                    dy: to * Math.sin @get "motAngle"
-                @set "motion", proxy
-            when "rate"
-                proxy =
-                    ddx: to * Math.cos @get "accAngle"
-                    ddy: to * Math.sin @get "accAngle"
-                @set "acceleration", proxy
-            when "posAngle"
-                proxy =
-                    x: @get("distance") * Math.cos to
-                    y: @get("distance") * Math.sin to
-                @set "position", proxy
-            when "motAngle"
-                proxy =
-                    dx: @get("speed") * Math.cos to
-                    dy: @get("speed") * Math.sin to
-                @set "motion", proxy
-            when "accAngle"
-                proxy =
-                    ddx: @get("rate") * Math.cos to
-                    ddy: @get("rate") * Math.sin to
-                @set "acceleration", proxy
-            else
-                throw new Error "#{what} is not a set-able Sprite attribute"
+        if what.match /^imageFile$/i
+            @_dis.image.src = env.IMAGE_PATH.concat to
+        else if what.match /(^x$|^y$|^a$)/i
+            @_pos[what.toLowerCase()] = to
+        else if what.match /(^dx$|^dy$|^da$)/i
+            @_mot[what.toLowerCase()] = to
+        else if what.match /(^ddx$|^ddy$|^dda$)/i
+            @_acc[what.toLowerCase()] = to
+        else if what.match /^top$/i
+            @_pos.y = to - @_dis.height / 2
+        else if what.match /^bottom$/i
+            @_pos.y = to + @_dis.height / 2
+        else if what.match /^right$/i
+            @_pos.x = to - @_dis.width / 2
+        else if what.match /^left$/i
+            @_pos.x = to + @_dis.width / 2
+        else if what.match /^distance$/i
+            proxy =
+                x: to * Math.cos @get('posAngle')
+                y: to * Math.sin @get('posAngle')
+            @set '_pos', proxy
+        else if what.match /^speed$/i
+            proxy =
+                dx: to * Math.cos @get('motAngle')
+                dy: to * Math.sin @get('motAngle')
+            @set '_mot', proxy
+        else if what.match /^rate$/i
+            proxy =
+                ddx: to * Math.cos @get('accAngle')
+                ddy: to * Math.sin @get('accAngle')
+            @set '_acc', proxy
+        else if what.match /^posAngle$/i
+            proxy =
+                x: @get('distance') * Math.cos to
+                y: @get('distance') * Math.sin to
+            @set '_pos', proxy
+        else if what.match /^motAngle$/i
+            proxy =
+                dx: @get('speed') * Math.cos to
+                dy: @get('speed') * Math.sin to
+            @set '_mot', proxy
+        else if what.match /^accAngle$/i
+            proxy =
+                ddx: @get('rate') * Math.cos to
+                ddy: @get('rate') * Math.sin to
+            @set '_acc', proxy
+        else if what.match /(^_?dis|^_?pos|^_?mot|^_?acc|^config)/i
+            @set k, v for own k, v of to
+        else if what.match /(^level$|^width$|^height$|^visible$|^boundAction$)/
+            @_dis[what] = to
+            _list.sort _sortRule if what is 'level'
+        else
+            throw new Error "#{what} is not a set-able Sprite attribute"
         this
-    
+
     #changer
     change: (what, step) ->
-        switch what
-            when "display", "position", "motion", "acceleration"
-                @change k.slice(1), v for own k, v of step
-            when "level", "width", "height"
-                @_dis[what] += step / env.FRAME_RATE
-            when "x", "y", "a"
-                @_pos[what] += step / env.FRAME_RATE
-            when "dx", "dy", "da"
-                @_mot[what] += step / env.FRAME_RATE
-            when "ddx", "ddy", "dda"
-                @_acc[what] += step / env.FRAME_RATE
-            when "distance"
-                proxy =
-                    dx: step * Math.cos @get "posAngle"
-                    dy: step * Math.sin @get "posAngle"
-                @change "position", proxy
-            when "speed"
-                proxy =
-                    ddx: step * Math.cos @get "motAngle"
-                    ddy: step * Math.sin @get "motAngle"
-                @change "motion", proxy
-            when "rate"
-                proxy =
-                    dddx: step * Math.cos @get "accAngle"
-                    dddy: step * Math.sin @get "accAngle"
-                @change "acceleration", proxy
-            when "posAngle"
-                proxy =
-                    dx: @get("distance") * Math.cos step
-                    dy: @get("distance") * Math.sin step
-                @change "position", proxy
-            when "motAngle"
-                proxy =
-                    ddx: @get("speed") * Math.cos step
-                    ddy: @get("speed") * Math.sin step
-                @change "motion", proxy
-            when "accAngle"
-                proxy =
-                    dddx: @get("rate") * Math.cos step
-                    dddy: @get("rate") * Math.sin step
-                @change "acceleration", proxy
-            else
-                throw new Error "#{what} is not a change-able Sprite attribute"
+        if what.match /(^x$|^y$|^a$)/i
+            @_pos[what.toLowerCase()] += step / env.FRAME_RATE
+        else if what.match /(^dx$|^dy$|^da$)/i
+            @_mot[what.toLowerCase()] += step / env.FRAME_RATE
+        else if what.match /(^ddx$|^ddy$|^dda$)/i
+            @_acc[what.toLowerCase()] += step / env.FRAME_RATE
+        else if what.match /(^level$|^width$|^height$)/i
+            @_dis[what.toLowerCase()] += step / env.FRAME_RATE
+        else if what.match /^distance$/i
+            proxy =
+                dx: step * Math.cos @get('posAngle')
+                dy: step * Math.sin @get('posAngle')
+            @change '_pos', proxy
+        else if what.match /^speed$/i
+            proxy =
+                ddx: step * Math.cos @get('motAngle')
+                ddy: step * Math.sin @get('motAngle')
+            @change '_mot', proxy
+        else if what.match /^rate$/i
+            proxy =
+                dddx: step * Math.cos @get('accAngle')
+                dddy: step * Math.sin @get('accAngle')
+            @change '_acc', proxy
+        else if what.match /^posAngle$/i
+            proxy =
+                dx: @get('distance') * Math.cos step
+                dy: @get('distance') * Math.sin step
+            @change '_pos', proxy
+        else if what.match /^motAngle$/i
+            proxy =
+                ddx: @get('speed') * Math.cos step
+                ddy: @get('speed') * Math.sin step
+            @change '_mot', proxy
+        else if what.match /^accAngle$/i
+            proxy =
+                dddx: @get('rate') * Math.cos step
+                dddy: @get('rate') * Math.sin step
+            @change '_acc', proxy
+        else if what.match /(^_?dis|^_?pos|^_?mot|^_?acc)/i
+            @change k.slice(1), v for own k, v of step
+        else
+            throw new Error "#{what} is not a change-able Sprite attribute"
         this
-    
+
     #collision routines
     collidesWith: (other) ->
         if other is 'mouse'
             collision = false
             if @_dis.visible
-                if @get("left") < Greenhorn.getMouseX() < @get("right") and
-                @get("bottom") < Greenhorn.getMouseY() < @get("top")
+                if @get('left') < Greenhorn.getMouseX() < @get('right') and
+                @get('bottom') < Greenhorn.getMouseY() < @get('top')
                     collision = true
         else
             collision = true
-            if @_dis.visible and other.get("visible") and @_dis.level == other.get("level")
-                if @get("bottom") > other.get("top") or
-                @get("top") < other.get("bottom") or
-                @get("right") < other.get("left") or
-                @get("left") > other.get("right")
+            if @_dis.visible and other.get('visible') and @_dis.level == other.get('level')
+                if @get('bottom') > other.get('top') or
+                @get('top') < other.get('bottom') or
+                @get('right') < other.get('left') or
+                @get('left') > other.get('right')
                     collision = false
             else collision = false
         collision
@@ -252,107 +259,90 @@ class @Sprite
             otherX = other.get 'x'
             otherY = other.get 'y'
         Math.atan2 @_pos.y - otherY, @_pos.x - otherX
-    
+
     #update routines
     _draw: ->
         if @_dis.visible
+            #save context
             @_dis.context.save()
-            
+
             #translate and rotate
             @_dis.context.translate @_pos.x, -@_pos.y
             @_dis.context.rotate -@_pos.a
-            
+
             #draw image
             @_dis.context.drawImage(
                 @_dis.image, #imageFile
-                -@_dis.width / 2, #x
-                -@_dis.height / 2, #y
+                -@_dis.width / 2, #left
+                -@_dis.height / 2, #top
                 @_dis.width, #width
                 @_dis.height) #height
-            
+
+            #restore context
             @_dis.context.restore()
     _update: =>
         if @_dis.visible
             #accelerate and move
-            @change "motion", @_acc
-            @change "position", @_mot
-            
+            @change '_mot', @_acc
+            @change '_pos', @_mot
+
             #check boundaries
             bounds =
-                top: Greenhorn.get("canvas", "height") / 2
-                bottom: -Greenhorn.get("canvas", "height") / 2
-                right: Greenhorn.get("canvas", "width") / 2
-                left: -Greenhorn.get("canvas", "width") / 2
-            
+                top: Greenhorn.get('canvas', 'height') / 2
+                bottom: -Greenhorn.get('canvas', 'height') / 2
+                right: Greenhorn.get('canvas', 'width') / 2
+                left: -Greenhorn.get('canvas', 'width') / 2
+
             #sprite has completely disappeared offscreen
-            offTop = @get("bottom") > bounds.top
-            offBottom = @get("top") < bounds.bottom
-            offRight = @get("left") > bounds.right
-            offLeft = @get("right") < bounds.left
-            
+            offTop = @get('bottom') > bounds.top
+            offBottom = @get('top') < bounds.bottom
+            offRight = @get('left') > bounds.right
+            offLeft = @get('right') < bounds.left
+
             #sprite has just come into contact with a boundary
-            hitTop = @get("top") >= bounds.top
-            hitBottom = @get("bottom") <= bounds.bottom
-            hitRight = @get("right") >= bounds.right
-            hitLeft = @get("left") <= bounds.left
-            
+            hitTop = @get('top') >= bounds.top
+            hitBottom = @get('bottom') <= bounds.bottom
+            hitRight = @get('right') >= bounds.right
+            hitLeft = @get('left') <= bounds.left
+
             #determine how to behave at boundaries
             switch @_dis.boundAction
-                when "WRAP"
-                    if offTop
-                        @set "y", bounds.bottom - @_dis.height / 2
-                    if offBottom
-                        @set "y", bounds.top + @_dis.height / 2
-                    if offRight
-                        @set "x", bounds.left - @_dis.width / 2
-                    if offLeft
-                        @set "x", bounds.right + @_dis.width / 2
-                when "BOUNCE"
-                    if hitTop
-                        @set "y", bounds.top - @_dis.height / 2
-                        @_mot.dy *= -1
-                    if hitBottom
-                        @set "y", bounds.bottom + @_dis.height / 2
-                        @_mot.dy *= -1
-                    if hitRight
-                        @set "x", bounds.right - @_dis.width / 2
-                        @_mot.dx *= -1
-                    if hitLeft
-                        @set "x", bounds.left + @_dis.width / 2
-                        @_mot.dx *= -1
-                when "SEMIBOUNCE"
-                    if hitTop
-                        @set "y", bounds.top - @_dis.height / 2
-                        @_mot.dy *= -.75
-                    if hitBottom
-                        @set "y", bounds.bottom + @_dis.height / 2
-                        @_mot.dy *= -.75
-                    if hitRight
-                        @set "x", bounds.right - @_dis.width / 2
-                        @_mot.dx *= -.75
-                    if hitLeft
-                        @set "x", bounds.left + @_dis.width / 2
-                        @_mot.dx *= -.75
-                when "STOP"
-                    if hitTop or hitBottom or hitRight or hitLeft
-                        @_mot.dx = 0
-                        @_mot.dy = 0
-                        @_acc.ddx = 0
-                        @_acc.ddy = 0
-                        
-                        if hitTop
-                            @set "y", bounds.top - @_dis.height / 2
-                        if hitBottom
-                            @set "y", bounds.bottom + @_dis.height / 2
-                        if hitRight
-                            @set "x", bounds.right - @_dis.width / 2
-                        if hitLeft
-                            @set "x", bounds.left + @_dis.width / 2
-                when "DIE"
+                when 'DIE'
                     if offTop or offBottom or offRight or offLeft
-                        @_dis.visible = no
+                        @_dis.visible = false
+                when 'WRAP'
+                    if offTop
+                        @set 'top', bounds.bottom
+                    if offBottom
+                        @set 'bottom', bounds.top
+                    if offRight
+                        @set 'right', bounds.left
+                    if offLeft
+                        @set 'left', bounds.right
+                when 'STOP'
+                    if hitTop
+                        @set 'top', bounds.top - 1
+                    if hitBottom
+                        @set 'bottom', bounds.bottom + 1
+                    if hitRight
+                        @set 'right', bounds.right - 1
+                    if hitLeft
+                        @set 'left', bounds.left + 1
+                when 'BOUNCE'
+                    if hitTop
+                        @set 'top', bounds.top - 1
+                        @_mot.dy *= -1 + env.ENGINE.bounceDecay
+                    if hitBottom
+                        @set 'bottom', bounds.bottom + 1
+                        @_mot.dy *= -1 + env.ENGINE.bounceDecay
+                    if hitRight
+                        @set 'right', bounds.right - 1
+                        @_mot.dx *= -1 + env.ENGINE.bounceDecay
+                    if hitLeft
+                        @set 'left', bounds.left + 1
+                        @_mot.dx *= -1 + env.ENGINE.bounceDecay
         this
-    
+
     #debugging
     report: ->
         """
