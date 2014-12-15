@@ -32,8 +32,10 @@ class @Sprite
             _list.splice i, 1
             return
     @removeAll = (excep...) ->
-        for sp in _list when sp not in excep
-            @remove sp
+        _list = []
+        for sp in excep
+            _list.push sp
+        _list.sort _sortRule
         return
     @_drawAll = ->
         for sp in _list

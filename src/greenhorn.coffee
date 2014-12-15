@@ -144,52 +144,53 @@ class @Greenhorn
 
     #game control
     @start = =>
-        if _firstTime
-            #add engine to a user defined '#GREENHORN' div or the document body
-            (document.querySelector('.gh') ? document.body).appendChild _elmnts.main
+        unless @isRunning()
+            if _firstTime
+                #add engine to a user defined '#GREENHORN' div or the document body
+                (document.querySelector('.gh') ? document.body).appendChild _elmnts.main
 
-            #set the size of the canvas
-            @set 'canvas', 'width', env.ENGINE.canvasWidth
-            @set 'canvas', 'height', env.ENGINE.canvasHeight
+                #set the size of the canvas
+                @set 'canvas', 'width', env.ENGINE.canvasWidth
+                @set 'canvas', 'height', env.ENGINE.canvasHeight
 
-            #center the canvas origin point
-            _elmnts.canvas.getContext('2d')
-            .translate(
-                _elmnts.canvas.width / 2,
-                _elmnts.canvas.height / 2)
+                #center the canvas origin point
+                _elmnts.canvas.getContext('2d')
+                .translate(
+                    _elmnts.canvas.width / 2,
+                    _elmnts.canvas.height / 2)
 
-            #set the innerHTML of each element
-            @set 'title', 'innerHTML', document.title
-            @set 'leftPanelHeader', 'innerHTML', env.ENGINE.leftHeader
-            @set 'rightPanelHeader', 'innerHTML', env.ENGINE.rightHeader
-            @set 'footer', 'innerHTML', env.ENGINE.footer
-            @set 'canvas', 'innerHTML', 'your browser does not support the <canvas> tag'
+                #set the innerHTML of each element
+                @set 'title', 'innerHTML', document.title
+                @set 'leftPanelHeader', 'innerHTML', env.ENGINE.leftHeader
+                @set 'rightPanelHeader', 'innerHTML', env.ENGINE.rightHeader
+                @set 'footer', 'innerHTML', env.ENGINE.footer
+                @set 'canvas', 'innerHTML', 'your browser does not support the <canvas> tag'
 
-            #draw the start screen
-            _ctx = _elmnts.canvas.getContext '2d'
-            _ctx.save()
-            _ctx.globalAlpha = 1.0
-            _ctx.textAlign = 'center'
-            _ctx.textBaseline = 'middle'
-            _ctx.font = "#{env.STARTUP.size}px #{env.STARTUP.font}"
-            _ctx.fillStyle = "#{env.ENGINE.foregroundColor}"
-            _ctx.fillText env.STARTUP.text, 0, 0
-            _ctx.restore()
+                #draw the start screen
+                _ctx = _elmnts.canvas.getContext '2d'
+                _ctx.save()
+                _ctx.globalAlpha = 1.0
+                _ctx.textAlign = 'center'
+                _ctx.textBaseline = 'middle'
+                _ctx.font = "#{env.STARTUP.size}px #{env.STARTUP.font}"
+                _ctx.fillStyle = "#{env.ENGINE.foregroundColor}"
+                _ctx.fillText env.STARTUP.text, 0, 0
+                _ctx.restore()
 
-            #make the entire canvas a button
-            #that preloads all sounds and
-            #launches all asynchronous updates
-            _elmnts.canvas.onclick = ->
-                Sounds._playAll()
+                #make the entire canvas a button
+                #that preloads all sounds and
+                #launches all asynchronous updates
+                _elmnts.canvas.onclick = ->
+                    Sounds._playAll()
+                    _startEverything()
+                    _elmnts.canvas.onclick = undefined
+
+                #set _firstTime to false to avoid unnessecary
+                #code being run if the game is stopped then restarted
+                _firstTime = false
+
+            else
                 _startEverything()
-                _elmnts.canvas.onclick = undefined
-
-            #set _firstTime to false to avoid unnessecary
-            #code being run if the game is stopped then restarted
-            _firstTime = false
-
-        else
-            _startEverything()
     @stop = ->
         Sprites._stopAll()
         Sounds._stopAll()
