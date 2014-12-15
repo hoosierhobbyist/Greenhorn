@@ -20,13 +20,16 @@ makeHTML = (source) ->
       <head>
         <meta charset='UTF-8'>
         <meta name='author' content='Seth David Bullock'>
-        <meta name='description' content='Greenhorn Gaming Engine example page'>
+        <meta name='description' content='Greenhorn Gaming Engine Example'>
+        <meta name='keywords' content='Greenhorn, Gaming, CoffeeScript, HTML5, canvas'>
         <link rel='stylesheet' href='./exampleStyle.css'>
         <script type='text/javascript' src='../lib/Greenhorn.js'></script>
         <script type='text/javascript' src='../lib/jquery-1.11.1.min.js'></script>
         <script type='text/javascript' src='#{source}'></script>
         <script type='text/javascript'>
           function loadSource(){
+              $('#gh-footer').html('\\\\/ Checkout the source code below \\\\/')
+
               $.get('#{source.replace('java', 'coffee').replace('.js', '.coffee')}', function(data){
                   while(data.match(/[<>]/)){
                       data = data.replace('<', '&lt');
@@ -50,6 +53,7 @@ makeHTML = (source) ->
       <body onload='loadSource()'>
         <div class='gh'>
           <h1 id='desc' class='title'><strong>GREENHORN GAMING: EXAMPLES</strong></h1>
+          <h2 id='author' class='title'><em>by Seth David Bullock</em></h2>
         </div>
         <div id='content'>
           <h2 id='code' class='title'><strong>SOURCE CODE</strong></h2>

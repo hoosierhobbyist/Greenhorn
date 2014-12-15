@@ -36,16 +36,16 @@ body{
     background: url("../images/bkg.png") 0 0;
 }/*end #GREENHORN*/
 
-#desc{
+#desc, #author{
     text-align: center;
     margin-top: 10px;
     margin-bottom: 10px;
 }/*end #desc*/
 
 #content{
-    width: 80%;
+    width: 95%;
     margin-top: 2.5em;
-    margin-left: 10%;
+    margin-left: 1%;
     padding: 15px;
     background: url("../images/bkg.png") 0 0;
     display: inline-block;

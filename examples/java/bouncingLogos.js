@@ -5,13 +5,15 @@ bouncingLogos.coffee
 Written by Seth Bullock
 sedabull@gmail.com
  */
-var init, randomConfig, update;
+var init, randomConfig;
 
-document.title = 'Bouncing Logos';
+document.title = 'Bouncing Ubuntu Logos';
 
 env.IMAGE_PATH = '../images/';
 
-env.ENGINE.footer = '\\/ Check out the source code below \\/';
+env.ENGINE.leftHeader = 'INSTRUCTIONS';
+
+env.ENGINE.rightHeader = 'BUTTONS';
 
 env.SPRITE_DEFAULT_CONFIG.ddy = -50;
 
@@ -33,8 +35,48 @@ randomConfig = function() {
 };
 
 init = function() {
-  var i, _results;
+  var i, instructions, _results;
   Greenhorn.start();
+  Greenhorn.addButton({
+    label: 'Clear Canvas',
+    onclick: function() {
+      return Sprites.deleteAll();
+    }
+  });
+  Greenhorn.addButton({
+    label: 'Add One',
+    onclick: function() {
+      return new Sprite(randomConfig());
+    }
+  });
+  Greenhorn.addButton({
+    label: 'Add Five',
+    onclick: function() {
+      var i, _results;
+      i = 5;
+      _results = [];
+      while (i > 0) {
+        i -= 1;
+        _results.push(new Sprite(randomConfig()));
+      }
+      return _results;
+    }
+  });
+  Greenhorn.addButton({
+    label: 'Add Ten',
+    onclick: function() {
+      var i, _results;
+      i = 10;
+      _results = [];
+      while (i > 0) {
+        i -= 1;
+        _results.push(new Sprite(randomConfig()));
+      }
+      return _results;
+    }
+  });
+  instructions = '<p style=\'white-space: initial\'>\nUse the Buttons on the left hand side\nto add or remove Ubuntu logos.\n</p>';
+  $('#gh-left-panel').append(instructions);
   i = Math.round(Math.random() * 9 + 1);
   _results = [];
   while (i > 0) {
@@ -42,10 +84,4 @@ init = function() {
     _results.push(new Sprite(randomConfig()));
   }
   return _results;
-};
-
-update = function() {
-  if (Greenhorn.isDown[KEYS.SPACE]) {
-    return new Sprite(randomConfig());
-  }
 };
