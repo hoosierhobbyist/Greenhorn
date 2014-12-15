@@ -26,6 +26,15 @@ class @Sprite
         for sp in _list when sp not in excep
             sp.change what, step
         return
+    @delete = (sprite) ->
+        sprite._stop() if sprite.isRunning()
+        for sp, i in _list when sp is sprite
+            _list.splice i, 1
+            return
+    @deleteAll = (excep...) ->
+        for sp in _list when sp not in excep
+            @delete sp
+        return
     @_drawAll = ->
         for sp in _list
             sp._draw()
