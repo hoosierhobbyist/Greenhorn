@@ -22,11 +22,11 @@ document.onreadystatechange = ->
     return
 document.onkeydown = (e) ->
     e.preventDefault()
-    isDown[e.keyCode] = true
+    Greenhorn.isDown[e.keyCode] = true
     return
 document.onkeyup = (e) ->
     e.preventDefault()
-    isDown[e.keyCode] = false
+    Greenhorn.isDown[e.keyCode] = false
     return
 document.onmousemove = (e) ->
     @mouseX = e.pageX
