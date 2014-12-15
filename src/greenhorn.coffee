@@ -4,10 +4,6 @@ Written by Seth Bullock
 sedabull@gmail.com
 ###
 
-#keyboard input tracking array
-@isDown = new Array(256)
-key = false for key in @isDown
-
 #keyboard value mapping object
 @KEYS =
     ESC: 27, SPACE: 32, PGUP: 33
@@ -55,6 +51,10 @@ _masterUpdate = ->
 
 #engine class
 class @Greenhorn
+    #keyboard input tracking array
+    @isDown = new Array(256)
+    key = false for key in @isDown
+
     #create Engine elements
     _elmnts =
         main: document.createElement 'div'
@@ -110,9 +110,6 @@ class @Greenhorn
     @set 'rightPanelHeader', 'style', _style.panelHeader
     @set 'footer', 'style', _style.footer
 
-    #unique id for each button created
-    _buttonID = 0
-
     #add button to one of the panels
     @addButton = (config = {}) ->
         #increment _buttonID
@@ -130,8 +127,8 @@ class @Greenhorn
         button = document.createElement 'button'
 
         #set values
-        button.id = "gh-button-#{_buttonID}"
-        button.setAttribute 'type', 'button'
+        button.class = 'gh-button'
+        button.type = config.type
         button.innerHTML = config.label
         button.onclick = config.onclick
         button.style[key] = value for own key, value of config.style
@@ -153,10 +150,7 @@ class @Greenhorn
     @start = =>
         if _firstTime
             #add engine to a user defined '#GREENHORN' div or the document body
-            (document.querySelector('#GREENHORN') ? document.body).appendChild _elmnts.main
-
-            #change the engine's parent's backgroundColor
-            _elmnts.main.parentNode.style.backgroundColor = env.ENGINE.backgroundColor
+            (document.querySelector('.gh') ? document.body).appendChild _elmnts.main
 
             #set the size of the canvas
             @set 'canvas', 'width', env.ENGINE.canvasWidth
@@ -217,7 +211,7 @@ class @Greenhorn
     @hide = ->
         @set 'main', 'style', {'display': 'none'}
     @show = ->
-        @set 'main', 'style', {'display': 'inline-block'}
+        @set 'main', 'style', {'display': 'block'}
     @hideCursor = ->
         @set 'canvas', 'style', {'cursor': 'none'}
     @showCursor = ->

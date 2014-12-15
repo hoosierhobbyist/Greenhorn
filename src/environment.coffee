@@ -90,6 +90,7 @@ sedabull@gmail.com
     TIMER_START_ON_CONSTRUCTION: yes
     #default button settings
     BUTTON_DEFAULT_CONFIG:
+        type: 'button'
         onclick: undefined
         parent: 'rightPanel'
         label: 'Launch the Missiles!'
