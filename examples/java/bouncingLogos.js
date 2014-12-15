@@ -2,9 +2,8 @@
 
 /*
 bouncingLogos.coffee
-
-the classic bouncing ball
-demonstration using the ubuntu logo
+Written by Seth Bullock
+sedabull@gmail.com
  */
 var init, randomConfig, update;
 
@@ -12,7 +11,9 @@ document.title = 'Bouncing Logos';
 
 env.IMAGE_PATH = '../images/';
 
-env.ENGINE_BOTTOM_PANEL = 'Press Space to add more logos';
+env.ENGINE.bounceDecay = .2;
+
+env.ENGINE.footer = '\\/ Check out the source code below \\/';
 
 env.SPRITE_DEFAULT_CONFIG.imageFile = 'logo.png';
 
@@ -22,8 +23,8 @@ randomConfig = function() {
   var size;
   size = Math.round(Math.random() * 64 + 32);
   return {
-    x: Math.random() * 400 - 200,
-    y: Math.random() * 300 - 150,
+    x: Math.random() * env.ENGINE.canvasWidth - env.ENGINE.canvasWidth / 2,
+    y: Math.random() * env.ENGINE.canvasHeight - env.ENGINE.canvasHeight / 2,
     dx: Math.random() * 50 - 25,
     da: Math.random() * 2 - 1,
     width: size,
@@ -32,17 +33,19 @@ randomConfig = function() {
 };
 
 init = function() {
-  var i;
+  var i, _results;
+  Greenhorn.start();
   i = Math.round(Math.random() * 9 + 1);
+  _results = [];
   while (i > 0) {
     i -= 1;
-    new Sprite(randomConfig());
+    _results.push(new Sprite(randomConfig()));
   }
-  return Greenhorn.start();
+  return _results;
 };
 
 update = function() {
-  if (keysDown[KEYS.SPACE]) {
+  if (isDown[KEYS.SPACE]) {
     new Sprite(randomConfig());
   }
   return Sprites.changeAll('dy', -50);

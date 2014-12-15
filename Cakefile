@@ -5,7 +5,7 @@ fs = require 'fs'
 
 compile = (source, destination, callback) ->
     coffee = spawn 'coffee', ['-c', '-b', '-o', "#{destination}", "#{source}"]
-    
+
     coffee.stderr.on 'data', (data) ->
         process.stderr.write data.toString()
     coffee.stdout.on 'data', (data) ->
@@ -19,10 +19,44 @@ makeHTML = (source) ->
     <html lang='en-US'>
       <head>
         <meta charset='UTF-8'>
+        <meta name='author' content='Seth David Bullock'>
+        <meta name='description' content='Greenhorn Gaming Engine example page'>
+        <link rel='stylesheet' href='./exampleStyle.css'>
         <script type='text/javascript' src='../lib/Greenhorn.js'></script>
+        <script type='text/javascript' src='../lib/jquery-1.11.1.min.js'></script>
         <script type='text/javascript' src='#{source}'></script>
+        <script type='text/javascript'>
+          function loadSource(){
+              $.get('#{source.replace('java', 'coffee').replace('.js', '.coffee')}', function(data){
+                  while(data.match(/[<>]/)){
+                      data = data.replace('<', '&lt');
+                      data = data.replace('>', '&gt');
+                  }//end while
+
+                  $('#coffee').html('\\n' + data);
+              }, 'text');//end get coffeescript source
+
+              $.get('#{source}', function(data){
+                  while(data.match(/[<>]/)){
+                      data = data.replace('<', '&lt');
+                      data = data.replace('>', '&gt');
+                  }//end while
+
+                  $('#java').html('\\n' + data);
+              }, 'text');//end get javascript source
+          }//end loadSource
+        </script>
       </head>
-      <body>
+      <body onload='loadSource()'>
+        <div id='GREENHORN'>
+          <h1 id='desc' class='title'><strong>Greenhorn Gaming: Examples</strong></h1>
+        </div>
+        <div id='content'>
+          <h2 id='code' class='title'><strong>SOURCE CODE</strong></h2>
+          <h3 class='title float-left'>Original CoffeeScript</h3>
+          <h3 class='title float-right'>Compiled JavaScript</h3>
+          <pre id='coffee' class='source float-left'></pre>
+          <pre id='java' class='source float-right'></pre>
       </body>
     </html>
     """

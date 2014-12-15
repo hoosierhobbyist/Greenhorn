@@ -23,7 +23,7 @@ body{
 .source{
     width: 45%;
     color: #FFFFFF;
-    font-size: .85em;
+    font-size: .80em;
     white-space: pre-wrap;
     background-color: #353535;
     border: 5px groove #FFFFFF;
@@ -42,7 +42,9 @@ body{
 }/*end #desc*/
 
 #content{
-    margin: 2.5em 0;
+    width: 80%;
+    margin-top: 2.5em;
+    margin-left: 10%;
     padding: 15px;
     background: #303030 url("../images/bkg.png") 0 0;
     display: inline-block;
