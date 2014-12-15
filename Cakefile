@@ -48,8 +48,8 @@ makeHTML = (source) ->
         </script>
       </head>
       <body onload='loadSource()'>
-        <div id='GREENHORN'>
-          <h1 id='desc' class='title'><strong>Greenhorn Gaming: Examples</strong></h1>
+        <div class='gh'>
+          <h1 id='desc' class='title'><strong>GREENHORN GAMING: EXAMPLES</strong></h1>
         </div>
         <div id='content'>
           <h2 id='code' class='title'><strong>SOURCE CODE</strong></h2>

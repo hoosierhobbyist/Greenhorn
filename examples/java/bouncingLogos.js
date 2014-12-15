@@ -11,9 +11,9 @@ document.title = 'Bouncing Logos';
 
 env.IMAGE_PATH = '../images/';
 
-env.ENGINE.bounceDecay = .2;
-
 env.ENGINE.footer = '\\/ Check out the source code below \\/';
+
+env.SPRITE_DEFAULT_CONFIG.ddy = -50;
 
 env.SPRITE_DEFAULT_CONFIG.imageFile = 'logo.png';
 
@@ -23,12 +23,12 @@ randomConfig = function() {
   var size;
   size = Math.round(Math.random() * 64 + 32);
   return {
-    x: Math.random() * env.ENGINE.canvasWidth - env.ENGINE.canvasWidth / 2,
-    y: Math.random() * env.ENGINE.canvasHeight - env.ENGINE.canvasHeight / 2,
-    dx: Math.random() * 50 - 25,
-    da: Math.random() * 2 - 1,
     width: size,
-    height: size
+    height: size,
+    da: Math.random() * 2 - 1,
+    dx: Math.random() * 50 - 25,
+    x: Math.random() * env.ENGINE.canvasWidth - env.ENGINE.canvasWidth / 2,
+    y: Math.random() * env.ENGINE.canvasHeight - env.ENGINE.canvasHeight / 2
   };
 };
 
@@ -45,8 +45,7 @@ init = function() {
 };
 
 update = function() {
-  if (isDown[KEYS.SPACE]) {
-    new Sprite(randomConfig());
+  if (Greenhorn.isDown[KEYS.SPACE]) {
+    return new Sprite(randomConfig());
   }
-  return Sprites.changeAll('dy', -50);
 };
