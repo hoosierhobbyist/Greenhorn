@@ -112,11 +112,7 @@ class @Greenhorn
 
     #add button to one of the panels
     @addButton = (config = {}) ->
-        #increment _buttonID
-        _buttonID += 1
-
-        #add environment defaults to config
-        #if the user has chosen to omit them
+        #add missing keys to config
         for own key, value of env.BUTTON_DEFAULT_CONFIG when key isnt 'style'
             config[key] ?= value
         for own key, value of env.BUTTON_DEFAULT_CONFIG.style
