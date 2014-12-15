@@ -38,9 +38,21 @@ init = function() {
   var i, instructions, _results;
   Greenhorn.start();
   Greenhorn.addButton({
-    label: 'Clear Canvas',
+    label: 'Start',
     onclick: function() {
-      return Sprites.deleteAll();
+      return Greenhorn.start();
+    }
+  });
+  Greenhorn.addButton({
+    label: 'Stop',
+    onclick: function() {
+      return Greenhorn.stop();
+    }
+  });
+  Greenhorn.addButton({
+    label: 'Remove All',
+    onclick: function() {
+      return Sprites.removeAll();
     }
   });
   Greenhorn.addButton({
@@ -67,6 +79,19 @@ init = function() {
     onclick: function() {
       var i, _results;
       i = 10;
+      _results = [];
+      while (i > 0) {
+        i -= 1;
+        _results.push(new Sprite(randomConfig()));
+      }
+      return _results;
+    }
+  });
+  Greenhorn.addButton({
+    label: 'Add Fifty',
+    onclick: function() {
+      var i, _results;
+      i = 50;
       _results = [];
       while (i > 0) {
         i -= 1;

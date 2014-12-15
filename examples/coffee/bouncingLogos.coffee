@@ -33,9 +33,15 @@ init = ->
     Greenhorn.start()
 
     #add control buttons
-    Greenhorn.addButton({label: 'Clear Canvas', onclick: ->
-        Sprites.deleteAll()
-    })#end Clear Canvas
+    Greenhorn.addButton({label: 'Start', onclick: ->
+        Greenhorn.start()
+    })#end Start
+    Greenhorn.addButton({label: 'Stop', onclick: ->
+        Greenhorn.stop()
+    })#end Stop
+    Greenhorn.addButton({label: 'Remove All', onclick: ->
+        Sprites.removeAll()
+    })#end Remove All
     Greenhorn.addButton({label: 'Add One', onclick: ->
         new Sprite(randomConfig())
     })#end Add One
@@ -51,6 +57,12 @@ init = ->
             i -= 1
             new Sprite(randomConfig())
     })#end Add Ten
+    Greenhorn.addButton({label: 'Add Fifty', onclick: ->
+        i = 50
+        while i > 0
+            i -= 1
+            new Sprite(randomConfig())
+    })#end Add Fifty
 
     #add instructions
     instructions =
