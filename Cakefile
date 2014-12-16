@@ -28,7 +28,8 @@ makeHTML = (source) ->
         <script type='text/javascript' src='#{source}'></script>
         <script type='text/javascript'>
           function loadSource(){
-              $('#gh-footer').html('\\\\/ Checkout the source code below \\\\/')
+              $('#gh-footer').html('\\\\/ Checkout the source code below \\\\/');
+              $('#gh-main').css('background', 'url(\"../images/gh_tile.png\") 0 0');
 
               $.get('#{source.replace('java', 'coffee').replace('.js', '.coffee')}', function(data){
                   while(data.match(/[<>]/)){

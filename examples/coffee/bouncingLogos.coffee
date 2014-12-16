@@ -9,11 +9,14 @@ document.title = 'Bouncing Ubuntu Logos'
 
 #setup the environment
 env.IMAGE_PATH = '../images/'
+env.ENGINE.accentColor = '#FFFFFF'
 env.ENGINE.leftHeader = 'INSTRUCTIONS'
 env.ENGINE.rightHeader = 'BUTTONS'
 env.SPRITE_DEFAULT_CONFIG.ddy = -50
 env.SPRITE_DEFAULT_CONFIG.imageFile = 'logo.png'
 env.SPRITE_DEFAULT_CONFIG.boundAction = 'BOUNCE'
+env.BUTTON_DEFAULT_CONFIG.style.color = 'white'
+env.BUTTON_DEFAULT_CONFIG.style.backgroundColor = 'black'
 
 #helper function to randomize Sprite config objects
 randomConfig = ->
@@ -39,9 +42,6 @@ init = ->
     Greenhorn.addButton({label: 'Stop', onclick: ->
         Greenhorn.stop()
     })#end Stop
-    Greenhorn.addButton({label: 'Remove All', onclick: ->
-        Sprites.removeAll()
-    })#end Remove All
     Greenhorn.addButton({label: 'Add One', onclick: ->
         new Sprite(randomConfig())
     })#end Add One
@@ -63,13 +63,17 @@ init = ->
             i -= 1
             new Sprite(randomConfig())
     })#end Add Fifty
+    Greenhorn.addButton({label: 'Remove All', onclick: ->
+        Sprites.removeAll()
+    })#end Remove All
 
     #add instructions
     instructions =
         '''
         <p style='white-space: initial'>
         Use the Buttons on the left hand side
-        to add or remove Ubuntu logos.
+        to start and stop the engine, or add
+        and remove Ubuntu Logos.
         </p>
         '''
     $('#gh-left-panel').append(instructions)
@@ -79,3 +83,8 @@ init = ->
     while i > 0
         i -= 1
         new Sprite(randomConfig())
+
+#define update() to be called once per frame
+update = ->
+    #report current number of Sprites
+    $('#gh-title').html("#{document.title}: #{Sprites.howMany()}")

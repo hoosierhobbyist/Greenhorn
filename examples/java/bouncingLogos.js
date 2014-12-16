@@ -5,11 +5,13 @@ bouncingLogos.coffee
 Written by Seth Bullock
 sedabull@gmail.com
  */
-var init, randomConfig;
+var init, randomConfig, update;
 
 document.title = 'Bouncing Ubuntu Logos';
 
 env.IMAGE_PATH = '../images/';
+
+env.ENGINE.accentColor = '#FFFFFF';
 
 env.ENGINE.leftHeader = 'INSTRUCTIONS';
 
@@ -20,6 +22,10 @@ env.SPRITE_DEFAULT_CONFIG.ddy = -50;
 env.SPRITE_DEFAULT_CONFIG.imageFile = 'logo.png';
 
 env.SPRITE_DEFAULT_CONFIG.boundAction = 'BOUNCE';
+
+env.BUTTON_DEFAULT_CONFIG.style.color = 'white';
+
+env.BUTTON_DEFAULT_CONFIG.style.backgroundColor = 'black';
 
 randomConfig = function() {
   var size;
@@ -47,12 +53,6 @@ init = function() {
     label: 'Stop',
     onclick: function() {
       return Greenhorn.stop();
-    }
-  });
-  Greenhorn.addButton({
-    label: 'Remove All',
-    onclick: function() {
-      return Sprites.removeAll();
     }
   });
   Greenhorn.addButton({
@@ -100,7 +100,13 @@ init = function() {
       return _results;
     }
   });
-  instructions = '<p style=\'white-space: initial\'>\nUse the Buttons on the left hand side\nto add or remove Ubuntu logos.\n</p>';
+  Greenhorn.addButton({
+    label: 'Remove All',
+    onclick: function() {
+      return Sprites.removeAll();
+    }
+  });
+  instructions = '<p style=\'white-space: initial\'>\nUse the Buttons on the left hand side\nto start and stop the engine, or add\nand remove Ubuntu Logos.\n</p>';
   $('#gh-left-panel').append(instructions);
   i = Math.round(Math.random() * 9 + 1);
   _results = [];
@@ -109,4 +115,8 @@ init = function() {
     _results.push(new Sprite(randomConfig()));
   }
   return _results;
+};
+
+update = function() {
+  return $('#gh-title').html("" + document.title + ": " + (Sprites.howMany()));
 };

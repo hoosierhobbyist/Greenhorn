@@ -1,6 +1,6 @@
 body{
     font-family: sans-serif;
-    background-color: darkgreen;
+    background: url("../images/gh_tile.png") 0 0;
 }/*end body*/
 
 .title{
@@ -33,7 +33,7 @@ body{
 .gh{
     border: 5px groove #FFFFFF;
     border-radius: 15px;
-    background: url("../images/bkg.png") 0 0;
+    background: url("../images/bg_tile.png") 0 0;
 }/*end #GREENHORN*/
 
 #desc, #author{
@@ -47,7 +47,7 @@ body{
     margin-top: 2.5em;
     margin-left: 1%;
     padding: 15px;
-    background: url("../images/bkg.png") 0 0;
+    background: url("../images/bg_tile.png") 0 0;
     display: inline-block;
     border: 5px groove #FFFFFF;
     border-radius: 15px
