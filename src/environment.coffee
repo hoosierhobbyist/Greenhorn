@@ -98,10 +98,10 @@ sedabull@gmail.com
             clear: 'left'
             cssFloat: 'left'
             width: '98%'
-            color: 'black'
             margin: '1%'
             fontSize: 'small'
-            backgroundColor: 'silver'
+            color: '#FFFFFF'
+            backgroundColor: '#000000'
 #end environment object
 
 #the Greenhorn engine style object
