@@ -11,7 +11,7 @@ document.title = 'Bouncing Ubuntu Logos';
 
 env.IMAGE_PATH = '../images/';
 
-env.ENGINE.leftHeader = 'INSTRUCTIONS';
+env.ENGINE.leftHeader = 'INFORMATION';
 
 env.ENGINE.rightHeader = 'BUTTONS';
 
@@ -100,7 +100,7 @@ init = function() {
       return Sprites.removeAll();
     }
   });
-  instructions = '<p style=\'white-space: initial\'>\nUse the Buttons on the left hand side\nto start and stop the engine, or add\nand remove Ubuntu Logos.\n</p>';
+  instructions = '<div style = \'white-space: wrap\'>\n<h4>Instructions</h4>\n<p>\nUse the Buttons on the left hand side\nto start and stop the engine, or add\nand remove Ubuntu Logos.\n</p>\n<h4>Trademark</h4>\n<p>\nPlease note the the logo used in this\nexample, which is known as\nThe Circle of Friends,\nis a registered trademark of\nCanonical Ltd.\n</p>\n</div>';
   $('#gh-left-panel').append(instructions);
   i = Math.round(Math.random() * 9 + 1);
   _results = [];

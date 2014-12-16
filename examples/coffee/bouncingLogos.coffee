@@ -9,7 +9,7 @@ document.title = 'Bouncing Ubuntu Logos'
 
 #setup the environment
 env.IMAGE_PATH = '../images/'
-env.ENGINE.leftHeader = 'INSTRUCTIONS'
+env.ENGINE.leftHeader = 'INFORMATION'
 env.ENGINE.rightHeader = 'BUTTONS'
 env.SPRITE_DEFAULT_CONFIG.ddy = -50
 env.SPRITE_DEFAULT_CONFIG.imageFile = 'logo.png'
@@ -67,11 +67,22 @@ init = ->
     #add instructions
     instructions =
         '''
-        <p style='white-space: initial'>
+        <div style = 'white-space: wrap'>
+        <h4>Instructions</h4>
+        <p>
         Use the Buttons on the left hand side
         to start and stop the engine, or add
         and remove Ubuntu Logos.
         </p>
+        <h4>Trademark</h4>
+        <p>
+        Please note the the logo used in this
+        example, which is known as
+        The Circle of Friends,
+        is a registered trademark of
+        Canonical Ltd.
+        </p>
+        </div>
         '''
     $('#gh-left-panel').append(instructions)
 
