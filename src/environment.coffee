@@ -151,7 +151,7 @@ _style =
         textAlign: 'center'
         marginBottom: '5px'
         paddingBottom: '2px'
-        borderBottom: "2px solid #{env.ENGINE.backgroundColor}"
+        borderBottom: "2px solid #{env.ENGINE.accentColor}"
     canvas:
         cssFloat: 'left'
         width: "#{env.ENGINE.canvasWidth}px"

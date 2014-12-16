@@ -144,7 +144,9 @@ class @Greenhorn
 
     #game control
     @start = =>
-        unless @isRunning()
+        #prevent starting without properly stopping first
+        unless @isRunning() or _elmnts.canvas.onclick?
+            #only do all of this once
             if _firstTime
                 #add engine to a user defined '#GREENHORN' div or the document body
                 (document.querySelector('.gh') ? document.body).appendChild _elmnts.main
