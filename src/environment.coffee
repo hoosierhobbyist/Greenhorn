@@ -16,9 +16,9 @@ sedabull@gmail.com
         titleHeight: 50
         footerHeight: 25
         bounceDecay: 0
-        accentColor: 'silver'
-        backgroundColor: 'black'
-        foregroundColor: 'darkgreen'
+        accentColor: '#FFFFFF'
+        backgroundColor: '#000000'
+        foregroundColor: '#006400'
         footer: 'BOTTOM PANEL'
         leftHeader: 'LEFT PANEL'
         rightHeader: 'RIGHT PANEL'
@@ -110,6 +110,7 @@ _style =
         margin: '2.5% auto'
         borderRadius: '15px'
         fontFamily: 'Tahoma, Geneva, sans-serif'
+        color: env.ENGINE.accentColor
         backgroundColor: env.ENGINE.foregroundColor
         border: "5px solid #{env.ENGINE.accentColor}"
         minHeight: "#{env.ENGINE.canvasHeight + env.ENGINE.titleHeight + env.ENGINE.footerHeight + 40}px"
