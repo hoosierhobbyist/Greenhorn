@@ -132,7 +132,6 @@ _style =
         margin: '10px'
         cssFloat: 'left'
         overflow: 'auto'
-        whiteSpace: 'pre'
         fontSize: '.70em'
         marginRight: '9px'
         width: "#{env.ENGINE.leftPanelWidth}px"
@@ -141,7 +140,6 @@ _style =
         margin: '10px'
         cssFloat: 'left'
         overflow: 'auto'
-        whiteSpace: 'pre'
         fontSize: '.70em'
         marginLeft: '9px'
         width: "#{env.ENGINE.rightPanelWidth}px"
