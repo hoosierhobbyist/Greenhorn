@@ -9,14 +9,11 @@ document.title = 'Bouncing Ubuntu Logos'
 
 #setup the environment
 env.IMAGE_PATH = '../images/'
-env.ENGINE.accentColor = '#FFFFFF'
 env.ENGINE.leftHeader = 'INSTRUCTIONS'
 env.ENGINE.rightHeader = 'BUTTONS'
 env.SPRITE_DEFAULT_CONFIG.ddy = -50
 env.SPRITE_DEFAULT_CONFIG.imageFile = 'logo.png'
 env.SPRITE_DEFAULT_CONFIG.boundAction = 'BOUNCE'
-env.BUTTON_DEFAULT_CONFIG.style.color = 'white'
-env.BUTTON_DEFAULT_CONFIG.style.backgroundColor = 'black'
 
 #helper function to randomize Sprite config objects
 randomConfig = ->
