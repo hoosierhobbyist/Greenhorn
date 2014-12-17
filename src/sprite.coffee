@@ -56,7 +56,7 @@ class @Sprite
     #<---INSTANCE-LEVEL--->
     constructor: (config = {}) ->
         #forbidden key regex
-        forbidden = /(^ditance$|^speed$|^rate$|^posAngle$|^motAngle$|^accAngle$)/i
+        forbidden = /(^distance$|^speed$|^rate$|^posAngle$|^motAngle$|^accAngle$)/i
 
         #throw an error if a forbidden key is provided in the configuration
         for own key of config when key.match forbidden
@@ -333,6 +333,15 @@ class @Sprite
                         @set 'right', bounds.left
                     if offLeft
                         @set 'left', bounds.right
+                when 'SPRING'
+                    if hitTop
+                        @change 'y', -50
+                    if hitBottom
+                        @change 'y', 50
+                    if hitRight
+                        @change 'x', -50
+                    if hitLeft
+                        @change 'x', 50
                 when 'STOP'
                     if hitTop
                         @set 'top', bounds.top - 1
