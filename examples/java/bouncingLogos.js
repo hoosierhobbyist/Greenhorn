@@ -35,7 +35,7 @@ randomConfig = function() {
 };
 
 init = function() {
-  var i, instructions, _results;
+  var i, information, _results;
   Greenhorn.start();
   Greenhorn.addButton({
     label: 'Start',
@@ -100,8 +100,8 @@ init = function() {
       return Sprites.removeAll();
     }
   });
-  instructions = '<div style = \'white-space: wrap\'>\n<h4>Instructions</h4>\n<p>\nUse the Buttons on the left hand side\nto start and stop the engine, or add\nand remove Ubuntu Logos.\n</p>\n<h4>Trademark</h4>\n<p>\nPlease note the the logo used in this\nexample, which is known as\nThe Circle of Friends,\nis a registered trademark of\nCanonical Ltd.\n</p>\n</div>';
-  $('#gh-left-panel').append(instructions);
+  information = '<div>\n<h4>Instructions</h4>\n<p style=\'margin:0\'>\nUse the Buttons on the left hand side\nto start and stop the engine, or add\nand remove Ubuntu Logos.\n</p>\n<h4>Trademark</h4>\n<p style=\'margin:0\'>\nPlease note that the logo used in this\nexample, which is known as\nThe Circle of Friends,\nis a registered trademark of\nCanonical Ltd.\n</p>\n</div>';
+  $('#gh-left-panel').append(information);
   i = Math.round(Math.random() * 9 + 1);
   _results = [];
   while (i > 0) {

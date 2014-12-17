@@ -64,19 +64,19 @@ init = ->
         Sprites.removeAll()
     })#end Remove All
 
-    #add instructions
-    instructions =
+    #add content to gh-left-panel
+    information =
         '''
-        <div style = 'white-space: wrap'>
+        <div>
         <h4>Instructions</h4>
-        <p>
+        <p style='margin:0'>
         Use the Buttons on the left hand side
         to start and stop the engine, or add
         and remove Ubuntu Logos.
         </p>
         <h4>Trademark</h4>
-        <p>
-        Please note the the logo used in this
+        <p style='margin:0'>
+        Please note that the logo used in this
         example, which is known as
         The Circle of Friends,
         is a registered trademark of
@@ -84,7 +84,7 @@ init = ->
         </p>
         </div>
         '''
-    $('#gh-left-panel').append(instructions)
+    $('#gh-left-panel').append(information)
 
     #create random number of logos to start
     i = Math.round(Math.random() * 9 + 1)

@@ -2,31 +2,38 @@
 
 /*
 pickupSounds.coffee
-
-plays a random sound file
-when the space bar is pressed
+Written by Seth Bullock
+sedabull@gmail.com
  */
-var init, update;
+var init, sndFx;
 
 document.title = 'Pickup Sounds';
 
-env.SOUND_PATH = '../sounds/';
+env.SOUND_PATH = './sounds/';
 
 env.USE_AUDIO_TAG = true;
 
-env.ENGINE_BOTTOM_PANEL = 'Press the space bar to hear a random sound';
+env.ENGINE.rightHeader = 'BUTTONS';
 
-env.ENGINE_LEFT_PANEL = '<p>\nFull credit for these\nsound effects goes to\n<a href="http://opengameart.org/users/jalastram">jalastram</a>\n</p>';
+env.ENGINE.leftHeader = 'INFORMATION';
+
+sndFx = new Array(50);
 
 init = function() {
-  return Greenhorn.start();
-};
-
-update = function() {
-  if (keysDown[KEYS.SPACE]) {
-    return new Sound({
-      url: "jalastram/SFX_Pickup_" + (Math.round(Math.random() * 50)) + ".wav",
-      playOnLoad: true
+  var i, information, snd, _i, _len;
+  Greenhorn.start();
+  for (i = _i = 0, _len = sndFx.length; _i < _len; i = ++_i) {
+    snd = sndFx[i];
+    sndFx[i] = new Sound({
+      url: "SFX_Pickup_" + (i + 1) + ".wav"
+    });
+    Greenhorn.addButton({
+      label: "Play #" + (i + 1),
+      onclick: function() {
+        return sndFx[i].play();
+      }
     });
   }
+  information = '<div>\n<h4>Instructions</h4>\n<p style=\'margin: 0\'>\nUse the buttons on the left to play\na collection of 8-bit pickup sounds\nfreely available on\n<a href=\'http://opengameart.org\'>OpenGameArt.org</a>.\n</p>\n<h4>Acknowledgement</h4>\n<p style=\'margin: 0\'>\nFull credit for these sound effects goes to\nopengameart user\n<a href="http://opengameart.org/users/jalastram">jalastram</a>\n</p>\n</div>';
+  return $('#gh-left-panel').append(information);
 };

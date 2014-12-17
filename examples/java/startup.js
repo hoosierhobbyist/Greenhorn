@@ -2,26 +2,21 @@
 
 /*
 startup.coffee
-
-The absolute minimum that needs to
-be done in order to create a Greenhorn page
+Written by Seth Bullock
+sedabull@gmail.com
  */
-var init, update;
+var init;
 
-document.title = 'Startup Page';
+document.title = 'Heroic Minority';
 
 env.SOUND_PATH = '../sounds/';
 
 env.USE_AUDIO_TAG = true;
 
-env.ENGINE_BOTTOM_PANEL = 'I found this background track <a href="http://opengameart.org/content/heroic-minority">here</a>.';
-
 init = function() {
-  new Sound({
+  Greenhorn.start();
+  return new Sound({
     url: 'heroic_minority.mp3',
     playOnLoad: true
   });
-  return Greenhorn.start();
 };
-
-update = function() {};
