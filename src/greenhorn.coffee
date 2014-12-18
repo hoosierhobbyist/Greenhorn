@@ -28,10 +28,6 @@ document.onkeyup = (e) ->
     e.preventDefault()
     Greenhorn.isDown[e.keyCode] = false
     return
-document.onmousemove = (e) ->
-    @mouseX = e.pageX
-    @mouseY = e.pageY
-    return
 
 #integer ID used to start and stop _masterUpdate
 _masterID = null
@@ -86,10 +82,16 @@ class @Greenhorn
     #append headers to panels
     _elmnts.leftPanel.appendChild _elmnts.leftPanelHeader
     _elmnts.rightPanel.appendChild _elmnts.rightPanelHeader
+    
+    #keep track of mouse position over canvas
+    _emnts.canvas.onmousemove = (e) ->
+        @mouseX = e.pageX
+        @mouseY = e.pageY
+        return
 
     #mouse position getters
-    @getMouseX = -> document.mouseX - @get('main', 'offsetLeft') - @get('canvas', 'offsetLeft') - @get('canvas', 'width') / 2
-    @getMouseY = -> document.mouseY - @get('main', 'offsetTop') - @get('canvas', 'offsetTop') - @get('canvas', 'height') / 2
+    @getMouseX = -> _elmnts.canvas.mouseX - @get('main', 'offsetLeft') - @get('canvas', 'offsetLeft') - @get('canvas', 'width') / 2
+    @getMouseY = -> _elmnts.canvas.mouseY - @get('main', 'offsetTop') - @get('canvas', 'offsetTop') - @get('canvas', 'height') / 2
 
     #generic element getter/setter
     @get = (elmnt, attr) ->
@@ -134,8 +136,9 @@ class @Greenhorn
 
     #start all asynchronous functions
     _startEverything = ->
-        _masterID = setInterval _masterUpdate, 1000 / env.FRAME_RATE
         Sprites._startAll()
+        Sounds._playAll()
+        _masterID = setInterval _masterUpdate, 1000 / env.FRAME_RATE
         return
 
     #used to keep engine from
@@ -148,8 +151,10 @@ class @Greenhorn
         unless @isRunning() or _elmnts.canvas.onclick?
             #only do all of this once
             if _firstTime
-                #add engine to a user defined '#GREENHORN' div or the document body
+                #add engine to a user defined '.gh' div or the document body
                 (document.querySelector('.gh') ? document.body).appendChild _elmnts.main
+                if _elmnts.main.parent is document.body
+                    document.body.class = 'gh'
 
                 #set the size of the canvas
                 @set 'canvas', 'width', env.ENGINE.canvasWidth
@@ -183,7 +188,6 @@ class @Greenhorn
                 #that preloads all sounds and
                 #launches all asynchronous updates
                 _elmnts.canvas.onclick = ->
-                    Sounds._playAll()
                     _startEverything()
                     _elmnts.canvas.onclick = undefined
 
@@ -198,8 +202,6 @@ class @Greenhorn
         Sounds._stopAll()
         clearInterval _masterID
         _masterID = null
-    @isRunning = ->
-        _masterID?
     @clear = ->
         _elmnts.canvas.getContext('2d')
         .clearRect(
@@ -207,6 +209,8 @@ class @Greenhorn
             -@get('canvas', 'height') / 2,
             @get('canvas', 'width'),
             @get('canvas', 'height'))
+    @isRunning = ->
+        _masterID?
     @hide = ->
         @set 'main', 'style', {'display': 'none'}
     @show = ->
