@@ -76,13 +76,6 @@ class @Greenhorn
     _elmnts.leftPanel.appendChild _elmnts.leftPanelHeader
     _elmnts.rightPanel.appendChild _elmnts.rightPanelHeader
     
-    #set the innerHTML of each element
-    _elmnts.title.innerHTML = document.title
-    _elmnts.leftPanelHeader.innerHTML = env.ENGINE.leftHeader
-    _elmnts.rightPanelHeader.innerHTML = env.ENGINE.rightHeader
-    _elmnts.footer.innerHTML = env.ENGINE.footer
-    _elmnts.canvas.innerHTML = 'Your browser does not support the &ltcanvas&gt tag'
-    
     #listen for key events on main div
     _elmnts.main.onkeydown = (e) ->
         e.preventDefault()
@@ -174,6 +167,13 @@ class @Greenhorn
                 (document.querySelector('.gh') ? document.body).appendChild _elmnts.main
                 if _elmnts.main.parentNode is document.body
                     document.body.classList.add 'gh'
+                
+                #set the innerHTML of each element
+                _elmnts.title.innerHTML = document.title
+                _elmnts.leftPanelHeader.innerHTML = env.ENGINE.leftHeader
+                _elmnts.rightPanelHeader.innerHTML = env.ENGINE.rightHeader
+                _elmnts.footer.innerHTML = env.ENGINE.footer
+                _elmnts.canvas.innerHTML = 'Your browser does not support the &ltcanvas&gt tag'
 
                 #set the size of the canvas
                 _elmnts.canvas.width = _elmnts.canvas.clientWidth
