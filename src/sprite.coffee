@@ -33,7 +33,7 @@ class @Sprite
             return
     @removeAll = (excep...) ->
         for sp in _list when sp not in excep
-            sp.stop() if sp.isRunning()
+            sp._stop() if sp.isRunning()
         
         _list = []
         for sp in excep
