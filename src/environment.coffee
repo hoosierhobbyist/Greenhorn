@@ -8,6 +8,7 @@ sedabull@gmail.com
     #miscellaneous
     FRAME_RATE: 25
     BOUNCE_DECAY: 0
+    SPRING_CONSTANT: 5
     #default engine settings
     ENGINE:
         footer: 'BOTTOM PANEL'

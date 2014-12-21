@@ -337,13 +337,13 @@ class @Sprite
                         @set 'left', bounds.right
                 when 'SPRING'
                     if hitTop
-                        @change 'y', -50
+                        @change 'ddy', -env.SPRING_CONSTANT
                     if hitBottom
-                        @change 'y', 50
+                        @change 'ddy', env.SPRING_CONSTANT
                     if hitRight
-                        @change 'x', -50
+                        @change 'ddx', -env.SPRING_CONSTANT
                     if hitLeft
-                        @change 'x', 50
+                        @change 'ddx', env.SPRING_CONSTANT
                 when 'STOP'
                     if hitTop
                         @set 'top', bounds.top - 1
@@ -356,16 +356,16 @@ class @Sprite
                 when 'BOUNCE'
                     if hitTop
                         @set 'top', bounds.top - 1
-                        @_mot.dy *= -1 + env.ENGINE.bounceDecay
+                        @_mot.dy *= -1 + env.BOUNCE_DECAY
                     if hitBottom
                         @set 'bottom', bounds.bottom + 1
-                        @_mot.dy *= -1 + env.ENGINE.bounceDecay
+                        @_mot.dy *= -1 + env.BOUNCE_DECAY
                     if hitRight
                         @set 'right', bounds.right - 1
-                        @_mot.dx *= -1 + env.ENGINE.bounceDecay
+                        @_mot.dx *= -1 + env.BOUNCE_DECAY
                     if hitLeft
                         @set 'left', bounds.left + 1
-                        @_mot.dx *= -1 + env.ENGINE.bounceDecay
+                        @_mot.dx *= -1 + env.BOUNCE_DECAY
         this
 
     #debugging
