@@ -1,0 +1,144 @@
+/*
+style.less
+Written by Seth Bullock
+sedabull@gmail.com
+*/
+
+//scheme and style
+@intrnlBgColor: #000000;
+@extrnlBgColor: #656565;
+@fgColor: #006400;
+@acntColor: #C0C0C0;
+@intrnlBorderStyle: solid;
+@extrnlBorderStyle: groove;
+
+//element sizes
+@canvasWidth: 800px;
+@canvasHeight: 450px;
+@titleHeight: 50px;
+@footerHeight: 25px;
+@leftPanelWidth: 150px;
+@rightPanelWidth: 150px;
+@borderRadius: 15px;
+@extrnlBorderWidth: 5px;
+@intrnlBorderWidth: 1px;
+@intrnlPadding: 10px;
+
+//rules
+body{
+    background-color: @fgColor;
+}//end body
+
+.gh{
+    //gh class style
+    background-color: @extrnlBgColor;
+    border-radius: @borderRadius;
+    border: @extrnlBorderWidth @extrnlBorderStyle @acntColor;
+    min-height: @canvasHeight + @titleHeight + @footerHeight + @intrnlPadding * 4 + 50;
+    
+    //gh classes
+    .gh-p{}//end .gh-p class
+    .gh-ol{}//end .gh-ol class
+    .gh-ul{}//end .gh-ul class
+    .gh-pre{}//end .gh-pre class
+    .gh-a{
+        &:link{
+            color: @acntColor;
+        }
+        &:visited{
+            color: darken(@acntColor, 25%);
+        }
+        &:hover{
+            color: lighten(@acntColor, 25%);
+        }
+        &:active{
+            color: @intrnlBgColor;
+        }
+    }//end .gh-a class
+    .gh-button{
+        margin: 1%;
+        width: 98%;
+        float: left;
+        clear: left;
+        font-size: small;
+        color: @acntColor;
+        border-radius: 5px;
+        background-color: @intrnlBgColor;
+    }//end .gh-button class
+    .gh-panel-header{
+        margin-top: 0px;
+        text-align: center;
+        margin-bottom: 5px;
+        padding-bottom: 2px;
+        border-bottom: 2px @intrnlBorderStyle @acntColor;
+    }//end .gh-panel-header class
+    
+    //gh named elements
+    #gh-main{
+        //main div style
+        margin: 2.5% auto;
+        color: @acntColor;
+        background-color: @fgColor;
+        border-radius: @borderRadius;
+        font-family: Tahoma, Geneva, sans-serif;
+        border: @extrnlBorderWidth @extrnlBorderStyle @acntColor;
+        box-shadow: 20px 20px 5px darken(@extrnlBgColor, 50%);
+        min-height: @canvasHeight + @titleHeight + @footerHeight + @intrnlPadding * 4;
+        max-height: @canvasHeight + @titleHeight + @footerHeight + @intrnlPadding * 4;
+        min-width: @canvasWidth + @leftPanelWidth + @rightPanelWidth + @intrnlPadding * 4;
+        max-width: @canvasWidth + @leftPanelWidth + @rightPanelWidth + @intrnlPadding * 4;
+        
+        //child elements style
+        #gh-title{
+            width: 100%;
+            float: left;
+            clear: both;
+            text-align: center;
+            height: @titleHeight;
+            border-radius: inherit;
+            margin: @intrnlPadding 0px 0px 0px;
+            border-bottom: @intrnlBorderWidth @intrnlBorderStyle @acntColor;
+            padding-bottom: @intrnlPadding - @intrnlBorderWidth;
+        }//end #gh-title style
+        #gh-left-panel{
+            float: left;
+            clear: left;
+            overflow: auto;
+            font-size: .7em;
+            width: @leftPanelWidth;
+            margin: @intrnlPadding;
+            height: @canvasHeight - @intrnlPadding * 2;
+            margin-right: @intrnlPadding - @intrnlBorderWidth;
+        }//end #gh-left-panel style
+        #gh-canvas{
+            float: left;
+            width: @canvasWidth;
+            height: @canvasHeight;
+            background-color: @intrnlBgColor;
+            border-left: @intrnlBorderWidth @intrnlBorderStyle @acntColor;
+            border-right: @intrnlBorderWidth @intrnlBorderStyle @acntColor;
+        }//end #gh-canvas style
+        #gh-right-panel{
+            float: left;
+            clear: right;
+            overflow: auto;
+            font-size: .7em;
+            margin: @intrnlPadding;
+            width: @rightPanelWidth;
+            height: @canvasHeight - @intrnlPadding * 2;
+            margin-left: @intrnlPadding - @intrnlBorderWidth;
+        }//end #gh-right-panel style
+        #gh-footer{
+            width: 100%;
+            float: left;
+            clear: both;
+            font-size: 1em;
+            text-align: center;
+            height: @footerHeight;
+            border-radius: inherit;
+            margin: 0px 0px @intrnlPadding 0px;
+            padding-top: @intrnlPadding - @intrnlBorderWidth;
+            border-top: @intrnlBorderWidth @intrnlBorderStyle @acntColor;
+        }//end #gh-footer style
+    }//end #gh-main style
+}//end .gh class style
