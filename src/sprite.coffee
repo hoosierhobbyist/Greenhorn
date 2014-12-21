@@ -91,13 +91,13 @@ class @Sprite
         _list.sort _sortRule
 
     #_update control
+    isRunning: ->
+        @_updateID?
     _start: ->
         @_updateID = setInterval @_update, 1000 / env.FRAME_RATE
     _stop: ->
         clearInterval @_updateID
         @_updateID = null
-    isRunning: ->
-        @_updateID?
 
     #getter
     get: (what) ->
@@ -300,12 +300,14 @@ class @Sprite
             @change '_mot', @_acc
             @change '_pos', @_mot
 
-            #check boundaries
+            #define boundaries
+            canvasWidth = document.querySelector('#gh-canvas').width
+            canvasHeight = document.querySelector('#gh-canvas').height
             bounds =
-                top: Greenhorn.get('canvas', 'height') / 2
-                bottom: -Greenhorn.get('canvas', 'height') / 2
-                right: Greenhorn.get('canvas', 'width') / 2
-                left: -Greenhorn.get('canvas', 'width') / 2
+                top: canvasHeight / 2
+                bottom: -canvasHeight / 2
+                right: canvasWidth / 2
+                left: -canvasWidth / 2
 
             #sprite has completely disappeared offscreen
             offTop = @get('bottom') > bounds.top
