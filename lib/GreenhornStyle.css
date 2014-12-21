@@ -12,6 +12,9 @@ body {
   border: 5px groove #c0c0c0;
   min-height: 615px;
 }
+.gh .gh-a {
+  font-size: 1.1em;
+}
 .gh .gh-a:link {
   color: #c0c0c0;
 }
@@ -23,6 +26,9 @@ body {
 }
 .gh .gh-a:active {
   color: #000000;
+}
+.gh .gh-p {
+  margin: 0;
 }
 .gh .gh-button {
   margin: 1%;
@@ -40,6 +46,11 @@ body {
   margin-bottom: 5px;
   padding-bottom: 2px;
   border-bottom: 2px solid #c0c0c0;
+}
+.gh .gh-panel-sub-header {
+  margin: 5px 0px;
+  font-weight: bold;
+  text-decoration: underline;
 }
 .gh #gh-main {
   margin: 2.5% auto;

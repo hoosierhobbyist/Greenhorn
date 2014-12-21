@@ -37,11 +37,11 @@ body{
     min-height: @canvasHeight + @titleHeight + @footerHeight + @intrnlPadding * 4 + 50;
     
     //gh classes
-    .gh-p{}//end .gh-p class
     .gh-ol{}//end .gh-ol class
     .gh-ul{}//end .gh-ul class
     .gh-pre{}//end .gh-pre class
     .gh-a{
+        font-size: 1.1em;
         &:link{
             color: @acntColor;
         }
@@ -55,6 +55,9 @@ body{
             color: @intrnlBgColor;
         }
     }//end .gh-a class
+    .gh-p{
+        margin: 0;
+    }//end .gh-p class
     .gh-button{
         margin: 1%;
         width: 98%;
@@ -72,6 +75,11 @@ body{
         padding-bottom: 2px;
         border-bottom: 2px @intrnlBorderStyle @acntColor;
     }//end .gh-panel-header class
+    .gh-panel-sub-header{
+        margin: 5px 0px;
+        font-weight: bold;
+        text-decoration: underline;
+    }//end .gh-panel-sub-header
     
     //gh named elements
     #gh-main{
