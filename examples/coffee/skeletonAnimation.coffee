@@ -1,105 +1,128 @@
 ###
 skeletonAnimation.coffee
-
-a simple example of the AniSprite class
+Written by Seth Bullock
+sedabull@gmail.com
 ###
 
 #name the document
-document.title = 'Mr. Bones\' Crystal Pickup'
+document.title = 'Bonehead\'s Crystal Pickup'
 
 #setup the environment
 env.IMAGE_PATH = '../images/'
 env.SOUND_PATH = '../sounds/'
-env.ANISPRITE_DEFAULT_CONFIG.frameRate = 10
-env.ENGINE_BOTTOM_PANEL = 'Use the arrow keys to control bones and collect the crystals'
-env.ENGINE_RIGHT_PANEL =
-    '''
-    <ul>
-    <li id="blue">blue: </li>
-    <li id="green">green: </li>
-    <li id="grey">grey: </li>
-    <li id="orange">orange: </li>
-    <li id="pink">pink: </li>
-    <li id="yellow">yellow: </li>
-    '''
+env.USE_AUDIO_TAG = true
+env.ENGINE.leftHeader = 'Bonehead Report'
+env.ENGINE.rightHeader = 'Crystals'
+env.SPRITE_DEFAULT_CONFIG.boundAction = 'STOP'
+env.ANICYCLE_DEFAULT_CONFIG.name = 'SPIN'
 
 #declare global variables
-bones = null
+bonehead= null
 pickup = null
 crystals = {}
 
-#define init() to be called by body.onload
+#define init() to setup document
 init = ->
+    #start the engine
+    Greenhorn.start()
+    
     #initialize variables
     pickup = new Sound({
         url: 'jalastram/SFX_Pickup_20.wav'
-    })
+    })#end pickup construction
     
     colors = ['blue', 'green', 'grey', 'orange', 'pink', 'yellow']
     for color in colors
-        crystals[color] = new AniSprite({
-            imageFile: "#{color}Crystal.png"
-            x: Math.random() * 400 - 200
-            y: Math.random() * 300 - 150
+        crystals[color] = new AniSprite(
+            imageFile: "crystals/#{color}Crystal.png"
+            x: Math.random() * env.ENGINE.canvasWidth - env.ENGINE.canvasWidth / 2
+            y: Math.random() * env.ENGINE.canvasHeight - env.ENGINE.canvasHeight / 2
             width: 32
             height: 32
-            cycleSPIN:
-                row: 1
-        })
+            cycle1:
+                index: 1
+        )#end cyrstal construction
     
-    bones = new AniSprite({
-        imageFile: 'skeleton.png'
-        boundAction: 'STOP'
+    bonehead = new AniSprite(
+        imageFile: 'bonehead.png'
         cellWidth: 64
         cellHeight: 64
-        cycleUP:
-            row: 9
-            numFrames: 9
-        cycleLEFT:
-            row: 10
-            numFrames: 9
-        cycleDOWN:
-            row: 11
-            numFrames: 9
-        cycleRIGHT:
-            row: 12
-            numFrames: 9
-    })
+        frameRate: 23
+        cycleSTAND_UP:
+            index: 9
+            start: 1
+            stop: 1
+        cycleSTAND_LEFT:
+            index: 10
+            start: 1
+            stop: 1
+        cycleSTAND_DOWN:
+            index: 11
+            start: 1
+            stop: 1
+        cycleSTAND_RIGHT:
+            index: 12
+            start: 1
+            stop: 1
+        cycleWALK_UP:
+            index: 9
+            start: 2
+        cycleWALK_LEFT:
+            index: 10
+            start: 2
+        cycleWALK_DOWN:
+            index: 11
+            start: 2
+        cycleWALK_RIGHT:
+            index: 12
+            start: 2
+    )#end bonehead construction
     
     #document specific setup
-    
-    #start the engine
-    Greenhorn.start()
+    $('#gh-left-panel').append('<pre></pre>')
+    $('#gh-right-panel').append('<p></p>')
+    $('#gh-right-panel p').html(
+        '''
+        <ul>
+        <li id="blue">BLUE: </li>
+        <li id="green">GREEN: </li>
+        <li id="grey">GREY: </li>
+        <li id="orange">ORANGE: </li>
+        <li id="pink">PIND: </li>
+        <li id="yellow">YELLOW: </li>
+        </ul>
+        '''
+    )#end rightPanel setup
 #end init
 
 #define update() to be called once per frame
 update = ->
     #handle any game specific events here
-    if keysDown[KEYS.UP]
-        bones.change 'y', 50
-        bones.set 'current', 'UP'
-        bones.play()
-    else if keysDown[KEYS.DOWN]
-        bones.change 'y', -50
-        bones.set 'current', 'DOWN'
-        bones.play()
-    else if keysDown[KEYS.RIGHT]
-        bones.change 'x', 50
-        bones.set 'current', 'RIGHT'
-        bones.play()
-    else if keysDown[KEYS.LEFT]
-        bones.change 'x', -50
-        bones.set 'current', 'LEFT'
-        bones.play()
+    if Greenhorn.isDown[KEYS.UP]
+        bonehead
+            .set 'animation', 'WALK_UP'
+            .change 'y', 50
+    else if Greenhorn.isDown[KEYS.DOWN]
+        bonehead
+            .set 'animation', 'WALK_DOWN'
+            .change 'y', -50
+    else if Greenhorn.isDown[KEYS.RIGHT]
+        bonehead
+            .set 'animation', 'WALK_RIGHT'
+            .change 'x', 50
+    else if Greenhorn.isDown[KEYS.LEFT]
+        bonehead
+            .set 'animation', 'WALK_LEFT'
+            .change 'x', -50
     else
-        bones.set 'current', 'DOWN'
-        bones.pause()
+        direction = bonehead.get('cycle').match(/(UP|LEFT|DOWN|RIGHT)/)[0];
+        bonehead.set('animation', 'STAND_' + direction);
     
     for color, crystal of crystals
-        if bones.collidesWith crystal
+        if bonehead.collidesWith crystal
             pickup.play()
             crystal.set 'visible', off
-            document.getElementById(color).innerHTML = "#{color}: FOUND!"
+            document.getElementById(color).innerHTML = "#{color.toUpperCase()}: FOUND!"
     
-    Greenhorn.set 'leftPanel', 'innerHTML', bones.report()
+    $('#gh-left-panel pre').html(bonehead.report())
 #end update

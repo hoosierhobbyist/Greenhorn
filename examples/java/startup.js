@@ -5,18 +5,22 @@ startup.coffee
 Written by Seth Bullock
 sedabull@gmail.com
  */
-var init;
 
-document.title = 'Heroic Minority';
+(function() {
+  var init;
 
-env.SOUND_PATH = '../sounds/';
+  document.title = 'Heroic Minority';
 
-env.USE_AUDIO_TAG = true;
+  env.SOUND_PATH = '../sounds/';
 
-init = function() {
-  Greenhorn.start();
-  return new Sound({
-    url: 'heroic_minority.mp3',
-    playOnLoad: true
-  });
-};
+  env.USE_AUDIO_TAG = true;
+
+  init = function() {
+    Greenhorn.start();
+    return new Sound({
+      url: 'heroic_minority.mp3',
+      playOnLoad: true
+    });
+  };
+
+}).call(this);

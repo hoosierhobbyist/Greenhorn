@@ -6,38 +6,42 @@ userMotion.coffee
 user controls the motion of
 a sprite with the keyboard
  */
-var init, logo, update;
 
-document.title = 'User Controlled Motion';
+(function() {
+  var init, logo, update;
 
-env.IMAGE_PATH = '../images/';
+  document.title = 'User Controlled Motion';
 
-env.ENGINE_BOTTOM_PANEL = 'Use the arrow keys to move\nand the space bar to spin';
+  env.IMAGE_PATH = '../images/';
 
-logo = null;
+  env.ENGINE_BOTTOM_PANEL = 'Use the arrow keys to move\nand the space bar to spin';
 
-init = function() {
-  logo = new Sprite({
-    imageFile: 'logo.png'
-  });
-  return Greenhorn.start();
-};
+  logo = null;
 
-update = function() {
-  if (keysDown[KEYS.UP]) {
-    logo.change('y', 50);
-  }
-  if (keysDown[KEYS.DOWN]) {
-    logo.change('y', -50);
-  }
-  if (keysDown[KEYS.RIGHT]) {
-    logo.change('x', 50);
-  }
-  if (keysDown[KEYS.LEFT]) {
-    logo.change('x', -50);
-  }
-  if (keysDown[KEYS.SPACE]) {
-    logo.change('a', 2);
-  }
-  return Greenhorn.set('leftPanel', 'innerHTML', logo.report());
-};
+  init = function() {
+    logo = new Sprite({
+      imageFile: 'logo.png'
+    });
+    return Greenhorn.start();
+  };
+
+  update = function() {
+    if (keysDown[KEYS.UP]) {
+      logo.change('y', 50);
+    }
+    if (keysDown[KEYS.DOWN]) {
+      logo.change('y', -50);
+    }
+    if (keysDown[KEYS.RIGHT]) {
+      logo.change('x', 50);
+    }
+    if (keysDown[KEYS.LEFT]) {
+      logo.change('x', -50);
+    }
+    if (keysDown[KEYS.SPACE]) {
+      logo.change('a', 2);
+    }
+    return Greenhorn.set('leftPanel', 'innerHTML', logo.report());
+  };
+
+}).call(this);

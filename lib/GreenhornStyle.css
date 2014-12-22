@@ -1,0 +1,119 @@
+/*
+style.less
+Written by Seth Bullock
+sedabull@gmail.com
+*/
+body {
+  background-color: #006400;
+}
+.gh {
+  background-color: #656565;
+  border-radius: 15px;
+  border: 5px groove #c0c0c0;
+  min-height: 615px;
+}
+.gh .gh-a {
+  cursor: pointer;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+}
+.gh .gh-a:link {
+  color: #c0c0c0;
+}
+.gh .gh-a:visited {
+  color: #808080;
+}
+.gh .gh-a:hover {
+  color: #ffffff;
+}
+.gh .gh-a:active {
+  color: #000000;
+}
+.gh .gh-p {
+  margin: 0;
+}
+.gh .gh-button {
+  margin: 1%;
+  width: 98%;
+  font-size: small;
+  color: #c0c0c0;
+  border-radius: 5px;
+  background-color: #000000;
+}
+.gh .gh-panel-header {
+  margin-top: 0px;
+  text-align: center;
+  margin-bottom: 5px;
+  padding-bottom: 2px;
+  border-bottom: 2px solid #c0c0c0;
+}
+.gh .gh-panel-sub-header {
+  margin: 5px 0px;
+  font-weight: bold;
+  text-decoration: underline;
+}
+.gh #gh-main {
+  margin: 2.5% auto;
+  color: #c0c0c0;
+  background-color: #006400;
+  border-radius: 15px;
+  font-family: Tahoma, Geneva, sans-serif;
+  border: 5px groove #c0c0c0;
+  box-shadow: 20px 20px 5px #000000;
+  min-height: 565px;
+  max-height: 565px;
+  min-width: 1140px;
+  max-width: 1140px;
+}
+.gh #gh-main #gh-title {
+  width: 100%;
+  float: left;
+  clear: both;
+  text-align: center;
+  height: 50px;
+  border-radius: inherit;
+  margin: 10px 0px 0px 0px;
+  border-bottom: 1px solid #c0c0c0;
+  padding-bottom: 9px;
+}
+.gh #gh-main #gh-left-panel {
+  float: left;
+  clear: left;
+  overflow: auto;
+  font-size: .7em;
+  width: 150px;
+  margin: 10px;
+  height: 430px;
+  margin-right: 9px;
+}
+.gh #gh-main #gh-canvas {
+  float: left;
+  width: 800px;
+  height: 450px;
+  background-color: #000000;
+  border-left: 1px solid #c0c0c0;
+  border-right: 1px solid #c0c0c0;
+}
+.gh #gh-main #gh-right-panel {
+  float: left;
+  clear: right;
+  overflow: auto;
+  font-size: .7em;
+  margin: 10px;
+  width: 150px;
+  height: 430px;
+  margin-left: 9px;
+}
+.gh #gh-main #gh-footer {
+  width: 100%;
+  float: left;
+  clear: both;
+  font-size: 1em;
+  text-align: center;
+  height: 25px;
+  border-radius: inherit;
+  margin: 0px 0px 10px 0px;
+  padding-top: 9px;
+  border-top: 1px solid #c0c0c0;
+}

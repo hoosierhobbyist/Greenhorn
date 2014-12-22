@@ -2,102 +2,125 @@
 
 /*
 skeletonAnimation.coffee
-
-a simple example of the AniSprite class
+Written by Seth Bullock
+sedabull@gmail.com
  */
-var bones, crystals, init, pickup, update;
 
-document.title = 'Mr. Bones\' Crystal Pickup';
+(function() {
+  var bonehead, crystals, init, pickup, update;
 
-env.IMAGE_PATH = '../images/';
+  document.title = 'Bonehead\'s Crystal Pickup';
 
-env.SOUND_PATH = '../sounds/';
+  env.IMAGE_PATH = '../images/';
 
-env.ANISPRITE_DEFAULT_CONFIG.frameRate = 10;
+  env.SOUND_PATH = '../sounds/';
 
-env.ENGINE_BOTTOM_PANEL = 'Use the arrow keys to control bones and collect the crystals';
+  env.USE_AUDIO_TAG = true;
 
-env.ENGINE_RIGHT_PANEL = '<ul>\n<li id="blue">blue: </li>\n<li id="green">green: </li>\n<li id="grey">grey: </li>\n<li id="orange">orange: </li>\n<li id="pink">pink: </li>\n<li id="yellow">yellow: </li>';
+  env.ENGINE.leftHeader = 'Bonehead Report';
 
-bones = null;
+  env.ENGINE.rightHeader = 'Crystals';
 
-pickup = null;
+  env.SPRITE_DEFAULT_CONFIG.boundAction = 'STOP';
 
-crystals = {};
+  env.ANICYCLE_DEFAULT_CONFIG.name = 'SPIN';
 
-init = function() {
-  var color, colors, _i, _len;
-  pickup = new Sound({
-    url: 'jalastram/SFX_Pickup_20.wav'
-  });
-  colors = ['blue', 'green', 'grey', 'orange', 'pink', 'yellow'];
-  for (_i = 0, _len = colors.length; _i < _len; _i++) {
-    color = colors[_i];
-    crystals[color] = new AniSprite({
-      imageFile: "" + color + "Crystal.png",
-      x: Math.random() * 400 - 200,
-      y: Math.random() * 300 - 150,
-      width: 32,
-      height: 32,
-      cycleSPIN: {
-        row: 1
+  bonehead = null;
+
+  pickup = null;
+
+  crystals = {};
+
+  init = function() {
+    var color, colors, _i, _len;
+    Greenhorn.start();
+    pickup = new Sound({
+      url: 'jalastram/SFX_Pickup_20.wav'
+    });
+    colors = ['blue', 'green', 'grey', 'orange', 'pink', 'yellow'];
+    for (_i = 0, _len = colors.length; _i < _len; _i++) {
+      color = colors[_i];
+      crystals[color] = new AniSprite({
+        imageFile: "crystals/" + color + "Crystal.png",
+        x: Math.random() * env.ENGINE.canvasWidth - env.ENGINE.canvasWidth / 2,
+        y: Math.random() * env.ENGINE.canvasHeight - env.ENGINE.canvasHeight / 2,
+        width: 32,
+        height: 32,
+        cycle1: {
+          index: 1
+        }
+      });
+    }
+    bonehead = new AniSprite({
+      imageFile: 'bonehead.png',
+      cellWidth: 64,
+      cellHeight: 64,
+      frameRate: 23,
+      cycleSTAND_UP: {
+        index: 9,
+        start: 1,
+        stop: 1
+      },
+      cycleSTAND_LEFT: {
+        index: 10,
+        start: 1,
+        stop: 1
+      },
+      cycleSTAND_DOWN: {
+        index: 11,
+        start: 1,
+        stop: 1
+      },
+      cycleSTAND_RIGHT: {
+        index: 12,
+        start: 1,
+        stop: 1
+      },
+      cycleWALK_UP: {
+        index: 9,
+        start: 2
+      },
+      cycleWALK_LEFT: {
+        index: 10,
+        start: 2
+      },
+      cycleWALK_DOWN: {
+        index: 11,
+        start: 2
+      },
+      cycleWALK_RIGHT: {
+        index: 12,
+        start: 2
       }
     });
-  }
-  bones = new AniSprite({
-    imageFile: 'skeleton.png',
-    boundAction: 'STOP',
-    cellWidth: 64,
-    cellHeight: 64,
-    cycleUP: {
-      row: 9,
-      numFrames: 9
-    },
-    cycleLEFT: {
-      row: 10,
-      numFrames: 9
-    },
-    cycleDOWN: {
-      row: 11,
-      numFrames: 9
-    },
-    cycleRIGHT: {
-      row: 12,
-      numFrames: 9
-    }
-  });
-  return Greenhorn.start();
-};
+    $('#gh-left-panel').append('<pre></pre>');
+    $('#gh-right-panel').append('<p></p>');
+    return $('#gh-right-panel p').html('<ul>\n<li id="blue">BLUE: </li>\n<li id="green">GREEN: </li>\n<li id="grey">GREY: </li>\n<li id="orange">ORANGE: </li>\n<li id="pink">PIND: </li>\n<li id="yellow">YELLOW: </li>\n</ul>');
+  };
 
-update = function() {
-  var color, crystal;
-  if (keysDown[KEYS.UP]) {
-    bones.change('y', 50);
-    bones.set('current', 'UP');
-    bones.play();
-  } else if (keysDown[KEYS.DOWN]) {
-    bones.change('y', -50);
-    bones.set('current', 'DOWN');
-    bones.play();
-  } else if (keysDown[KEYS.RIGHT]) {
-    bones.change('x', 50);
-    bones.set('current', 'RIGHT');
-    bones.play();
-  } else if (keysDown[KEYS.LEFT]) {
-    bones.change('x', -50);
-    bones.set('current', 'LEFT');
-    bones.play();
-  } else {
-    bones.set('current', 'DOWN');
-    bones.pause();
-  }
-  for (color in crystals) {
-    crystal = crystals[color];
-    if (bones.collidesWith(crystal)) {
-      pickup.play();
-      crystal.set('visible', false);
-      document.getElementById(color).innerHTML = "" + color + ": FOUND!";
+  update = function() {
+    var color, crystal, direction;
+    if (Greenhorn.isDown[KEYS.UP]) {
+      bonehead.set('animation', 'WALK_UP').change('y', 50);
+    } else if (Greenhorn.isDown[KEYS.DOWN]) {
+      bonehead.set('animation', 'WALK_DOWN').change('y', -50);
+    } else if (Greenhorn.isDown[KEYS.RIGHT]) {
+      bonehead.set('animation', 'WALK_RIGHT').change('x', 50);
+    } else if (Greenhorn.isDown[KEYS.LEFT]) {
+      bonehead.set('animation', 'WALK_LEFT').change('x', -50);
+    } else {
+      direction = bonehead.get('cycle').match(/(UP|LEFT|DOWN|RIGHT)/)[0];
+      bonehead.set('animation', 'STAND_' + direction);
     }
-  }
-  return Greenhorn.set('leftPanel', 'innerHTML', bones.report());
-};
+    for (color in crystals) {
+      crystal = crystals[color];
+      if (bonehead.collidesWith(crystal)) {
+        pickup.play();
+        crystal.set('visible', false);
+        document.getElementById(color).innerHTML = "" + (color.toUpperCase()) + ": FOUND!";
+      }
+    }
+    return $('#gh-left-panel pre').html(bonehead.report());
+  };
+
+}).call(this);
