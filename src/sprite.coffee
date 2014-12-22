@@ -136,9 +136,7 @@ class @Sprite
 
     #setter
     set: (what, to) ->
-        if what.match /^imageFile$/i
-            @_dis.image.src = env.IMAGE_PATH.concat to
-        else if what.match /(^x$|^y$|^a$)/i
+        if what.match /(^x$|^y$|^a$)/i
             @_pos[what.toLowerCase()] = to
         else if what.match /(^dx$|^dy$|^da$)/i
             @_mot[what.toLowerCase()] = to
@@ -152,6 +150,15 @@ class @Sprite
             @_pos.x = to - @_dis.width / 2
         else if what.match /^left$/i
             @_pos.x = to + @_dis.width / 2
+        else if what.match /^imageFile$/i
+            if env.IMAGE_PATH.match /\/$/
+                @_dis.image.src = env.IMAGE_PATH.concat to
+            else
+                if env.IMAGE_PATH
+                    env.IMAGE_PATH += '/'
+                    @_dis.image.src = env.IMAGE_PATH.concat to
+                else
+                    @_dis.image.src = to
         else if what.match /^distance$/i
             proxy =
                 x: to * Math.cos @get('posAngle')

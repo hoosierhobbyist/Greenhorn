@@ -91,9 +91,9 @@ class @Greenhorn
 
     #start all asynchronous functions
     _startEverything = ->
+        _masterID = setInterval _masterUpdate, 1000 / env.FRAME_RATE
         Sprites._startAll()
         Sounds._playAll()
-        _masterID = setInterval _masterUpdate, 1000 / env.FRAME_RATE
         return
 
     #execute start-up logic only once
@@ -148,7 +148,7 @@ class @Greenhorn
         _masterID?
     @stop = ->
         Sprites._stopAll()
-        Sounds._stopAll()
+        Sounds._pauseAll()
         clearInterval _masterID
         _masterID = null
     @clear = ->

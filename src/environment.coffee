@@ -78,7 +78,7 @@ sedabull@gmail.com
         url: ""
         loop: false
         volume: 1.0
-        playOnLoad: false
+        autoplay: false
     #default button settings
     BUTTON_DEFAULT_CONFIG:
         type: 'button'
