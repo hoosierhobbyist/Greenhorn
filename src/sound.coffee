@@ -24,7 +24,7 @@ class @Sound
                 snd.play()
             else
                 snd.play volume: 0, loop: false
-                setTimeout snd.stop, 50, this
+                setTimeout snd.stop, 50
         return
     @_stopAll = ->
         snd.stop() for snd in _list
@@ -109,7 +109,7 @@ class @Sound
         _list.push this
 
     #sound control
-    play: (opt = {}) ->
+    play: (opt = {}) =>
         if env.USE_AUDIO_TAG
             @_audio.loop = opt.loop ? @_config.loop
             @_audio.volume = opt.volume ? @_config.volume
@@ -138,7 +138,7 @@ class @Sound
 
                 #start playing
                 @_source.start()
-    stop: ->
+    stop: =>
         if env.USE_AUDIO_TAG
             @_audio.pause()
             @_audio.currentTime = 0
