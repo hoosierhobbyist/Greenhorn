@@ -23,8 +23,9 @@ class @Sound
             if snd._config.playOnLoad
                 snd.play()
             else
-                snd.play {volume: 0, loop: false}
-                setTimeout snd.stop, 50
+                snd.play volume: 0, loop: false
+                setTimeout snd.stop, 50, this
+        return
     @_stopAll = ->
         snd.stop() for snd in _list
         return
