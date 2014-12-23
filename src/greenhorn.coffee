@@ -41,6 +41,14 @@ class @Greenhorn
     #keyboard input tracking array
     _isDown = new Array 256
     key = false for key in _isDown
+    
+    #listen for key events
+    document.onkeydown = (e) ->
+        e.preventDefault()
+        _isDown[e.keyCode] = true
+    document.onkeyup = (e) ->
+        e.preventDefault()
+        _isDown[e.keyCode] = false
 
     #create Engine elements
     _elmnts =
@@ -75,15 +83,6 @@ class @Greenhorn
     #append headers to panels
     _elmnts.leftPanel.appendChild _elmnts.leftPanelHeader
     _elmnts.rightPanel.appendChild _elmnts.rightPanelHeader
-    
-    #listen for key events on main div
-    _elmnts.main.tabIndex = 0
-    _elmnts.main.onkeydown = (e) ->
-        e.preventDefault()
-        _isDown[e.keyCode] = true
-    _elmnts.main.onkeyup = (e) ->
-        e.preventDefault()
-        _isDown[e.keyCode] = false
     
     #keep track of mouse position over canvas
     _elmnts.canvas.onmousemove = (e) ->
