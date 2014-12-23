@@ -152,13 +152,48 @@ class @Sound
 
                     #start playing
                     @_source.start @_startTime, @_elapsedTime
+    restart: (opt = {}) =>
+        if Greenhorn.isRunning()
+            if env.USE_AUDIO_TAG
+                @_audio.currentTime = 0
+                @_audio.loop = opt.loop ? @_config.loop
+                @_audio.volume = opt.volume ? @_config.volume
+                @_audio.play()
+            else
+                #stop source
+                @_source.stop()
+                @_elapsedTime = 0
+                
+                #create audio nodes
+                gainNode = _audioContext.createGain()
+                @_source = _audioContext.createBufferSource()
+
+                #set values on source node
+                @_source.buffer = @_buffer
+                @_source.loop = opt.loop ? @_config.loop
+                @_source.onended = =>
+                    @_isEnded = true
+                    @_elapsedTime = 0
+
+                #set value on gain node
+                gainNode.gain.value = opt.volume ? @_config.volume
+
+                #connect nodes
+                @_source.connect gainNode
+                gainNode.connect _audioContext.destination
+                
+                #record start time
+                @_startTime = _audioContext.currentTime
+
+                #start playing
+                @_source.start @_startTime, @_elapsedTime
     pause: =>
         if Greenhorn.isRunning()
             if env.USE_AUDIO_TAG
                 @_audio.pause()
             else
                 @_source.stop()
-                @_elapsedTime = _audioContext.currentTime - @_startTime
+                @_elapsedTime += _audioContext.currentTime - @_startTime
     stop: =>
         if Greenhorn.isRunning()
             if env.USE_AUDIO_TAG
