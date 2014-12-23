@@ -24,7 +24,7 @@ class @Sound
                 snd.play()
             else
                 snd.play volume: 0, loop: false
-                setTimeout snd.stop, 20
+                setTimeout snd.stop, 50
         return
     @_pauseAll = ->
         snd.pause() for snd in _list
