@@ -21,6 +21,14 @@ document.onreadystatechange = ->
     if @readyState is 'interactive'
         (init ? Greenhorn.start)()
 
+#listen for key events
+document.onkeydown = (e) ->
+    e.preventDefault()
+    Greenhorn.isDown[e.keyCode] = true
+document.onkeyup = (e) ->
+    e.preventDefault()
+    Greenhorn.isDown[e.keyCode] = false
+
 #asynchronous ID
 _masterID = null
 
@@ -41,14 +49,6 @@ class @Greenhorn
     #keyboard input tracking array
     @isDown = new Array 256
     key = false for key in @isDown
-    
-    #listen for key events
-    document.onkeydown = (e) =>
-        e.preventDefault
-        @isDown[e.keyCode] = true
-    document.onkeyup = (e) =>
-        e.preventDefault()
-        @isDown[e.keyCode] = false
 
     #create Engine elements
     _elmnts =
