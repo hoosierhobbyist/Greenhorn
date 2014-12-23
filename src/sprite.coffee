@@ -55,16 +55,16 @@ class @Sprite
 
     #<---INSTANCE-LEVEL--->
     constructor: (config = {}) ->
-        #forbidden key regex
-        forbidden = /(^distance$|^speed$|^rate$|^posAngle$|^motAngle$|^accAngle$)/i
-
-        #throw an error if a forbidden key is provided in the configuration
-        for own key of config when key.match forbidden
-            throw new Error "#{key} is a forbidden config value"
-
         #add missing keys to config
         for own key, value of env.SPRITE_DEFAULT_CONFIG
             config[key] ?= value
+
+        #move secondary config keys over for post processing
+        postConfig = {}
+        for own key, value of config
+            if key.match /(^distance$|^speed$|^rate$|^posAngle$|^motAngle$|^accAngle$)/i
+                delete config[key]
+                postConfig[key] = value
 
         #used to track asynchronous _update
         @_updateID = null
@@ -82,6 +82,7 @@ class @Sprite
         #set this sprite's configuration
         #"virtually" calls child's set method in derived classes
         @set 'config', config
+        @set 'config', postConfig
 
         #start updating if the engine is already running
         if Greenhorn.isRunning() then @_start()
@@ -124,11 +125,11 @@ class @Sprite
         else if what.match /^rate$/i
             Math.sqrt @_acc.ddx**2 + @_acc.ddy**2
         else if what.match /^posAngle$/i
-            Math.atan2 -@_pos.y, @_pos.x
+            Math.atan2 @_pos.y, @_pos.x
         else if what.match /^motAngle$/i
-            Math.atan2 -@_mot.dy, @_mot.dx
+            Math.atan2 @_mot.dy, @_mot.dx
         else if what.match /^accAngle$/i
-            Math.atan2 -@_acc.ddy, @_acc.ddx
+            Math.atan2 @_acc.ddy, @_acc.ddx
         else if what.match /(^level$|^width$|^height$|^visible$|^boundAction$)/
             @_dis[what]
         else
@@ -344,13 +345,13 @@ class @Sprite
                         @set 'left', bounds.right
                 when 'SPRING'
                     if hitTop
-                        @change 'ddy', -env.SPRING_CONSTANT
+                        @change 'dy', -env.SPRING_CONSTANT
                     if hitBottom
-                        @change 'ddy', env.SPRING_CONSTANT
+                        @change 'dy', env.SPRING_CONSTANT
                     if hitRight
-                        @change 'ddx', -env.SPRING_CONSTANT
+                        @change 'dx', -env.SPRING_CONSTANT
                     if hitLeft
-                        @change 'ddx', env.SPRING_CONSTANT
+                        @change 'dx', env.SPRING_CONSTANT
                 when 'STOP'
                     if hitTop
                         @set 'top', bounds.top - 1

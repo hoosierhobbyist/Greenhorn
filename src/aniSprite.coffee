@@ -14,32 +14,34 @@ class AniCycle
         @name = data.name
 
 class @AniSprite extends @Sprite
-    #constructor
     constructor: (config = {}) ->
-        #forbidden key regex
-        forbidden = /(^current$|^animation$|^cycle$)/i
-
-        #throw an error if a forbidden key is provided in the configuration
-        for own key of config when key.match forbidden
-            throw new Error "#{key} is a forbidden config value"
-
         #add missing keys to config
         for own key, value of env.ANISPRITE_DEFAULT_CONFIG
             config[key] ?= value
+        
+        #filter out initial cycle if one is provided
+        initialCycle = null
+        for own key, value of config
+            if key.match /(^current$|^animation$)/i
+                delete config[key]
+                initialCycle = value
 
         #create primary object
         @_ani = {}
 
         #create secondary objects
         @_ani.cycles = []
-        @_ani.timer = new Timer(true)
+        @_ani.timer = new Timer(on)
 
         #call the Sprite constructor
         super(config)
+        
+        #set initial cycle if one was provided
+        @set 'current', initialCycle if initialCycle?
 
     #getter
     get: (what) ->
-        if what.match /(^current$|^animation$|^cycle$)/i
+        if what.match /(^current$|^animation$)/i
             @_ani.current.name
         else if what.match /(^cellWidth$|^cellHeight$|^frameRate$|^orientation$)/
             @_ani[what]
@@ -48,7 +50,7 @@ class @AniSprite extends @Sprite
 
     #setter
     set: (what, to) ->
-        if what.match /(^current$|^animation$|^cycle$)/i
+        if what.match /(^current$|^animation$)/i
             if to isnt @_ani.current.name
                 @_ani.current.frame = @_ani.current.start
                 for cycle in @_ani.cycles when cycle.name is to
@@ -56,11 +58,10 @@ class @AniSprite extends @Sprite
         else if what.match /(^cellWidth$|^cellHeight$|^frameRate$|^orientation$)/
             @_ani[what] = to
         else if what.match /^cycle/i
-            i = 0
-            to.index ?= i += 1
-            to.start ?= 1
+            to.index ?= env.ANICYCLE_DEFAULT_CONFIG.index
+            to.start ?= env.ANICYCLE_DEFAULT_CONFIG.start
             to.stop ?= to.start + env.ANICYCLE_DEFAULT_CONFIG.numFrames - 1
-            to.name ?= if what.slice(5) then what.slice(5) else env.ANICYCLE_DEFAULT_CONFIG.name
+            to.name ?= what.slice(5) ? env.ANICYCLE_DEFAULT_CONFIG.name
 
             @_ani.cycles.push(new AniCycle(to))
             @_ani.current ?= @_ani.cycles[0]

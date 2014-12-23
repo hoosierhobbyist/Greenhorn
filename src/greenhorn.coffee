@@ -77,6 +77,7 @@ class @Greenhorn
     _elmnts.rightPanel.appendChild _elmnts.rightPanelHeader
     
     #listen for key events on main div
+    _elmnts.main.tabIndex = 0
     _elmnts.main.onkeydown = (e) ->
         e.preventDefault()
         _isDown[e.keyCode] = true

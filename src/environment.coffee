@@ -8,10 +8,10 @@ sedabull@gmail.com
     #miscellaneous
     FRAME_RATE: 25
     BOUNCE_DECAY: 0
-    SPRING_CONSTANT: 5
+    SPRING_CONSTANT: 25
     #default engine settings
     ENGINE:
-        footer: 'BOTTOM PANEL'
+        footer: 'FOOTER'
         leftHeader: 'LEFT PANEL'
         rightHeader: 'RIGHT PANEL'
     #The Startup display
@@ -64,8 +64,10 @@ sedabull@gmail.com
         backgroundColor: "black"
     #default aniSprite settings
     ANICYCLE_DEFAULT_CONFIG:
-        name: 'UNDEFINED'
+        index: 1
+        start: 1
         numFrames: 8
+        name: 'UNDEFINED'
     ANISPRITE_DEFAULT_CONFIG:
         cellWidth: 32
         cellHeight: 32
