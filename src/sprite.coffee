@@ -367,13 +367,13 @@ class @Sprite
                         @_mot.dx *= -1 + env.BOUNCE_DECAY
                 when 'SPRING'
                     if hitTop
-                        @change 'dy', env.SPRING_CONSTANT * (bounds.top - @get(top))
+                        @change 'dy', env.SPRING_CONSTANT * (bounds.top - @get('top'))
                     if hitBottom
-                        @change 'dy', env.SPRING_CONSTANT * (bounds.bottom - @get(bottom))
+                        @change 'dy', env.SPRING_CONSTANT * (bounds.bottom - @get('bottom'))
                     if hitRight
-                        @change 'dx', env.SPRING_CONSTANT * (bounds.right - @get(right))
+                        @change 'dx', env.SPRING_CONSTANT * (bounds.right - @get('right'))
                     if hitLeft
-                        @change 'dx', env.SPRING_CONSTANT * (bounds.left - @get(left))
+                        @change 'dx', env.SPRING_CONSTANT * (bounds.left - @get('left'))
         this
 
     #debugging
