@@ -6,14 +6,15 @@ A *greenhorn* is an untrained or inexperienced person, and that's exactly who th
 Working Examples
 ================
 
-The official website can be found [here](http://sedabull.github.io/Greenhorn). There are several working examples up and running, and I hope to have a few full fledged games up as well as soon as is humanly possible.
+The official website can be found [here](http://sedabull.github.io/Greenhorn). There are several working examples up and running, which have just recently recieved a *major* facelift. That style is what I plan to implement across the entire web site.
 
 Using the Engine
 ================
 
 If you would like to use the Greenhorn Gaming Engine to create your own games, all you must do
-is download the file lib/Greenhorn.js and include it in your webpage like this:
+is download the files in lib/ and include them in your webpage like this:
 ```html
+<link rel="stylesheet" href="path/to/GreenhornStyle.css">
 <script type="text/javascript" src="path/to/Greenhorn.js"></script>
 ```
 Some rough documentation can be found [here](http://github.com/sedabull/Greenhorn/wiki/API). Please keep in mind though that the documentation, along with everything else about this library, is still very much a work in progress.
