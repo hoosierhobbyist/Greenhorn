@@ -1,5 +1,5 @@
 ###
-skeletonAnimation.coffee
+boneheadsCrystalPickup.coffee
 Written by Seth Bullock
 sedabull@gmail.com
 ###
@@ -11,7 +11,7 @@ document.title = 'Bonehead\'s Crystal Pickup'
 env.IMAGE_PATH = '../images/'
 env.SOUND_PATH = '../sounds/jalastram/'
 env.USE_AUDIO_TAG = true
-env.ENGINE.leftHeader = 'REPORT'
+env.ENGINE.leftHeader = 'INFORMATION'
 env.ENGINE.rightHeader = 'CRYSTALS'
 env.SPRITE_DEFAULT_CONFIG.boundAction = 'STOP'
 env.ANICYCLE_DEFAULT_CONFIG.name = 'SPIN'
@@ -78,7 +78,30 @@ crystals = {}
             start: 2
     
     #document specific setup
-    $('#gh-left-panel').append('<pre></pre>')
+    $('#gh-left-panel').append(
+        '''
+        <h4 class='gh-panel-sub-header'>Instructions</h4>
+        <p class='gh-p'>
+        Use the arrow keys to move Bonehead and collect the
+        colored crystals.
+        </p>
+        <h4 class='gh-panel-sub-header'>Acknowledgements</h4>
+        <p class='gh-p'>
+        The 'bonehead.png' sprite sheet used for this example
+        was generated using <a class='gh-a' 
+        href='http://gaurav.munjal.us/Universal-LPC-Spritesheet-Character-Generator'>
+        this</a> tool. Which uses open-source resources that were created
+        in what's know as the <a class='gh-a' 
+        href='http://lpc.opengameart.org'>Liberated Pixel Cup</a>, which was sponsered
+        by <a class='gh-a' href='http://opengameart.org'>OpenGameArt.org</a>.
+        </p>
+        <h4 class='gh-panel-sub-header'>Discussion</h4>
+        <p class='gh-p'>
+        This example is a full demonstration of the Greenhorn AniSprite class.
+        To better understand what's going on, check out the source code, or the
+        documentation (coming soon).
+        </p>
+        ''')
     $('#gh-right-panel').append(
         '''
         <ul>
@@ -86,15 +109,14 @@ crystals = {}
         <li id="green">GREEN: </li>
         <li id="grey">GREY: </li>
         <li id="orange">ORANGE: </li>
-        <li id="pink">PIND: </li>
+        <li id="pink">PINK: </li>
         <li id="yellow">YELLOW: </li>
         </ul>
-        '''
-    )#end rightPanel setup
+        ''')
 
 #define update() to be called once per frame
 @update = ->
-    #handle any game specific events here
+    #move bonehead
     if Greenhorn.isDown[KEYS.UP]
         bonehead
             .change 'y', 50
@@ -115,10 +137,9 @@ crystals = {}
         direction = bonehead.get('current').match(/(UP|LEFT|DOWN|RIGHT)/)[0]
         bonehead.set 'animation', "STAND_#{direction}"
     
+    #check for collisions
     for color, crystal of crystals
         if bonehead.collidesWith crystal
             pickupSnd.play()
             crystal.set 'visible', off
             $("##{color}").html "#{color.toUpperCase()}: FOUND!"
-    
-    $('#gh-left-panel pre').html bonehead.report()
