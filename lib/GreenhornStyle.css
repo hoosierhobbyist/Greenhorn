@@ -16,7 +16,7 @@ body {
   cursor: pointer;
   font-weight: 500;
   text-decoration: underline;
-  font-size: 0.77em;
+  font-size: 1.05em;
 }
 .gh .gh-a:link {
   color: #c0c0c0;
@@ -43,7 +43,7 @@ body {
   outline-style: none;
   background-color: #000000;
 }
-.gh .gh-panel-header {
+.gh .gh-h {
   margin-top: 0px;
   text-align: center;
   margin-bottom: 5px;
@@ -51,7 +51,7 @@ body {
   font-size: 0.805em;
   border-bottom: 2px solid #c0c0c0;
 }
-.gh .gh-panel-sub-header {
+.gh .gh-sub-h {
   margin: 5px 0px;
   font-weight: bold;
   text-decoration: underline;

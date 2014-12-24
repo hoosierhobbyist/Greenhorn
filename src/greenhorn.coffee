@@ -69,9 +69,9 @@ class @Greenhorn
     _elmnts.rightPanel.id = 'gh-right-panel'
     _elmnts.footer.id = 'gh-footer'
     
-    #assign gh-panel-header class to panelHeaders
-    _elmnts.leftPanelHeader.classList.add 'gh-panel-header'
-    _elmnts.rightPanelHeader.classList.add 'gh-panel-header'
+    #assign gh-h class to panelHeaders
+    _elmnts.leftPanelHeader.classList.add 'gh-h'
+    _elmnts.rightPanelHeader.classList.add 'gh-h'
 
     #append all primary children to main div
     _elmnts.main.appendChild _elmnts.title
