@@ -7,19 +7,19 @@ sedabull@gmail.com
  */
 
 (function() {
-  var bonehead, crystals, init, pickup, update;
+  var bonehead, crystals, pickupSnd;
 
   document.title = 'Bonehead\'s Crystal Pickup';
 
   env.IMAGE_PATH = '../images/';
 
-  env.SOUND_PATH = '../sounds/';
+  env.SOUND_PATH = '../sounds/jalastram/';
 
   env.USE_AUDIO_TAG = true;
 
-  env.ENGINE.leftHeader = 'Bonehead Report';
+  env.ENGINE.leftHeader = 'REPORT';
 
-  env.ENGINE.rightHeader = 'Crystals';
+  env.ENGINE.rightHeader = 'CRYSTALS';
 
   env.SPRITE_DEFAULT_CONFIG.boundAction = 'STOP';
 
@@ -27,28 +27,28 @@ sedabull@gmail.com
 
   bonehead = null;
 
-  pickup = null;
+  pickupSnd = null;
 
   crystals = {};
 
-  init = function() {
-    var color, colors, _i, _len;
+  this.init = function() {
+    var canvasHeight, canvasWidth, color, colors, _i, _len;
     Greenhorn.start();
-    pickup = new Sound({
-      url: 'jalastram/SFX_Pickup_20.wav'
+    pickupSnd = new Sound({
+      url: 'SFX_Pickup_20.wav'
     });
+    canvasWidth = $('#gh-canvas')[0].width;
+    canvasHeight = $('#gh-canvas')[0].height;
     colors = ['blue', 'green', 'grey', 'orange', 'pink', 'yellow'];
     for (_i = 0, _len = colors.length; _i < _len; _i++) {
       color = colors[_i];
       crystals[color] = new AniSprite({
         imageFile: "crystals/" + color + "Crystal.png",
-        x: Math.random() * env.ENGINE.canvasWidth - env.ENGINE.canvasWidth / 2,
-        y: Math.random() * env.ENGINE.canvasHeight - env.ENGINE.canvasHeight / 2,
+        x: Math.random() * canvasWidth - canvasWidth / 2,
+        y: Math.random() * canvasHeight - canvasHeight / 2,
         width: 32,
         height: 32,
-        cycle1: {
-          index: 1
-        }
+        cycle: {}
       });
     }
     bonehead = new AniSprite({
@@ -56,6 +56,7 @@ sedabull@gmail.com
       cellWidth: 64,
       cellHeight: 64,
       frameRate: 23,
+      current: 'STAND_DOWN',
       cycleSTAND_UP: {
         index: 9,
         start: 1,
@@ -94,30 +95,29 @@ sedabull@gmail.com
       }
     });
     $('#gh-left-panel').append('<pre></pre>');
-    $('#gh-right-panel').append('<p></p>');
-    return $('#gh-right-panel p').html('<ul>\n<li id="blue">BLUE: </li>\n<li id="green">GREEN: </li>\n<li id="grey">GREY: </li>\n<li id="orange">ORANGE: </li>\n<li id="pink">PIND: </li>\n<li id="yellow">YELLOW: </li>\n</ul>');
+    return $('#gh-right-panel').append('<ul>\n<li id="blue">BLUE: </li>\n<li id="green">GREEN: </li>\n<li id="grey">GREY: </li>\n<li id="orange">ORANGE: </li>\n<li id="pink">PIND: </li>\n<li id="yellow">YELLOW: </li>\n</ul>');
   };
 
-  update = function() {
+  this.update = function() {
     var color, crystal, direction;
     if (Greenhorn.isDown[KEYS.UP]) {
-      bonehead.set('animation', 'WALK_UP').change('y', 50);
+      bonehead.change('y', 50).set('animation', 'WALK_UP');
     } else if (Greenhorn.isDown[KEYS.DOWN]) {
-      bonehead.set('animation', 'WALK_DOWN').change('y', -50);
+      bonehead.change('y', -50).set('animation', 'WALK_DOWN');
     } else if (Greenhorn.isDown[KEYS.RIGHT]) {
-      bonehead.set('animation', 'WALK_RIGHT').change('x', 50);
+      bonehead.change('x', 50).set('animation', 'WALK_RIGHT');
     } else if (Greenhorn.isDown[KEYS.LEFT]) {
-      bonehead.set('animation', 'WALK_LEFT').change('x', -50);
+      bonehead.change('x', -50).set('animation', 'WALK_LEFT');
     } else {
-      direction = bonehead.get('cycle').match(/(UP|LEFT|DOWN|RIGHT)/)[0];
-      bonehead.set('animation', 'STAND_' + direction);
+      direction = bonehead.get('current').match(/(UP|LEFT|DOWN|RIGHT)/)[0];
+      bonehead.set('animation', "STAND_" + direction);
     }
     for (color in crystals) {
       crystal = crystals[color];
       if (bonehead.collidesWith(crystal)) {
-        pickup.play();
+        pickupSnd.play();
         crystal.set('visible', false);
-        document.getElementById(color).innerHTML = "" + (color.toUpperCase()) + ": FOUND!";
+        $("#" + color).html("" + (color.toUpperCase()) + ": FOUND!");
       }
     }
     return $('#gh-left-panel pre').html(bonehead.report());

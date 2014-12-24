@@ -9,12 +9,12 @@
     <link rel='stylesheet' href='../lib/GreenhornStyle.css'>
     <script type='text/javascript' src='../lib/Greenhorn.js'></script>
     <script type='text/javascript' src='../lib/jquery-1.11.1.min.js'></script>
-    <script type='text/javascript' src='./java/userMotion.js'></script>
+    <script type='text/javascript' src='./java/boneheadsCrystalPickup.js'></script>
     <script type='text/javascript'>
       function loadSource(){
           $('#gh-footer').html('\\/ Checkout the source code below \\/');
 
-          $.get('./coffee/userMotion.coffee', function(data){
+          $.get('./coffee/boneheadsCrystalPickup.coffee', function(data){
               while(data.match(/[<>]/)){
                   data = data.replace('<', '&lt');
                   data = data.replace('>', '&gt');
@@ -23,7 +23,7 @@
               $('#coffee').html('\n' + data);
           }, 'text');//end get coffeescript source
 
-          $.get('./java/userMotion.js', function(data){
+          $.get('./java/boneheadsCrystalPickup.js', function(data){
               while(data.match(/[<>]/)){
                   data = data.replace('<', '&lt');
                   data = data.replace('>', '&gt');

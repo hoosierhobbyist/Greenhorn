@@ -9,45 +9,45 @@ document.title = 'Bonehead\'s Crystal Pickup'
 
 #setup the environment
 env.IMAGE_PATH = '../images/'
-env.SOUND_PATH = '../sounds/'
+env.SOUND_PATH = '../sounds/jalastram/'
 env.USE_AUDIO_TAG = true
-env.ENGINE.leftHeader = 'Bonehead Report'
-env.ENGINE.rightHeader = 'Crystals'
+env.ENGINE.leftHeader = 'REPORT'
+env.ENGINE.rightHeader = 'CRYSTALS'
 env.SPRITE_DEFAULT_CONFIG.boundAction = 'STOP'
 env.ANICYCLE_DEFAULT_CONFIG.name = 'SPIN'
 
 #declare global variables
 bonehead= null
-pickup = null
+pickupSnd = null
 crystals = {}
 
 #define init() to setup document
-init = ->
+@init = ->
     #start the engine
     Greenhorn.start()
     
     #initialize variables
-    pickup = new Sound({
-        url: 'jalastram/SFX_Pickup_20.wav'
-    })#end pickup construction
+    pickupSnd = new Sound url: 'SFX_Pickup_20.wav'
     
+    canvasWidth = $('#gh-canvas')[0].width
+    canvasHeight = $('#gh-canvas')[0].height
     colors = ['blue', 'green', 'grey', 'orange', 'pink', 'yellow']
+    
     for color in colors
-        crystals[color] = new AniSprite(
+        crystals[color] = new AniSprite
             imageFile: "crystals/#{color}Crystal.png"
-            x: Math.random() * env.ENGINE.canvasWidth - env.ENGINE.canvasWidth / 2
-            y: Math.random() * env.ENGINE.canvasHeight - env.ENGINE.canvasHeight / 2
+            x: Math.random() * canvasWidth - canvasWidth / 2
+            y: Math.random() * canvasHeight - canvasHeight / 2
             width: 32
             height: 32
-            cycle1:
-                index: 1
-        )#end cyrstal construction
+            cycle: {}
     
-    bonehead = new AniSprite(
+    bonehead = new AniSprite
         imageFile: 'bonehead.png'
         cellWidth: 64
         cellHeight: 64
         frameRate: 23
+        current: 'STAND_DOWN'
         cycleSTAND_UP:
             index: 9
             start: 1
@@ -76,12 +76,10 @@ init = ->
         cycleWALK_RIGHT:
             index: 12
             start: 2
-    )#end bonehead construction
     
     #document specific setup
     $('#gh-left-panel').append('<pre></pre>')
-    $('#gh-right-panel').append('<p></p>')
-    $('#gh-right-panel p').html(
+    $('#gh-right-panel').append(
         '''
         <ul>
         <li id="blue">BLUE: </li>
@@ -93,36 +91,34 @@ init = ->
         </ul>
         '''
     )#end rightPanel setup
-#end init
 
 #define update() to be called once per frame
-update = ->
+@update = ->
     #handle any game specific events here
     if Greenhorn.isDown[KEYS.UP]
         bonehead
-            .set 'animation', 'WALK_UP'
             .change 'y', 50
+            .set 'animation', 'WALK_UP'
     else if Greenhorn.isDown[KEYS.DOWN]
         bonehead
-            .set 'animation', 'WALK_DOWN'
             .change 'y', -50
+            .set 'animation', 'WALK_DOWN'
     else if Greenhorn.isDown[KEYS.RIGHT]
         bonehead
-            .set 'animation', 'WALK_RIGHT'
             .change 'x', 50
+            .set 'animation', 'WALK_RIGHT'
     else if Greenhorn.isDown[KEYS.LEFT]
         bonehead
-            .set 'animation', 'WALK_LEFT'
             .change 'x', -50
+            .set 'animation', 'WALK_LEFT'
     else
-        direction = bonehead.get('cycle').match(/(UP|LEFT|DOWN|RIGHT)/)[0];
-        bonehead.set('animation', 'STAND_' + direction);
+        direction = bonehead.get('current').match(/(UP|LEFT|DOWN|RIGHT)/)[0]
+        bonehead.set 'animation', "STAND_#{direction}"
     
     for color, crystal of crystals
         if bonehead.collidesWith crystal
-            pickup.play()
+            pickupSnd.play()
             crystal.set 'visible', off
-            document.getElementById(color).innerHTML = "#{color.toUpperCase()}: FOUND!"
+            $("##{color}").html "#{color.toUpperCase()}: FOUND!"
     
-    $('#gh-left-panel pre').html(bonehead.report())
-#end update
+    $('#gh-left-panel pre').html bonehead.report()

@@ -51,6 +51,10 @@ randomConfig = ->
         env.SPRITE_DEFAULT_CONFIG.boundAction = 'BOUNCE'
         Sprites.setAll 'boundAction', 'BOUNCE'
     
+    Greenhorn.addButton label: 'SPRING', onclick: ->
+        env.SPRITE_DEFAULT_CONFIG.boundAction = 'SPRING'
+        Sprites.setAll 'boundAction', 'SPRING'
+    
     Greenhorn.addButton label: 'WRAP', onclick: ->
         env.SPRITE_DEFAULT_CONFIG.boundAction = 'WRAP'
         Sprites.setAll 'boundAction', 'WRAP'
@@ -94,9 +98,8 @@ randomConfig = ->
         Sprites.removeAll()
 
     #add content to gh-left-panel
-    information =
+    $('#gh-left-panel').append(
         '''
-        <div>
         <h4 class='gh-panel-sub-header'>Instructions</h4>
         <p class='gh-p'>
         Use the Buttons on the left hand side
@@ -119,9 +122,7 @@ randomConfig = ->
         boundary action from BOUNCE to WRAP to BOUNCE
         to STOP to DIE, with about 5-10 seconds inbetween. Have fun!
         </p>
-        </div>
-        '''
-    $('#gh-left-panel').append information
+        ''')
 
     #create random number of logos to start
     i = Math.round Math.random() * 9 + 1
