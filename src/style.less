@@ -1,0 +1,156 @@
+/*
+style.less
+Written by Seth Bullock
+sedabull@gmail.com
+*/
+
+//scheme and style
+@intrnlBgColor: #000000;
+@extrnlBgColor: #656565;
+@fgColor: #006400;
+@acntColor: #C0C0C0;
+@intrnlBorderStyle: solid;
+@extrnlBorderStyle: groove;
+
+//element sizes
+@canvasWidth: 800px;
+@canvasHeight: 450px;
+@titleHeight: 50px;
+@footerHeight: 25px;
+@leftPanelWidth: 150px;
+@rightPanelWidth: 150px;
+@borderRadius: 15px;
+@extrnlBorderWidth: 5px;
+@intrnlBorderWidth: 1px;
+@intrnlPadding: 10px;
+@panelFontSize: .7em;
+
+//rules
+body{
+    background-color: @fgColor;
+}//end body
+
+.gh{
+    //gh class style
+    border-radius: @borderRadius;
+    background-color: @extrnlBgColor;
+    border: @extrnlBorderWidth @extrnlBorderStyle @acntColor;
+    min-height: @canvasHeight + @titleHeight + @footerHeight + @intrnlPadding * 4 + 50;
+    
+    //gh sub-classes
+    .gh-ol{}//end .gh-ol class
+    .gh-ul{}//end .gh-ul class
+    .gh-pre{}//end .gh-pre class
+    .gh-a{
+        cursor: pointer;
+        font-weight: 500;
+        text-decoration: underline;
+        font-size: 1.05em;
+        
+        &:link{
+            color: @acntColor;
+        }
+        &:visited{
+            color: darken(@acntColor, 25%);
+        }
+        &:hover{
+            color: lighten(@acntColor, 25%);
+        }
+        &:active{
+            color: @intrnlBgColor;
+        }
+    }//end .gh-a class
+    .gh-p{
+        margin: 0;
+        font-size: @panelFontSize;
+    }//end .gh-p class
+    .gh-button{
+        margin: 1%;
+        width: 98%;
+        font-size: small;
+        color: @acntColor;
+        border-radius: 5px;
+        outline-style: none;
+        background-color: @intrnlBgColor;
+    }//end .gh-button class
+    .gh-h{
+        margin-top: 0px;
+        text-align: center;
+        margin-bottom: 5px;
+        padding-bottom: 2px;
+        font-size: @panelFontSize * 1.15;
+        border-bottom: 2px @intrnlBorderStyle @acntColor;
+    }//end .gh-panel-header class
+    .gh-sub-h{
+        margin: 5px 0px;
+        font-weight: bold;
+        text-decoration: underline;
+        font-size: @panelFontSize * 1.10;
+    }//end .gh-panel-sub-header
+    
+    //gh named elements
+    #gh-main{
+        //main div style
+        margin: 2.5% auto;
+        color: @acntColor;
+        background-color: @fgColor;
+        border-radius: @borderRadius;
+        font-family: Tahoma, Geneva, sans-serif;
+        box-shadow: 20px 20px 5px darken(@extrnlBgColor, 50%);
+        border: @extrnlBorderWidth @extrnlBorderStyle @acntColor;
+        min-height: @canvasHeight + @titleHeight + @footerHeight + @intrnlPadding * 4;
+        max-height: @canvasHeight + @titleHeight + @footerHeight + @intrnlPadding * 4;
+        min-width: @canvasWidth + @leftPanelWidth + @rightPanelWidth + @intrnlPadding * 4;
+        max-width: @canvasWidth + @leftPanelWidth + @rightPanelWidth + @intrnlPadding * 4;
+        
+        //child elements style
+        #gh-title{
+            width: 100%;
+            float: left;
+            clear: both;
+            text-align: center;
+            height: @titleHeight;
+            border-radius: inherit;
+            margin: @intrnlPadding 0px 0px 0px;
+            padding-bottom: @intrnlPadding - @intrnlBorderWidth;
+            border-bottom: @intrnlBorderWidth @intrnlBorderStyle @acntColor;
+        }//end #gh-title style
+        #gh-left-panel{
+            float: left;
+            clear: left;
+            overflow: auto;
+            width: @leftPanelWidth;
+            margin: @intrnlPadding;
+            height: @canvasHeight - @intrnlPadding * 2;
+            margin-right: @intrnlPadding - @intrnlBorderWidth;
+        }//end #gh-left-panel style
+        #gh-canvas{
+            float: left;
+            width: @canvasWidth;
+            height: @canvasHeight;
+            background-color: @intrnlBgColor;
+            border-left: @intrnlBorderWidth @intrnlBorderStyle @acntColor;
+            border-right: @intrnlBorderWidth @intrnlBorderStyle @acntColor;
+        }//end #gh-canvas style
+        #gh-right-panel{
+            float: left;
+            clear: right;
+            overflow: auto;
+            margin: @intrnlPadding;
+            width: @rightPanelWidth;
+            height: @canvasHeight - @intrnlPadding * 2;
+            margin-left: @intrnlPadding - @intrnlBorderWidth;
+        }//end #gh-right-panel style
+        #gh-footer{
+            width: 100%;
+            float: left;
+            clear: both;
+            text-align: center;
+            height: @footerHeight;
+            border-radius: inherit;
+            margin: 0px 0px @intrnlPadding 0px;
+            padding-top: @intrnlPadding - @intrnlBorderWidth;
+            border-top: @intrnlBorderWidth @intrnlBorderStyle @acntColor;
+        }//end #gh-footer style
+    }//end #gh-main style
+}//end .gh class style

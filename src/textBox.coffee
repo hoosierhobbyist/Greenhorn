@@ -1,141 +1,184 @@
 ###
 textBox.coffee
-
-The Greenhorn Gaming TextBox class
+Written by Seth Bullock
+sedabull@gmail.com
 ###
 
-#simple textbox
 class @TextBox extends @Sprite
-    #constructor
     constructor: (config = {}) ->
-        #add the environment defaults to config,
-        #if the user has chosen to omit them
+        #add missing keys to config
         for own key, value of env.TEXTBOX_DEFAULT_CONFIG
             config[key] ?= value
-        
-        #primary objects
+
+        #NOTE: consider allowing images for bg, brd, and font
+        #set imageFile to '' as it will not be needed
+        config.imageFile = ''
+
+        #create primary objects
         @_text = []
-        @_background = {}
-        @_border = {}
         @_font = {}
+        @_border = {}
+        @_outline = {}
         @_margins = {}
-        
+        @_background = {}
+
         #call Sprite constructor
         super(config)
-    
-    #generic getter
+
+    #getter
     get: (what) ->
-        switch what
-            when "text"
-                @_text.join '\n'
-            when "align"
-                @_dis.context.textAlign
-            when "background", "border", "font", "margins"
-                @["_".concat what]
-            when what.indexOf("background") is 0
-                @_background[what.slice(10).toLowerCase()]
-            when what.indexOf("border") is 0
-                @_border[what.slice(6).toLowerCase()]
-            when what.indexOf("font") is 0
-                @_font[what.slice(4).toLowerCase()]
-            when what.indexOf("margins") is 0
-                @_margins[what.slice(7).toLowerCase()]
-            else
-                super what
-    
-    #generic setter
+        if what.match /^text$/i
+            @_text.join '\n'
+        else if what.match /^font\w+/i
+            @_font[what.slice(4).toLowerCase()]
+        else if what.match /^border\w+/i
+            @_border[what.slice(6).toLowerCase()]
+        else if what.match /^outline\w+/i
+            @_outline[what.slice(7).toLowerCase()]
+        else if what.match /^margins\w+/i
+            @_margins[what.slice(7).toLowerCase()]
+        else if what.match /^background\w+/i
+            @_background[what.slice(10).toLowerCase()]
+        else
+            super what
+
+    #setter
     set: (what, to) ->
-        if what is "text"
-            @_text = to.split "\n"
-        else if what is "align"
-            @_dis.context.textAlign = to
-        else if what is "background" or what is "border" or what is "font" or what is "margins"
-            @["_".concat what][k] = v for k, v of to
-        else if what.indexOf("background") is 0
-            @_background[what.slice(10).toLowerCase()] = to
-        else if what.indexOf("border") is 0
-            @_border[what.slice(6).toLowerCase()] = to
-        else if what.indexOf("font") is 0
+        if what.match /^text$/i
+            @_text = to.split '\n'
+        else if what.match /^font\w+/i
             @_font[what.slice(4).toLowerCase()] = to
-        else if what.indexOf("margins") is 0
+        else if what.match /^border\w+/i
+            @_border[what.slice(6).toLowerCase()] = to
+        else if what.match /^outline\w+/i
+            @_outline[what.slice(7).toLowerCase()] = to
+        else if what.match /^margins\w+/i
             @_margins[what.slice(7).toLowerCase()] = to
+        else if what.match /^background\w+/i
+            @_background[what.slice(10).toLowerCase()] = to
+        else if what.match /(^font$|^border$|^outline$|^margins$|^background$)/i
+            @set what.concat(k), v for own k, v of to
         else
             super what, to
-        
-        if @_dis.width? and @_dis.height? and @_font.size? and
-        @_margins.left? and @_margins.right? and @_margins.bottom? and
-        @_margins.top? and @_border.visible? and @_border.size?
-            @_fitText()
         this
-    
-    #style control
-    showBackground: ->
-        @_background.visible = yes
-    hideBackground: ->
-        @_background.visible = no
-    showBorder: ->
-        @_border.visible = yes
-        @_fitText()
-    hideBorder: ->
-        @_border.visible = no
-        @_fitText()
-    
+
+    change: (what, step) ->
+        if what.match /^text$/i
+            @_text = (@_text.join('\n').concat(step)).split('\n')
+        else if what.match /^font\w+/i
+            @_font[what.slice(4).toLowerCase()] += step
+        else if what.match /^border\w+/i
+            @_border[what.slice(6).toLowerCase()] += step
+        else if what.match /^outline\w+/i
+            @_outline[what.slice(7).toLowerCase()] += step
+        else if what.match /^margins\w+/i
+            @_margins[what.slice(7).toLowerCase()] += step
+        else if what.match /^background\w+/i
+            @_background[what.slice(10).toLowerCase()] += step
+        else if what.match /(^font$|^border$|^outline$|^margins$|^background$)/i
+            @change what.concat(k), v for own k, v of to
+        else
+            super what, step
+        this
+
     #internal control
-    _fitText: ->
+    _draw: ->
+        if @_dis.visible
+
+            #save current context
+            @_dis.context.save()
+
+            #translate and rotate
+            @_dis.context.translate @_pos.x, -@_pos.y
+            @_dis.context.rotate -@_pos.a
+
+            #draw background
+            if @_background.visible
+                @_dis.context.save()
+                @_dis.context.fillStyle = @_background.color
+                @_dis.context.globalAlpha = @_background.alpha
+                @_dis.context.fillRect(
+                    -@_dis.width / 2, #left
+                    -@_dis.height / 2, #top
+                    @_dis.width, #width
+                    @_dis.height) #height
+                @_dis.context.restore()
+
+            #draw borders
+            if @_border.visible
+                @_dis.context.save()
+                @_dis.context.strokeStyle = @_border.color
+                @_dis.context.lineWidth = @_border.size
+                @_dis.context.globalAlpha = @_border.alpha
+                @_dis.context.strokeRect(
+                    -@_dis.width / 2, #left
+                    -@_dis.height / 2, #top
+                    @_dis.width, #width
+                    @_dis.height) #height
+                @_dis.context.restore()
+
+            #calculate text yOffset
+            yOffset = (@_text.length - 1) * @_font.size * .75
+
+            #calculate text xOffset
+            if @_font.align.toLowerCase() is 'center'
+                xOffset = 0
+            else if @_font.align.toLowerCase() is 'left'
+                xOffset = -@_dis.width / 2 + @_margins.left
+                if @_border.visible
+                    xOffset += @_border.size
+            else if @_font.align.toLowerCase() is 'right'
+                xOffset = @_dis.width / 2 - @_margins.right
+                if @_border.visible
+                    xOffset -= @_border.size
+
+            #initialize context for text
+            @_dis.context.textBaseline = 'middle'
+            @_dis.context.fillStyle = @_font.color
+            @_dis.context.globalAlpha = @_font.alpha
+            @_dis.context.textAlign = "#{@_font.align}"
+            @_dis.context.font = "#{@_font.size}px #{@_font.name}"
+
+            #draw text on canvas
+            for line, i in @_text
+                @_dis.context.fillText(
+                    line,
+                    xOffset,
+                    @_font.size * 1.5 * i - yOffset)
+
+            #draw text outline if visible
+            if @_outline.visible
+                @_dis.context.lineWidth = @_outline.size
+                @_dis.context.strokeStyle = @_outline.color
+                @_dis.context.globalAlpha = @_outline.alpha
+                for line, i in @_text
+                    @_dis.context.strokeText(
+                        line,
+                        xOffset,
+                        @_font.size * 1.5 * i - yOffset)
+
+            #restore old context
+            @_dis.context.restore()
+    _update: ->
         #calculate new size
         @_dis.width = 0
-        @_dis.height = (@_font.size * @_text.length) + (@_font.size * (@_text.length - 1))
+        @_dis.height = @_font.size * 1.5 * @_text.length
+
+        #find maximum line width
+        @_dis.context.save()
+        @_dis.context.font = "#{@_font.size}px #{@_font.name}"
         for line in @_text
             len = @_dis.context.measureText(line).width
             @_dis.width = len if @_dis.width < len
-        
+        @_dis.context.restore()
+
         #adjust for margins and border
         @_dis.width += @_margins.left + @_margins.right
         @_dis.height += @_margins.top + @_margins.bottom
         if @_border.visible
             @_dis.width += 2 * @_border.size
             @_dis.height += 2 * @_border.size
-    _draw: ->
-        if @_dis.visible
-            #save current context
-            @_dis.context.save()
-            
-            #translate and rotate
-            @_dis.context.translate @_pos.x, -@_pos.y
-            @_dis.context.rotate -@_pos.a
-            
-            #draw background
-            if @_background.visible
-                @_dis.context.fillStyle = @_background.color
-                @_dis.context.globalAlpha = @_background.alpha
-                @_dis.context.fillRect -@_dis.width / 2, -@_dis.height / 2, @_dis.width, @_dis.height
-            
-            #draw borders
-            if @_border.visible
-                @_dis.context.strokeStyle = @_border.color
-                @_dis.context.lineWidth = @_border.size
-                @_dis.context.globalAlpha = @_border.alpha
-                @_dis.context.strokeRect -@_dis.width / 2, -@_dis.height / 2, @_dis.width, @_dis.height
-            
-            #draw text
-            xOffset = @_margins.left
-            yOffset = @_margins.top + @_font.size
-            if @_border.visible
-                xOffset += @_border.size
-                yOffset += @_border.size
-            
-            #initialize context
-            @_dis.context._font = "#{@_font.size}px #{@_font.name}"
-            @_dis.context.fillStyle = @_font.color
-            @_dis.context.globalAlpha = @_font.alpha
-            
-            #draw text on canvas
-            if @_text.length > 1
-                for line, i in @_text
-                    @_dis.context.fillText line, xOffset - (@_dis.width / 2), yOffset - (@_dis.height / 2) + (@_font.size * 2 * i)
-            else
-                @_dis.context.fillText @_text[0], xOffset - (@_dis.width / 2), yOffset - (@_dis.height / 2)
-            
-            #restore old context
-            @_dis.context.restore()
+
+        #call Sprite update
+        super()
 #end class TextBox

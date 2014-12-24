@@ -1,73 +1,92 @@
 ###
 environment.coffee
-
-The Greenhorn Gaming environment object
+Written by Seth Bullock
+sedabull@gmail.com
 ###
 
 @env =
     #miscellaneous
     FRAME_RATE: 25
-    #document body settings
-    BODY_BACKGROUND_COLOR: "goldenrod"
+    BOUNCE_DECAY: 0
+    SPRING_CONSTANT: 25
     #default engine settings
-    ENGINE_LEFT_PANEL: "LEFT PANEL"
-    ENGINE_RIGHT_PANEL: "RIGHT PANEL"
-    ENGINE_BOTTOM_PANEL: "BOTTOM PANEL"
-    ENGINE_CANVAS_COLOR: "black"
-    ENGINE_BACKGROUND_COLOR: "darkgreen"
+    ENGINE:
+        footer: 'FOOTER'
+        leftHeader: 'LEFT PANEL'
+        rightHeader: 'RIGHT PANEL'
+    #The Startup display
+    STARTUP:
+        size: 50
+        color: '#006400'
+        font: 'sans-serif'
+        text: 'Click here to Start'
     #default Sprite settings
     IMAGE_PATH: ""
     SPRITE_DEFAULT_CONFIG:
         x: 0
         y: 0
-        z: 0
         a: 0
         dx: 0
         dy: 0
-        dz: 0
         da: 0
         ddx: 0
         ddy: 0
-        ddz: 0
         dda: 0
+        level: 0
         width: 64
         height: 64
-        imageFile: ""
         visible: yes
+        imageFile: ""
         boundAction: "WRAP"
     #default TextBox settings
     TEXTBOX_DEFAULT_CONFIG:
-        z: -1
+        level: -1
         text: "*-TextBox-*"
-        align: "center"
-        backgroundColor: "black"
-        backgroundAlpha: 1.0
-        backgroundVisible: yes
+        fontSize: 12
+        fontAlpha: 1.0
+        fontColor: "white"
+        fontAlign: "left"
+        fontName: "sans-serif"
         borderSize: 5
-        borderColor: "white"
         borderAlpha: 1.0
         borderVisible: yes
-        fontName: "Arial"
-        fontSize: 8
-        fontColor: "white"
-        fontAlpha: 1.0
+        borderColor: "white"
+        outlineSize: 1
+        outlineAlpha: 1.0
+        outlineVisible: no
+        outlineColor: "grey"
         marginsTop: 5
         marginsBottom: 5
         marginsRight: 5
         marginsLeft: 5
+        backgroundAlpha: 1.0
+        backgroundVisible: yes
+        backgroundColor: "black"
+    #default aniSprite settings
+    ANICYCLE_DEFAULT_CONFIG:
+        index: 1
+        start: 1
+        numFrames: 8
+        name: 'UNDEFINED'
     ANISPRITE_DEFAULT_CONFIG:
         cellWidth: 32
         cellHeight: 32
-        frameRate: 5
-        numFrames: 8
+        frameRate: 10
+        orientation: 'horizontal'
     #default sound settings
     SOUND_PATH: ""
     USE_AUDIO_TAG: false
     SOUND_DEFAULT_CONFIG:
         url: ""
-        playOnLoad: false
+        loop: false
+        volume: 1.0
+        autoplay: false
+    #default button settings
+    BUTTON_DEFAULT_CONFIG:
+        type: 'button'
+        onclick: undefined
+        parent: 'rightPanel'
+        label: 'Launch the Missiles!'
     #default timer settings
     TIMER_START_ON_CONSTRUCTION: yes
-    #default button settings
-    BUTTON_DEFAULT_LABEL: "Launch the Missiles!"
 #end environment object
