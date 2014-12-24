@@ -51,7 +51,7 @@ sedabull@gmail.com
         return timer.stop();
       }
     });
-    return $('#gh-left-panel').append('<h4 class=\'gh-panel-sub-header\'>Instructions</h4>\n<p class=\'gh-p\'>\nUse the buttons on the right-hand side to experiment\nwith the four primary timer functions: play, pause,\nrestart, and stop. The elapsed time is displayed\non the canvas using a Greenhorn TextBox.\n</p>\n<h4 class=\'gh-panel-sub-header\'>Discussion</h4>\n<p class=\'gh-p\'>\nThe timer class is used internally by the Greenhorn AniSprite\nto determine when to change frames. It could also be used to\noffset particular events, measure and compare a player\'s performance\nto others, or set a time limit on a particular game.\n</p>');
+    return $('#gh-left-panel').append('<h4 class=\'gh-sub-h\'>Instructions</h4>\n<p class=\'gh-p\'>\nUse the buttons on the right-hand side to experiment\nwith the four primary timer functions: play, pause,\nrestart, and stop. The elapsed time is displayed\non the canvas using a Greenhorn TextBox.\n</p>\n<h4 class=\'gh-sub-h\'>Discussion</h4>\n<p class=\'gh-p\'>\nThe timer class is used internally by the Greenhorn AniSprite\nto determine when to change frames. It could also be used to\noffset particular events, measure and compare a player\'s performance\nto others, or set a time limit on a particular game.\n</p>');
   };
 
   this.update = function() {

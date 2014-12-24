@@ -36,7 +36,7 @@ randomConfig = ->
 
     #add control buttons and labels
     $('#gh-right-panel').append(
-        '<h4 class="gh-panel-sub-header">ENGINE CONTROL</h4>')
+        '<h4 class="gh-sub-h">ENGINE CONTROL</h4>')
     
     Greenhorn.addButton label: 'START', onclick: ->
         Greenhorn.start()
@@ -45,7 +45,7 @@ randomConfig = ->
         Greenhorn.stop()
     
     $('#gh-right-panel').append(
-        '<h4 class="gh-panel-sub-header">BOUND ACTIONS</h4>')
+        '<h4 class="gh-sub-h">BOUND ACTIONS</h4>')
     
     Greenhorn.addButton label: 'BOUNCE', onclick: ->
         env.SPRITE_DEFAULT_CONFIG.boundAction = 'BOUNCE'
@@ -68,7 +68,7 @@ randomConfig = ->
         Sprites.setAll 'boundAction', 'DIE'
     
     $('#gh-right-panel').append(
-        '<h4 class="gh-panel-sub-header">ADD/REMOVE SPRITES</h4>')
+        '<h4 class="gh-sub-h">ADD/REMOVE SPRITES</h4>')
     
     Greenhorn.addButton label: 'ADD ONE', onclick: ->
         new Sprite randomConfig()
@@ -100,14 +100,14 @@ randomConfig = ->
     #add content to gh-left-panel
     $('#gh-left-panel').append(
         '''
-        <h4 class='gh-panel-sub-header'>Instructions</h4>
+        <h4 class='gh-sub-h'>Instructions</h4>
         <p class='gh-p'>
         Use the Buttons on the left hand side
         to start and stop the engine, change the
         default boundary action, or add
         and remove Circles of Friends.
         </p>
-        <h4 class='gh-panel-sub-header'>Trademark</h4>
+        <h4 class='gh-sub-h'>Trademark</h4>
         <p class='gh-p'>
         Please note that the logo used in this
         example, which is known as
@@ -115,7 +115,7 @@ randomConfig = ->
         is a registered trademark of
         Canonical Ltd.
         </p>
-        <h4 class='gh-panel-sub-header'>Discussion</h4>
+        <h4 class='gh-sub-h'>Discussion</h4>
         <p class='gh-p'>
         Try this if you're not sure where to start. 
         Create about 150 Sprites, then change the 

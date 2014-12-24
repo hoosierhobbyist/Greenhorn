@@ -34,12 +34,12 @@ env.ENGINE.rightHeader = 'BUTTONS'
     #add info
     $('#gh-left-panel').append( 
         '''
-        <h4 class='gh-panel-sub-header'>Instructions</h4>
+        <h4 class='gh-sub-h'>Instructions</h4>
         <p class='gh-p'>
         Use the buttons on the right-hand side to test the
         four primary Sound functions: play, restart, pause, and stop.
         </p>
-        <h4 class='gh-panel-sub-header'>Acknowledgements</h4>
+        <h4 class='gh-sub-h'>Acknowledgements</h4>
         <p class='gh-p'>
         This track you're listening to is titled <em>Heroic Minority</em>.
         I found it, along with many other great resources on 
@@ -49,7 +49,7 @@ env.ENGINE.rightHeader = 'BUTTONS'
         Alexandr Zhelanov</a>. You can check out some of his other work 
         <a class='gh-a' href='https://soundcloud.com/alexandr-zhelanov'>here</a>.
         </p>
-        <h4 class='gh-panel-sub-header'>Discussion</h4>
+        <h4 class='gh-sub-h'>Discussion</h4>
         <p class='gh-p'>
         Please note that the soundtrack will not start playing back
         until the engine has started.

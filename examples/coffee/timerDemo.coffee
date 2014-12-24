@@ -40,14 +40,14 @@ display = null
     #include information
     $('#gh-left-panel').append(
         '''
-        <h4 class='gh-panel-sub-header'>Instructions</h4>
+        <h4 class='gh-sub-h'>Instructions</h4>
         <p class='gh-p'>
         Use the buttons on the right-hand side to experiment
         with the four primary timer functions: play, pause,
         restart, and stop. The elapsed time is displayed
         on the canvas using a Greenhorn TextBox.
         </p>
-        <h4 class='gh-panel-sub-header'>Discussion</h4>
+        <h4 class='gh-sub-h'>Discussion</h4>
         <p class='gh-p'>
         The timer class is used internally by the Greenhorn AniSprite
         to determine when to change frames. It could also be used to

@@ -41,7 +41,7 @@ sedabull@gmail.com
   this.init = function() {
     var i;
     Greenhorn.start();
-    $('#gh-right-panel').append('<h4 class="gh-panel-sub-header">ENGINE CONTROL</h4>');
+    $('#gh-right-panel').append('<h4 class="gh-sub-h">ENGINE CONTROL</h4>');
     Greenhorn.addButton({
       label: 'START',
       onclick: function() {
@@ -54,7 +54,7 @@ sedabull@gmail.com
         return Greenhorn.stop();
       }
     });
-    $('#gh-right-panel').append('<h4 class="gh-panel-sub-header">BOUND ACTIONS</h4>');
+    $('#gh-right-panel').append('<h4 class="gh-sub-h">BOUND ACTIONS</h4>');
     Greenhorn.addButton({
       label: 'BOUNCE',
       onclick: function() {
@@ -90,7 +90,7 @@ sedabull@gmail.com
         return Sprites.setAll('boundAction', 'DIE');
       }
     });
-    $('#gh-right-panel').append('<h4 class="gh-panel-sub-header">ADD/REMOVE SPRITES</h4>');
+    $('#gh-right-panel').append('<h4 class="gh-sub-h">ADD/REMOVE SPRITES</h4>');
     Greenhorn.addButton({
       label: 'ADD ONE',
       onclick: function() {
@@ -136,7 +136,7 @@ sedabull@gmail.com
         return Sprites.removeAll();
       }
     });
-    $('#gh-left-panel').append('<h4 class=\'gh-panel-sub-header\'>Instructions</h4>\n<p class=\'gh-p\'>\nUse the Buttons on the left hand side\nto start and stop the engine, change the\ndefault boundary action, or add\nand remove Circles of Friends.\n</p>\n<h4 class=\'gh-panel-sub-header\'>Trademark</h4>\n<p class=\'gh-p\'>\nPlease note that the logo used in this\nexample, which is known as\nThe Circle of Friends,\nis a registered trademark of\nCanonical Ltd.\n</p>\n<h4 class=\'gh-panel-sub-header\'>Discussion</h4>\n<p class=\'gh-p\'>\nTry this if you\'re not sure where to start. \nCreate about 150 Sprites, then change the \nboundary action from BOUNCE to WRAP to BOUNCE\nto STOP to DIE, with about 5-10 seconds inbetween. Have fun!\n</p>');
+    $('#gh-left-panel').append('<h4 class=\'gh-sub-h\'>Instructions</h4>\n<p class=\'gh-p\'>\nUse the Buttons on the left hand side\nto start and stop the engine, change the\ndefault boundary action, or add\nand remove Circles of Friends.\n</p>\n<h4 class=\'gh-sub-h\'>Trademark</h4>\n<p class=\'gh-p\'>\nPlease note that the logo used in this\nexample, which is known as\nThe Circle of Friends,\nis a registered trademark of\nCanonical Ltd.\n</p>\n<h4 class=\'gh-sub-h\'>Discussion</h4>\n<p class=\'gh-p\'>\nTry this if you\'re not sure where to start. \nCreate about 150 Sprites, then change the \nboundary action from BOUNCE to WRAP to BOUNCE\nto STOP to DIE, with about 5-10 seconds inbetween. Have fun!\n</p>');
     i = Math.round(Math.random() * 9 + 1);
     while (i > 0) {
       i -= 1;

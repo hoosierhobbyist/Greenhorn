@@ -80,12 +80,12 @@ crystals = {}
     #document specific setup
     $('#gh-left-panel').append(
         '''
-        <h4 class='gh-panel-sub-header'>Instructions</h4>
+        <h4 class='gh-sub-h'>Instructions</h4>
         <p class='gh-p'>
         Use the arrow keys to move Bonehead and collect the
         colored crystals.
         </p>
-        <h4 class='gh-panel-sub-header'>Acknowledgements</h4>
+        <h4 class='gh-sub-h'>Acknowledgements</h4>
         <p class='gh-p'>
         The 'bonehead.png' sprite sheet used for this example
         was generated using <a class='gh-a' 
@@ -95,7 +95,7 @@ crystals = {}
         href='http://lpc.opengameart.org'>Liberated Pixel Cup</a>, which was sponsered
         by <a class='gh-a' href='http://opengameart.org'>OpenGameArt.org</a>.
         </p>
-        <h4 class='gh-panel-sub-header'>Discussion</h4>
+        <h4 class='gh-sub-h'>Discussion</h4>
         <p class='gh-p'>
         This example is a full demonstration of the Greenhorn AniSprite class.
         To better understand what's going on, check out the source code, or the
