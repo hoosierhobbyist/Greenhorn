@@ -1,26 +1,27 @@
 ###
-textBoxTimer.coffee
-
-a demonstration of two classes at once
+timerDemon.coffee
+Written by Seth Bullock
+sedabull@gmail.com
 ###
 
 #name the document
 document.title = 'Timer Demo'
 
 #setup the environment
-env.ENGINE.rightHeader = 'CONTROLS'
+env.ENGINE.rightHeader = 'BUTTONS'
+env.ENGINE.leftHeader = 'INFORMATION'
 
 #declare global variables
 timer = null
 display = null
 
-#define init() to be called by body.onload
+#define init() to setup the document
 @init = ->
     #start the engine
     Greenhorn.start()
     
     #initialize variables
-    timer = new Timer(false)
+    timer = new Timer(off)
     display = new TextBox
         fontSize: 60
         borderVisible: false
@@ -35,10 +36,27 @@ display = null
         timer.restart()
     Greenhorn.addButton label: 'STOP', onclick: ->
         timer.stop()
-#end init
+    
+    #include information
+    $('#gh-left-panel').append(
+        '''
+        <h4 class='gh-panel-sub-header'>Instructions</h4>
+        <p class='gh-p'>
+        Use the buttons on the right-hand side to experiment
+        with the four primary timer functions: play, pause,
+        restart, and stop. The elapsed time is displayed
+        on the canvas using a Greenhorn TextBox.
+        </p>
+        <h4 class='gh-panel-sub-header'>Discussion</h4>
+        <p class='gh-p'>
+        The timer class is used internally by the Greenhorn AniSprite
+        to determine when to change frames. It could also be used to
+        offset particular events, measure and compare a player's performance
+        to others, or set a time limit on a particular game.
+        </p>
+        ''')
 
 #define update() to be called once per frame
 @update = ->
-    #update TextBox
+    #update the displayed time
     display.set 'text', (timer.getElapsedTime() / 1000).toFixed(2)
-#end update
