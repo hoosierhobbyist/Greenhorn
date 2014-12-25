@@ -135,7 +135,9 @@ class Sound
                     @_source.loop = opt.loop ? @_config.loop
                     @_source.onended = =>
                         @_isEnded = true
-                        @_elapsedTime = 0
+                        @_elapsedTime += _audioContext.currentTime - @_startTime
+                        if @_elapsedTime >= @_buffer.duration
+                            @_elapsedTime = 0
 
                     #set value on gain node
                     gainNode.gain.value = opt.volume ? @_config.volume
@@ -190,7 +192,6 @@ class Sound
                 @_audio.pause()
             else
                 @_source.stop()
-                @_elapsedTime += _audioContext.currentTime - @_startTime
     stop: =>
         if Greenhorn.isRunning()
             if env.USE_AUDIO_TAG
