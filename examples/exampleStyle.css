@@ -51,6 +51,6 @@ body{
     background: url("../images/gh_tile.png") 0 0;
 }/*end #gh-main*/
 
-#gh-right-panel .gh-panel-sub-header{
+#gh-right-panel .gh-sub-h{
     text-align: center;
 }/*end left-panel sub-header*/

@@ -138,9 +138,9 @@ randomConfig = ->
     
     #highlight current boundAction
     $('.gh-button').each ->
-        if this.innerHTML is env.SPRITE_DEFAULT_CONFIG.boundAction
-            this.style.color = '#006400'
+        if @innerHTML is env.SPRITE_DEFAULT_CONFIG.boundAction
+            @style.color = '#006400'
         else
-            this.style.color = '#C0C0C0'
+            @style.color = '#C0C0C0'
     
     return
