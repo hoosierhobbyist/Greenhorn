@@ -7,9 +7,11 @@ sedabull@gmail.com
  */
 
 (function() {
-  var helloWorld, scripts;
+  var Greenhorn, TextSprite, env, helloWorld, scripts;
 
   document.title = 'Hello Greenhorn!';
+
+  env = gh.env, Greenhorn = gh.Greenhorn, TextSprite = gh.TextSprite;
 
   env.ENGINE.rightHeader = 'BUTTONS';
 
@@ -28,9 +30,9 @@ sedabull@gmail.com
 
   helloWorld = null;
 
-  this.init = function() {
+  gh.init = function() {
     Greenhorn.start();
-    helloWorld = new TextBox({
+    helloWorld = new TextSprite({
       dx: 50,
       dy: 50,
       text: scripts.helloC,
@@ -86,10 +88,10 @@ sedabull@gmail.com
         return helloWorld.set('text', scripts.helloCoffeeScript);
       }
     });
-    return $('#gh-left-panel').append('<h4 class=\'gh-sub-h\'>Instructions</h4>\n<p class=\'gh-p\'>\nUse the buttons on the right-hand side to\ndisplay a few example "Hello World!" programs.\n</p>\n<h4 class=\'gh-sub-h\'>Discussion</h4>\n<p class=\'gh-p\'>\nThe TextBox class is a direct extention of the\nSprite class, meaning that anything a Sprite can\ndo, the TextBox can also do. The only difference\nis that string data, instead of image data, is\nwhat\'s being displayed. As you can see by switching\nbetween a few examples, the Textbox automatically\nresizes itself whenever it\'s content changes.\n</p>');
+    return $('#gh-left-panel').append('<h4 class=\'gh-sub-h\'>Instructions</h4>\n<p class=\'gh-p\'>\nUse the buttons on the right-hand side to\ndisplay a few example "Hello World!" programs.\n</p>\n<h4 class=\'gh-sub-h\'>Discussion</h4>\n<p class=\'gh-p\'>\nThe TextSprite class is a direct extention of the\nSprite class, meaning that anything a Sprite can\ndo, the TextSprite can also do. The only difference\nis that string data, instead of image data, is\nwhat\'s being displayed. As you can see by switching\nbetween a few examples, the TextSprite automatically\nresizes itself whenever it\'s content changes.\n</p>');
   };
 
-  this.update = function() {
+  gh.update = function() {
     var current;
     current = helloWorld.get('text');
     return $('.gh-button').each(function() {

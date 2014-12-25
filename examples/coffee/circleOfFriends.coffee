@@ -7,6 +7,10 @@ sedabull@gmail.com
 #name the document
 document.title = 'Circle of Friends'
 
+#bring in needed classes
+{env, Greenhorn, Sprite} = gh
+Sprites = Sprite
+
 #setup the environment
 env.IMAGE_PATH = '../images/'
 env.ENGINE.leftHeader = 'INFORMATION'
@@ -30,7 +34,7 @@ randomConfig = ->
     }#end randomConfig
 
 #define init() to set up the document
-@init = ->
+gh.init = ->
     #start the engine
     Greenhorn.start()
 
@@ -132,7 +136,7 @@ randomConfig = ->
     return
 
 #define update() to be called once per frame
-@update = ->
+gh.update = ->
     #report current number of Sprites
     $('#gh-title').html "#{document.title}: #{Sprites.howMany()}"
     

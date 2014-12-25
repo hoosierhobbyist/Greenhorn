@@ -7,9 +7,11 @@ sedabull@gmail.com
  */
 
 (function() {
-  var display, timer;
+  var Greenhorn, TextSprite, Timer, display, env, timer;
 
   document.title = 'Timer Demo';
+
+  env = gh.env, Greenhorn = gh.Greenhorn, Timer = gh.Timer, TextSprite = gh.TextSprite;
 
   env.ENGINE.rightHeader = 'BUTTONS';
 
@@ -19,10 +21,10 @@ sedabull@gmail.com
 
   display = null;
 
-  this.init = function() {
+  gh.init = function() {
     Greenhorn.start();
     timer = new Timer(false);
-    display = new TextBox({
+    display = new TextSprite({
       fontSize: 60,
       borderVisible: false,
       text: (timer.getElapsedTime() / 1000).toFixed(2)
@@ -51,10 +53,10 @@ sedabull@gmail.com
         return timer.stop();
       }
     });
-    return $('#gh-left-panel').append('<h4 class=\'gh-sub-h\'>Instructions</h4>\n<p class=\'gh-p\'>\nUse the buttons on the right-hand side to experiment\nwith the four primary timer functions: play, pause,\nrestart, and stop. The elapsed time is displayed\non the canvas using a Greenhorn TextBox.\n</p>\n<h4 class=\'gh-sub-h\'>Discussion</h4>\n<p class=\'gh-p\'>\nThe timer class is used internally by the Greenhorn AniSprite\nto determine when to change frames. It could also be used to\noffset particular events, measure and compare a player\'s performance\nto others, or set a time limit on a particular game.\n</p>');
+    return $('#gh-left-panel').append('<h4 class=\'gh-sub-h\'>Instructions</h4>\n<p class=\'gh-p\'>\nUse the buttons on the right-hand side to experiment\nwith the four primary timer functions: play, pause,\nrestart, and stop. The elapsed time is displayed\non the canvas using a Greenhorn TextSprite.\n</p>\n<h4 class=\'gh-sub-h\'>Discussion</h4>\n<p class=\'gh-p\'>\nThe timer class is used internally by the Greenhorn AniSprite\nto determine when to change frames. It could also be used to\noffset particular events, measure and compare a player\'s performance\nto others, or set a time limit on a particular game.\n</p>');
   };
 
-  this.update = function() {
+  gh.update = function() {
     return display.set('text', (timer.getElapsedTime() / 1000).toFixed(2));
   };
 

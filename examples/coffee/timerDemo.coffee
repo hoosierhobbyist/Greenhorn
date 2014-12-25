@@ -7,6 +7,9 @@ sedabull@gmail.com
 #name the document
 document.title = 'Timer Demo'
 
+#bring in needed classes
+{env, Greenhorn, Timer, TextSprite} = gh
+
 #setup the environment
 env.ENGINE.rightHeader = 'BUTTONS'
 env.ENGINE.leftHeader = 'INFORMATION'
@@ -16,13 +19,13 @@ timer = null
 display = null
 
 #define init() to setup the document
-@init = ->
+gh.init = ->
     #start the engine
     Greenhorn.start()
     
     #initialize variables
     timer = new Timer(off)
-    display = new TextBox
+    display = new TextSprite
         fontSize: 60
         borderVisible: false
         text: (timer.getElapsedTime() / 1000).toFixed(2)
@@ -45,7 +48,7 @@ display = null
         Use the buttons on the right-hand side to experiment
         with the four primary timer functions: play, pause,
         restart, and stop. The elapsed time is displayed
-        on the canvas using a Greenhorn TextBox.
+        on the canvas using a Greenhorn TextSprite.
         </p>
         <h4 class='gh-sub-h'>Discussion</h4>
         <p class='gh-p'>
@@ -57,6 +60,6 @@ display = null
         ''')
 
 #define update() to be called once per frame
-@update = ->
+gh.update = ->
     #update the displayed time
     display.set 'text', (timer.getElapsedTime() / 1000).toFixed(2)

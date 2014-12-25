@@ -7,19 +7,21 @@ sedabull@gmail.com
 #name the document
 document.title = 'Heroic Minority'
 
+#bring in needed classes
+{env, Greenhorn, Sound} = gh
+
 #setup the environment
-env.USE_AUDIO_TAG = true
 env.SOUND_PATH = '../sounds/'
 env.ENGINE.leftHeader = 'INFORMATION'
 env.ENGINE.rightHeader = 'BUTTONS'
 
 #define init() to set up document
-@init = ->
+gh.init = ->
     #start the engine
     Greenhorn.start()
 
     #initialize background music
-    bgMusic = new Sound url: 'heroic_minority.mp3'
+    window.bgMusic = new Sound url: 'heroic_minority.mp3'
     
     #add buttons
     Greenhorn.addButton label: 'PLAY MUSIC', onclick: ->

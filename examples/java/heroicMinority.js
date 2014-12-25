@@ -7,9 +7,11 @@ sedabull@gmail.com
  */
 
 (function() {
+  var Greenhorn, Sound, env;
+
   document.title = 'Heroic Minority';
 
-  env.USE_AUDIO_TAG = true;
+  env = gh.env, Greenhorn = gh.Greenhorn, Sound = gh.Sound;
 
   env.SOUND_PATH = '../sounds/';
 
@@ -17,10 +19,9 @@ sedabull@gmail.com
 
   env.ENGINE.rightHeader = 'BUTTONS';
 
-  this.init = function() {
-    var bgMusic;
+  gh.init = function() {
     Greenhorn.start();
-    bgMusic = new Sound({
+    window.bgMusic = new Sound({
       url: 'heroic_minority.mp3'
     });
     Greenhorn.addButton({

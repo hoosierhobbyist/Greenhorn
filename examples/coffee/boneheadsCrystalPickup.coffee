@@ -7,10 +7,12 @@ sedabull@gmail.com
 #name the document
 document.title = 'Bonehead\'s Crystal Pickup'
 
+#bring in needed classes
+{env, Greenhorn, AniSprite, Sound, KEYS} = gh
+
 #setup the environment
 env.IMAGE_PATH = '../images/'
 env.SOUND_PATH = '../sounds/jalastram/'
-env.USE_AUDIO_TAG = true
 env.ENGINE.leftHeader = 'INFORMATION'
 env.ENGINE.rightHeader = 'CRYSTALS'
 env.SPRITE_DEFAULT_CONFIG.boundAction = 'STOP'
@@ -22,7 +24,7 @@ pickupSnd = null
 crystals = {}
 
 #define init() to setup document
-@init = ->
+gh.init = ->
     #start the engine
     Greenhorn.start()
     
@@ -115,7 +117,7 @@ crystals = {}
         ''')
 
 #define update() to be called once per frame
-@update = ->
+gh.update = ->
     #move bonehead
     if Greenhorn.isDown[KEYS.UP]
         bonehead

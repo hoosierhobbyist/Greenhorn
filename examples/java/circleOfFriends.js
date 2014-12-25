@@ -7,9 +7,13 @@ sedabull@gmail.com
  */
 
 (function() {
-  var randomConfig;
+  var Greenhorn, Sprite, Sprites, env, randomConfig;
 
   document.title = 'Circle of Friends';
+
+  env = gh.env, Greenhorn = gh.Greenhorn, Sprite = gh.Sprite;
+
+  Sprites = Sprite;
 
   env.IMAGE_PATH = '../images/';
 
@@ -38,7 +42,7 @@ sedabull@gmail.com
     };
   };
 
-  this.init = function() {
+  gh.init = function() {
     var i;
     Greenhorn.start();
     $('#gh-right-panel').append('<h4 class="gh-sub-h">ENGINE CONTROL</h4>');
@@ -144,7 +148,7 @@ sedabull@gmail.com
     }
   };
 
-  this.update = function() {
+  gh.update = function() {
     $('#gh-title').html("" + document.title + ": " + (Sprites.howMany()));
     $('.gh-button').each(function() {
       if (this.innerHTML === env.SPRITE_DEFAULT_CONFIG.boundAction) {

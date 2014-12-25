@@ -7,6 +7,9 @@ sedabull@gmail.com
 #name the document
 document.title = 'Hello Greenhorn!'
 
+#bring in needed classes
+{env, Greenhorn, TextSprite} = gh
+
 #setup the environment
 env.ENGINE.rightHeader = 'BUTTONS'
 env.ENGINE.leftHeader = 'INFORMATION'
@@ -74,12 +77,12 @@ scripts =
 helloWorld = null
 
 #define init() to setup the document
-@init = ->
+gh.init = ->
     #start the engine
     Greenhorn.start()
     
-    #initialize TextBox
-    helloWorld = new TextBox
+    #initialize TextSprite
+    helloWorld = new TextSprite
         dx: 50
         dy: 50
         text: scripts.helloC
@@ -115,18 +118,18 @@ helloWorld = null
         </p>
         <h4 class='gh-sub-h'>Discussion</h4>
         <p class='gh-p'>
-        The TextBox class is a direct extention of the
+        The TextSprite class is a direct extention of the
         Sprite class, meaning that anything a Sprite can
-        do, the TextBox can also do. The only difference
+        do, the TextSprite can also do. The only difference
         is that string data, instead of image data, is
         what's being displayed. As you can see by switching
-        between a few examples, the Textbox automatically
+        between a few examples, the TextSprite automatically
         resizes itself whenever it's content changes.
         </p>
         ''')
 
 #define update() to be called once per frame
-@update = ->
+gh.update = ->
     #highlight current language
     current = helloWorld.get 'text'
     $('.gh-button').each ->

@@ -7,15 +7,15 @@ sedabull@gmail.com
  */
 
 (function() {
-  var bonehead, crystals, pickupSnd;
+  var AniSprite, Greenhorn, KEYS, Sound, bonehead, crystals, env, pickupSnd;
 
   document.title = 'Bonehead\'s Crystal Pickup';
+
+  env = gh.env, Greenhorn = gh.Greenhorn, AniSprite = gh.AniSprite, Sound = gh.Sound, KEYS = gh.KEYS;
 
   env.IMAGE_PATH = '../images/';
 
   env.SOUND_PATH = '../sounds/jalastram/';
-
-  env.USE_AUDIO_TAG = true;
 
   env.ENGINE.leftHeader = 'INFORMATION';
 
@@ -31,7 +31,7 @@ sedabull@gmail.com
 
   crystals = {};
 
-  this.init = function() {
+  gh.init = function() {
     var canvasHeight, canvasWidth, color, colors, _i, _len;
     Greenhorn.start();
     pickupSnd = new Sound({
@@ -98,7 +98,7 @@ sedabull@gmail.com
     return $('#gh-right-panel').append('<ul>\n<li id="blue">BLUE: </li>\n<li id="green">GREEN: </li>\n<li id="grey">GREY: </li>\n<li id="orange">ORANGE: </li>\n<li id="pink">PINK: </li>\n<li id="yellow">YELLOW: </li>\n</ul>');
   };
 
-  this.update = function() {
+  gh.update = function() {
     var color, crystal, direction, _results;
     if (Greenhorn.isDown[KEYS.UP]) {
       bonehead.change('y', 50).set('animation', 'WALK_UP');
