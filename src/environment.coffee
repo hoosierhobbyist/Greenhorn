@@ -25,7 +25,7 @@ env =
         font: 'sans-serif'
         text: 'Click here to Start'
     #default Sprite settings
-    IMAGE_PATH: ""
+    IMAGE_PATH: "./"
     SPRITE_DEFAULT_CONFIG:
         x: 0
         y: 0
@@ -42,10 +42,10 @@ env =
         visible: yes
         imageFile: ""
         boundAction: "WRAP"
-    #default TextBox settings
-    TEXTBOX_DEFAULT_CONFIG:
+    #default TEXTSPRITE settings
+    TEXTSPRITE_DEFAULT_CONFIG:
         level: -1
-        text: "*-TextBox-*"
+        text: "*-TEXTSPRITE-*"
         fontSize: 12
         fontAlpha: 1.0
         fontColor: "white"
@@ -78,7 +78,7 @@ env =
         frameRate: 10
         orientation: 'horizontal'
     #default sound settings
-    SOUND_PATH: ""
+    SOUND_PATH: "./"
     USE_AUDIO_TAG: false
     SOUND_DEFAULT_CONFIG:
         url: ""

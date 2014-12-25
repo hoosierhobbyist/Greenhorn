@@ -7,7 +7,7 @@ sedabull@gmail.com
 class TextSprite extends Sprite
     constructor: (config = {}) ->
         #add missing keys to config
-        for own key, value of env.TEXTBOX_DEFAULT_CONFIG
+        for own key, value of env.TEXTSPRITE_DEFAULT_CONFIG
             config[key] ?= value
 
         #create primary objects
