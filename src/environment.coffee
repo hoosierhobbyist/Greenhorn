@@ -4,7 +4,11 @@ Written by Seth Bullock
 sedabull@gmail.com
 ###
 
-@env =
+#namespace object
+@gh = Object.create(null)
+
+#Greenhorn environment
+env =
     #miscellaneous
     FRAME_RATE: 25
     BOUNCE_DECAY: 0
@@ -89,4 +93,6 @@ sedabull@gmail.com
         label: 'Launch the Missiles!'
     #default timer settings
     TIMER_START_ON_CONSTRUCTION: yes
-#end environment object
+
+#add to namespace object
+gh.env = env

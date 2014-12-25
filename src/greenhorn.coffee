@@ -5,7 +5,7 @@ sedabull@gmail.com
 ###
 
 #keyboard value mapping object
-@KEYS =
+gh.KEYS =
     ESC: 27, SPACE: 32, PGUP: 33
     PGDOWN: 34, END: 35, HOME: 36
     LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40
@@ -19,7 +19,7 @@ sedabull@gmail.com
 #automatic initialization
 document.onreadystatechange = ->
     if @readyState is 'interactive'
-        (init ? Greenhorn.start)()
+        (gh.init ? Greenhorn.start)()
 
 #listen for key events
 document.onkeydown = (e) ->
@@ -38,14 +38,14 @@ _masterUpdate = ->
     Greenhorn.clear()
 
     #call custom update
-    update?()
+    gh.update?()
 
     #draw all Sprites
-    Sprites._drawAll()
+    Sprite._drawAll()
 #end _masterUpdate
 
 #Engine class
-class @Greenhorn
+class Greenhorn
     #keyboard input tracking array
     @isDown = new Array 256
     key = false for key in @isDown
@@ -92,16 +92,14 @@ class @Greenhorn
     #start all asynchronous functions
     _startEverything = ->
         _masterID = setInterval _masterUpdate, 1000 / env.FRAME_RATE
-        Sprites._startAll()
-        Sounds._playAll()
+        Sprite._startAll()
+        Sound._playAll()
         return
 
     #mouse position getters
     @getMouseX = ->
         indexNode = _elmnts.canvas
-        mouseX = indexNode.mouseX -\
-                  indexNode.offsetLeft -\
-                   indexNode.width / 2
+        mouseX = indexNode.mouseX - indexNode.offsetLeft - indexNode.width / 2
         
         while indexNode = indexNode.parentNode
             mouseX -= indexNode.offsetLeft
@@ -109,9 +107,7 @@ class @Greenhorn
         mouseX
     @getMouseY = ->
         indexNode = _elmnts.canvas
-        mouseY = indexNode.mouseY -\
-                  indexNode.offsetTop -\
-                   indexNode.height / 2
+        mouseY = indexNode.mouseY - indexNode.offsetTop - indexNode.height / 2
         
         while indexNode = indexNode.parentNode
             mouseY -= indexNode.offsetTop
@@ -143,8 +139,8 @@ class @Greenhorn
     @isRunning = ->
         _masterID?
     @stop = ->
-        Sprites._stopAll()
-        Sounds._pauseAll()
+        Sprite._stopAll()
+        Sound._pauseAll()
         clearInterval _masterID
         _masterID = null
     @clear = ->
@@ -202,4 +198,6 @@ class @Greenhorn
                 _firstTime = false
             else
                 _startEverything()
-#end class Greenhorn
+
+#add to namespace object
+gh.Greenhorn = Greenhorn

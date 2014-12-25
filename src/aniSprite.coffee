@@ -4,7 +4,7 @@ Written by Seth Bullock
 sedabull@gmail.com
 ###
 
-#private helper class
+#closed over helper class
 class AniCycle
     constructor: (data) ->
         @frame = data.start
@@ -13,7 +13,7 @@ class AniCycle
         @stop = data.stop
         @name = data.name
 
-class @AniSprite extends @Sprite
+class AniSprite extends Sprite
     constructor: (config = {}) ->
         #add missing keys to config
         for own key, value of env.ANISPRITE_DEFAULT_CONFIG
@@ -135,4 +135,6 @@ class @AniSprite extends @Sprite
 
             #call Sprite _update
             super()
-#end class AniSprite
+
+#add to namespace object
+gh.AniSprite = AniSprite

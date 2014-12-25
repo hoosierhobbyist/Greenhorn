@@ -1,18 +1,14 @@
 ###
-textBox.coffee
+textSprite.coffee
 Written by Seth Bullock
 sedabull@gmail.com
 ###
 
-class @TextBox extends @Sprite
+class TextSprite extends Sprite
     constructor: (config = {}) ->
         #add missing keys to config
         for own key, value of env.TEXTBOX_DEFAULT_CONFIG
             config[key] ?= value
-
-        #NOTE: consider allowing images for bg, brd, and font
-        #set imageFile to '' as it will not be needed
-        config.imageFile = ''
 
         #create primary objects
         @_text = []
@@ -181,4 +177,6 @@ class @TextBox extends @Sprite
 
         #call Sprite update
         super()
-#end class TextBox
+
+#add to namespace object
+gh.TextSprite = TextSprite
