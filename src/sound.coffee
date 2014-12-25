@@ -11,10 +11,8 @@ if window.AudioContext? or window.webkitAudioContext?
 else
     env.USE_AUDIO_TAG = true
 
-#simple sound class
-class @Sound
-    #<---CLASS LEVEL--->
-    #used to track all Sound instances
+class Sound
+    #closure
     _list = []
 
     #Sound class methods
@@ -34,7 +32,6 @@ class @Sound
         return
 
     #<---INSTANCE LEVEL--->
-    #constructor
     constructor: (@_config = {}) ->
         #assign default values if they have been omitted
         for own key, value of env.SOUND_DEFAULT_CONFIG
@@ -202,7 +199,6 @@ class @Sound
             else
                 @_source.stop()
                 @_elapsedTime = 0
-#end class Sound
 
-#more natural alias for calling class methods
-@Sounds = @Sound
+#add to namespace object
+gh.Sound = Sound

@@ -4,10 +4,8 @@ Written by Seth Bullock
 sedabull@gmail.com
 ###
 
-#core engine class
-class @Sprite
-    #<---CLASS-LEVEL--->
-    #used to track all Sprite instances
+class Sprite
+    #closures
     _list = []
     _sortRule = (sp1, sp2) ->
         sp1._dis.level - sp2._dis.level
@@ -401,8 +399,6 @@ class @Sprite
     log: ->
         console.log @report()
         return
-#end class Sprite
 
-#more natural alias for
-#calling collective methods
-@Sprites = @Sprite
+#add to namespace object
+gh.Sprite = Sprite

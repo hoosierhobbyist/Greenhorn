@@ -4,9 +4,7 @@ Written by Seth Bullock
 sedabull@gmail.com
 ###
 
-#simple timer class
-class @Timer
-    #constructor
+class Timer
     constructor: (start_now = env.TIMER_START_ON_CONSTRUCTION) ->
         @_elapsedTime = 0
         @_startTime = if start_now then @getCurrentTime() else null
@@ -39,4 +37,6 @@ class @Timer
         @_elapsedTime = 0
         @_startTime = null
         return
-#end class Timer
+
+#add to namespace object
+gh.Timer = Timer

@@ -2,6 +2,6 @@ environment.coffee
 greenhorn.coffee
 sprite.coffee
 aniSprite.coffee
-textBox.coffee
+textSprite.coffee
 timer.coffee
 sound.coffee
