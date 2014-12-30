@@ -75,7 +75,7 @@ class Sprite
 
         #create secondary objects
         @_dis.image = new Image()
-        @_dis.context = document.querySelector('#gh-canvas').getContext('2d')
+        @_dis.context = document.getElementById('gh-canvas').getContext('2d')
 
         #set this sprite's configuration
         #"virtually" calls child's set method in derived classes
@@ -307,13 +307,11 @@ class Sprite
             @change '_pos', @_mot
 
             #define boundaries
-            canvasWidth = document.querySelector('#gh-canvas').width
-            canvasHeight = document.querySelector('#gh-canvas').height
             bounds =
-                top: canvasHeight / 2
-                bottom: -canvasHeight / 2
-                right: canvasWidth / 2
-                left: -canvasWidth / 2
+                top: @_dis.context.canvas.height / 2
+                bottom: -@_dis.context.canvas.height / 2
+                right: @_dis.context.canvas.width / 2
+                left: -@_dis.context.canvas.width / 2
 
             #sprite has completely disappeared offscreen
             offTop = @get('bottom') > bounds.top
@@ -377,12 +375,6 @@ class Sprite
     #debugging
     report: ->
         """
-        display:
-            level: #{Math.round @_dis.level}
-            width: #{Math.round @_dis.width}
-            height: #{Math.round @_dis.height}
-            visible: #{@_dis.visible}
-            boundAction: #{@_dis.boundAction}
         position:
             x: #{@_pos.x.toFixed 2}
             y: #{@_pos.y.toFixed 2}
@@ -395,6 +387,12 @@ class Sprite
             ddx: #{@_acc.ddx.toFixed 2}
             ddy: #{@_acc.ddy.toFixed 2}
             dda: #{@_acc.dda.toFixed 2}
+        display:
+            level: #{Math.round @_dis.level}
+            width: #{Math.round @_dis.width}
+            height: #{Math.round @_dis.height}
+            visible: #{@_dis.visible}
+            boundAction: #{@_dis.boundAction}
         """
     log: ->
         console.log @report()
