@@ -1,4 +1,5 @@
 environment.coffee
+eventEmitter.coffee
 greenhorn.coffee
 sprite.coffee
 aniSprite.coffee

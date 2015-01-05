@@ -121,20 +121,19 @@ class AniSprite extends Sprite
             #restore context
             @_dis.context.restore()
     _update: ->
-        if @_dis.visible
-            #determine if it's time to change frames
-            if @_ani.timer.getElapsedTime() >= (1000 / @_ani.frameRate)
-                #determine next frame in animation loop
-                if @_ani.current.frame < @_ani.current.stop
-                    @_ani.current.frame += 1
-                else
-                    @_ani.current.frame = @_ani.current.start
+        #call Sprite _update
+        super()
+            
+        #determine if it's time to change frames
+        if @_ani.timer.getElapsedTime() >= (1000 / @_ani.frameRate)
+            #determine next frame in animation loop
+            if @_ani.current.frame < @_ani.current.stop
+                @_ani.current.frame += 1
+            else
+                @_ani.current.frame = @_ani.current.start
 
-                #restart the timer
-                @_ani.timer.restart()
-
-            #call Sprite _update
-            super()
+            #restart the timer
+            @_ani.timer.restart()
 
 #add to namespace object
 gh.AniSprite = AniSprite

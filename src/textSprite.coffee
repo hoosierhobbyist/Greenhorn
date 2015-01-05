@@ -80,7 +80,6 @@ class TextSprite extends Sprite
     #internal control
     _draw: ->
         if @_dis.visible
-
             #save current context
             @_dis.context.save()
 
@@ -156,6 +155,9 @@ class TextSprite extends Sprite
             #restore old context
             @_dis.context.restore()
     _update: ->
+        #call Sprite update
+        super()
+        
         #calculate new size
         @_dis.width = 0
         @_dis.height = @_font.size * 1.5 * @_text.length
@@ -174,9 +176,6 @@ class TextSprite extends Sprite
         if @_border.visible
             @_dis.width += 2 * @_border.size
             @_dis.height += 2 * @_border.size
-
-        #call Sprite update
-        super()
 
 #add to namespace object
 gh.TextSprite = TextSprite
