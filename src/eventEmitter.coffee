@@ -27,21 +27,19 @@ class EventEmitter
         return false
     remove: (event, listener) ->
         @_events ?= {}
-        if event?
-            if @_events[event]?
-                if listener?
-                    for fn, i in @_events[event] when fn is listener
-                        @_events[event].splice i, 1
-                else
-                    delete @_events[event]
-        else
-            @_events = {}
+        if @_events[event]?
+            if listener?
+                for cb, i in @_events[event] when cb is listener
+                    @_events[event].splice i, 1
+                    if @_events[event].length is 0
+                        delete @_events[event]
+            else
+                delete @_events[event]
         return this
     listeners: (event) ->
         if event? then @_events[event]
         else @_events
 
 _mixin = (dest, source) ->
-    for own key, value of source
-        dest[key] = value
+    dest[key] = value for own key, value of source
     return dest

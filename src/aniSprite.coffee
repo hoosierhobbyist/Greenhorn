@@ -41,23 +41,28 @@ class AniSprite extends Sprite
 
     #getter
     get: (what) ->
-        if what.match /(^current$|^animation$)/i
-            @_ani.current.name
+        _emit = true
+        if what.match /(^current$|^animation$)/
+            value = @_ani.current.name
         else if what.match /(^cellWidth$|^cellHeight$|^frameRate$|^orientation$)/
-            @_ani[what]
+            value = @_ani[what]
         else
-            super what
+            value = super what
+            _emit = false
+        if _emit then @emit "get:#{what}"
+        return value
 
     #setter
     set: (what, to) ->
-        if what.match /(^current$|^animation$)/i
+        _emit = true
+        if what.match /(^current$|^animation$)/
             if to isnt @_ani.current.name
                 @_ani.current.frame = @_ani.current.start
                 for cycle in @_ani.cycles when cycle.name is to
                     @_ani.current = cycle
         else if what.match /(^cellWidth$|^cellHeight$|^frameRate$|^orientation$)/
             @_ani[what] = to
-        else if what.match /^cycle/i
+        else if what.match /^cycle/
             to.index ?= env.ANICYCLE_DEFAULT_CONFIG.index
             to.start ?= env.ANICYCLE_DEFAULT_CONFIG.start
             to.stop ?= to.start + env.ANICYCLE_DEFAULT_CONFIG.numFrames - 1
@@ -67,23 +72,32 @@ class AniSprite extends Sprite
             @_ani.current ?= @_ani.cycles[0]
         else
             super what, to
+            _emit = false
+        if _emit then @emit "set:#{what}", to
         this
 
     #changer
     change: (what, step) ->
-        if what.match /^frameRate$/i
+        _emit = true
+        if what.match /^frameRate$/
             @_ani.frameRate += step
         else
             super what, step
+            _emit = false
+        if _emit then @emit "change:#{what}", step
+        this
 
     #animation control
     play: ->
+        @emit 'play'
         @_ani.timer.start()
         this
     pause: ->
+        @emit 'pause'
         @_ani.timer.pause()
         this
     stop: ->
+        @emit 'stop'
         @_ani.timer.stop()
         @_ani.current.frame = @_ani.current.start
         this
@@ -91,6 +105,9 @@ class AniSprite extends Sprite
     #update routines
     _draw: ->
         if @_dis.visible
+            #fire draw event
+            @emit 'draw'
+            
             #save current context
             @_dis.context.save()
 

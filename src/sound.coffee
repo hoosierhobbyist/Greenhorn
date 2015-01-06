@@ -60,15 +60,15 @@ class Sound
             wav_src.type = 'audio/wav'
 
             #assign proper srcs
-            if @_config.url.match /.mp3$/
+            if @_config.url.match /\.mp3$/
                 mp3_src.src = @_config.url
                 ogg_src.src = @_config.url.replace '.mp3', '.ogg'
                 wav_src.src = @_config.url.replace '.mp3', '.wav'
-            else if @_config.url.match /.ogg$/
+            else if @_config.url.match /\.ogg$/
                 ogg_src.src = @_config.url
                 mp3_src.src = @_config.url.replace '.ogg', '.mp3'
                 wav_src.src = @_config.url.replace '.ogg', '.wav'
-            else if @_config.url.match /.wav$/
+            else if @_config.url.match /\.wav$/
                 wav_src.src = @_config.url
                 mp3_src.src = @_config.url.replace '.wav', '.mp3'
                 ogg_src.src = @_config.url.replace '.wav', '.ogg'

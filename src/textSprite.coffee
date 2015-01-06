@@ -23,63 +23,76 @@ class TextSprite extends Sprite
 
     #getter
     get: (what) ->
-        if what.match /^text$/i
-            @_text.join '\n'
-        else if what.match /^font\w+/i
-            @_font[what.slice(4).toLowerCase()]
-        else if what.match /^border\w+/i
-            @_border[what.slice(6).toLowerCase()]
-        else if what.match /^outline\w+/i
-            @_outline[what.slice(7).toLowerCase()]
-        else if what.match /^margins\w+/i
-            @_margins[what.slice(7).toLowerCase()]
-        else if what.match /^background\w+/i
-            @_background[what.slice(10).toLowerCase()]
+        _emit = true
+        if what.match /^text$/
+            value = @_text.join '\n'
+        else if what.match /^font\w+/
+            value = @_font[what.slice(4)]
+        else if what.match /^border\w+/
+            value = @_border[what.slice(6)]
+        else if what.match /^outline\w+/
+            value = @_outline[what.slice(7)]
+        else if what.match /^margins\w+/
+            value = @_margins[what.slice(7)]
+        else if what.match /^background\w+/
+            value = @_background[what.slice(10)]
         else
-            super what
+            value = super what
+            _emit = false
+        if _emit then @emit "get:#{what}"
+        return value
 
     #setter
     set: (what, to) ->
-        if what.match /^text$/i
+        _emit = true
+        if what.match /^text$/
             @_text = to.split '\n'
-        else if what.match /^font\w+/i
-            @_font[what.slice(4).toLowerCase()] = to
-        else if what.match /^border\w+/i
-            @_border[what.slice(6).toLowerCase()] = to
-        else if what.match /^outline\w+/i
-            @_outline[what.slice(7).toLowerCase()] = to
-        else if what.match /^margins\w+/i
-            @_margins[what.slice(7).toLowerCase()] = to
-        else if what.match /^background\w+/i
-            @_background[what.slice(10).toLowerCase()] = to
-        else if what.match /(^font$|^border$|^outline$|^margins$|^background$)/i
+        else if what.match /^font\w+/
+            @_font[what.slice(4)] = to
+        else if what.match /^border\w+/
+            @_border[what.slice(6)] = to
+        else if what.match /^outline\w+/
+            @_outline[what.slice(7)] = to
+        else if what.match /^margins\w+/
+            @_margins[what.slice(7)] = to
+        else if what.match /^background\w+/
+            @_background[what.slice(10)] = to
+        else if what.match /(^font$|^border$|^outline$|^margins$|^background$)/
             @set what.concat(k), v for own k, v of to
         else
             super what, to
+            _emit = false
+        if _emit then @emit "set:#{what}", to
         this
 
     change: (what, step) ->
-        if what.match /^text$/i
+        _emit = true
+        if what.match /^text$/
             @_text = (@_text.join('\n').concat(step)).split('\n')
-        else if what.match /^font\w+/i
-            @_font[what.slice(4).toLowerCase()] += step
-        else if what.match /^border\w+/i
-            @_border[what.slice(6).toLowerCase()] += step
-        else if what.match /^outline\w+/i
-            @_outline[what.slice(7).toLowerCase()] += step
-        else if what.match /^margins\w+/i
-            @_margins[what.slice(7).toLowerCase()] += step
-        else if what.match /^background\w+/i
-            @_background[what.slice(10).toLowerCase()] += step
+        else if what.match /^font\w+/
+            @_font[what.slice(4)] += step
+        else if what.match /^border\w+/
+            @_border[what.slice(6)] += step
+        else if what.match /^outline\w+/
+            @_outline[what.slice(7)] += step
+        else if what.match /^margins\w+/
+            @_margins[what.slice(7)] += step
+        else if what.match /^background\w+/
+            @_background[what.slice(10)] += step
         else if what.match /(^font$|^border$|^outline$|^margins$|^background$)/i
             @change what.concat(k), v for own k, v of to
         else
             super what, step
+            _emit = false
+        if _emit then @emit "change:#{what}", step
         this
 
     #internal control
     _draw: ->
         if @_dis.visible
+            #fire draw event
+            @emit 'draw'
+            
             #save current context
             @_dis.context.save()
 

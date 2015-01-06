@@ -84,10 +84,30 @@ class Greenhorn
     _elmnts.leftPanel.appendChild _elmnts.leftPanelHeader
     _elmnts.rightPanel.appendChild _elmnts.rightPanelHeader
     
-    #keep track of mouse position over canvas
+    #keep track of mouse events over canvas
+    _elmnts.canvas.draggable = true
     _elmnts.canvas.onmousemove = (e) ->
         @mouseX = e.pageX
         @mouseY = e.pageY
+        Sprite.emitAll 'mouse:move'
+    _elmnts.canvas.onmousedown = (e) ->
+        Sprite.emitAll 'mouse:down'
+    _elmnts.canvas.onmouseup = (e) ->
+        Sprite.emitAll 'mouse:up'
+    _elmnts.canvas.ondblclick = (e) ->
+        Sprite.emitAll 'mouse:doubleClick'
+    _elmnts.canvas.oncontextmenu = (e) ->
+        e.preventDefault()
+        Sprite.emitAll 'mouse:contextMenu'
+    _elmnts.canvas.ondrag = (e) ->
+        e.preventDefault()
+        Sprite.emitAll 'mouse:drag'
+    _elmnts.canvas.ondragstart = (e) ->
+        e.preventDefault()
+        Sprite.emitAll 'mouse:dragStart'
+    _elmnts.canvas.ondragend = (e) ->
+        e.preventDefault()
+        Sprite.emitAll 'mouse:dragEnd'
 
     #start all asynchronous functions
     _startEverything = ->
@@ -192,7 +212,8 @@ class Greenhorn
                 #make the entire canvas a start button
                 _elmnts.canvas.onclick = ->
                     _startEverything()
-                    _elmnts.canvas.onclick = undefined
+                    _elmnts.canvas.onclick = (e) ->
+                        Sprite.emitAll 'mouse:click'
 
                 #don't do all this a second time
                 _firstTime = false

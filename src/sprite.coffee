@@ -9,6 +9,64 @@ class Sprite
     _list = []
     _sortRule = (sp1, sp2) ->
         sp1._dis.level - sp2._dis.level
+    _bounds =
+        top: document.getElementById('gh-canvas').height / 2
+        bottom: -document.getElementById('gh-canvas').height / 2
+        right: document.getElementById('gh-canvas').width / 2
+        left: -document.getElementById('gh-canvas').width / 2
+    _boundaryCallback = (boundAction, side) ->
+        #return appropriate callback function
+        switch boundAction
+            when 'DIE'
+                -> @_dis.visible = off
+            when 'WRAP'
+                switch side
+                    when 'top'
+                        -> @set 'top', _bounds.bottom
+                    when 'bottom'
+                        -> @set 'bottom', _bounds.top
+                    when 'right'
+                        -> @set 'right', _bounds.left
+                    when 'left'
+                        -> @set 'left', _bounds.right
+            when 'STOP'
+                switch side
+                    when 'top'
+                        -> @set 'top', _bounds.top - 1
+                    when 'bottom'
+                        -> @set 'bottom', _bounds.bottom + 1
+                    when 'right'
+                        -> @set 'right', _bounds.right - 1
+                    when 'left'
+                        -> @set 'left', _bounds.left + 1
+            when 'SPRING'
+                switch side
+                    when 'top'
+                        -> @change 'dy', env.SPRING_CONSTANT * (_bounds.top - @get('top'))
+                    when 'bottom'
+                        -> @change 'dy', env.SPRING_CONSTANT * (_bounds.bottom - @get('bottom'))
+                    when 'right'
+                        -> @change 'dx', env.SPRING_CONSTANT * (_bounds.right - @get('right'))
+                    when 'left'
+                        -> @change 'dx', env.SPRING_CONSTANT * (_bounds.left - @get('left'))
+            when 'BOUNCE'
+                switch side
+                    when 'top'
+                        ->
+                            @set 'top', _bounds.top - 1
+                            @_mot.dy *= -1 + env.BOUNCE_DECAY
+                    when 'bottom'
+                        ->
+                            @set 'bottom', _bounds.bottom + 1
+                            @_mot.dy *= -1 + env.BOUNCE_DECAY
+                    when 'right'
+                        ->
+                            @set 'right', _bounds.right - 1
+                            @_mot.dx *= -1 + env.BOUNCE_DECAY
+                    when 'left'
+                        ->
+                            @set 'left', _bounds.left + 1
+                            @_mot.dx *= -1 + env.BOUNCE_DECAY
 
     #class methods
     @howMany = ->
@@ -23,6 +81,10 @@ class Sprite
     @changeAll = (what, step, excep...) ->
         for sp in _list when sp not in excep
             sp.change what, step
+        return
+    @emitAll = (event, args...) ->
+        for sp in _list
+            sp.emit event, args...
         return
     @remove = (sprite) ->
         sprite._stop() if sprite.isRunning()
@@ -76,6 +138,7 @@ class Sprite
         @_pos = {}
         @_mot = {}
         @_acc = {}
+        @_bas = {}
 
         #create secondary objects
         @_dis.image = new Image()
@@ -135,8 +198,10 @@ class Sprite
             value = Math.atan2 @_mot.dy, @_mot.dx
         else if what.match /^accAngle$/
             value = Math.atan2 @_acc.ddy, @_acc.ddx
-        else if what.match /(^level$|^width$|^height$|^visible$|^boundAction$)/
+        else if what.match /(^level$|^width$|^height$|^visible$)/
             value = @_dis[what]
+        else if what.match /^ba_(top|bottom|right|left)/
+            value = @_bas[what.split('_')[1]].ba
         else
             throw new Error "#{what} is not a get-able Sprite attribute"
         @emit "get:#{what}"
@@ -199,9 +264,38 @@ class Sprite
             @set '_acc', proxy
         else if what.match /(^_?dis|^_?pos|^_?mot|^_?acc|^config)/
             @set k, v for own k, v of to
-        else if what.match /(^level$|^width$|^height$|^visible$|^boundAction$)/
+        else if what.match /(^level$|^width$|^height$|^visible$)/
             @_dis[what] = to
             _list.sort _sortRule if what is 'level'
+        else if what.match /^ba_(all|top|bottom|right|left)$/
+            side = what.split('_')[1]
+            oldCollision =
+                if @_bas[side]?
+                    if @_bas[side].ba.match /(DIE|WRAP)/
+                        'off'
+                    else
+                        'hit'
+                else ''
+            newCollision = 
+                if to.match /(DIE|WRAP)/
+                    'off'
+                else if to.match /(STOP|SPRING|BOUNCE)/
+                    'hit'
+                else
+                    throw new Error "#{to} is not a valid boundary action"
+            unless side is 'all'
+                if @_bas[side]?
+                    @remove "#{oldCollision}:#{side}", @_bas[side]
+                @_bas[side] = _boundaryCallback to, side
+                @_bas[side].ba = to
+                @on "#{newCollision}:#{side}", @_bas[side]
+            else
+                proxy =
+                    ba_top: to
+                    ba_bottom: to
+                    ba_right: to
+                    ba_left: to
+                @set 'config', proxy
         else
             throw new Error "#{what} is not a set-able Sprite attribute"
         @emit "set:#{what}", to
@@ -322,24 +416,17 @@ class Sprite
         @change '_mot', @_acc
         @change '_pos', @_mot
 
-        #define boundaries
-        bounds =
-            top: @_dis.context.canvas.height / 2
-            bottom: -@_dis.context.canvas.height / 2
-            right: @_dis.context.canvas.width / 2
-            left: -@_dis.context.canvas.width / 2
+        #fire 'off:boundary' events
+        if @get('bottom') > _bounds.top then @emit 'off:top'
+        if @get('top') < _bounds.bottom then @emit 'off:bottom'
+        if @get('left') > _bounds.right then @emit 'off:right'
+        if @get('right') < _bounds.left then @emit 'off:left'
 
-        #fire 'offBoundary' events
-        if @get('bottom') > bounds.top then @emit 'offTop'
-        if @get('top') < bounds.bottom then @emit 'offBottom'
-        if @get('left') > bounds.right then @emit 'offRight'
-        if @get('right') < bounds.left then @emit 'offLeft'
-
-        #fire 'hitBoundary' events
-        if @get('top') >= bounds.top then @emit 'hitTop'
-        if @get('bottom') <= bounds.bottom then @emit 'hitBottom'
-        if @get('right') >= bounds.right then @emit 'hitRight'
-        if @get('left') <= bounds.left then @emit 'hitLeft'
+        #fire 'hit:boundary' events
+        if @get('top') >= _bounds.top then @emit 'hit:top'
+        if @get('bottom') <= _bounds.bottom then @emit 'hit:bottom'
+        if @get('right') >= _bounds.right then @emit 'hit:right'
+        if @get('left') <= _bounds.left then @emit 'hit:left'
         
         #determine other events to fire
         for own event, listeners of @_events
@@ -428,54 +515,6 @@ class Sprite
                     when 'ne'
                         if @get(tokens[0]) != tokens[2]
                             @emit event
-
-        ###
-        #determine how to behave at boundaries
-        switch @_dis.boundAction
-            when 'DIE'
-                if offTop or offBottom or offRight or offLeft
-                    @_dis.visible = false
-            when 'WRAP'
-                if offTop
-                    @set 'top', bounds.bottom
-                if offBottom
-                    @set 'bottom', bounds.top
-                if offRight
-                    @set 'right', bounds.left
-                if offLeft
-                    @set 'left', bounds.right
-            when 'STOP'
-                if hitTop
-                    @set 'top', bounds.top - 1
-                if hitBottom
-                    @set 'bottom', bounds.bottom + 1
-                if hitRight
-                    @set 'right', bounds.right - 1
-                if hitLeft
-                    @set 'left', bounds.left + 1
-            when 'BOUNCE'
-                if hitTop
-                    @set 'top', bounds.top - 1
-                    @_mot.dy *= -1 + env.BOUNCE_DECAY
-                if hitBottom
-                    @set 'bottom', bounds.bottom + 1
-                    @_mot.dy *= -1 + env.BOUNCE_DECAY
-                if hitRight
-                    @set 'right', bounds.right - 1
-                    @_mot.dx *= -1 + env.BOUNCE_DECAY
-                if hitLeft
-                    @set 'left', bounds.left + 1
-                    @_mot.dx *= -1 + env.BOUNCE_DECAY
-            when 'SPRING'
-                if hitTop
-                    @change 'dy', env.SPRING_CONSTANT * (bounds.top - @get('top'))
-                if hitBottom
-                    @change 'dy', env.SPRING_CONSTANT * (bounds.bottom - @get('bottom'))
-                if hitRight
-                    @change 'dx', env.SPRING_CONSTANT * (bounds.right - @get('right'))
-                if hitLeft
-                    @change 'dx', env.SPRING_CONSTANT * (bounds.left - @get('left'))
-        ###
         this
 
     #debugging
