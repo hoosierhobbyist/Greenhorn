@@ -431,15 +431,45 @@ class Sprite
         #determine other events to fire
         for own event, listeners of @_events
             #fire 'isDown' event
-            if event.match /^isDown:(\w+|\d)$/
-                key = event.split(':')[1].toUpperCase()
-                if Greenhorn.isDown[KEYS[key]]
-                    @emit event
+            if event.match /^isDown:(\w+|\d)/
+                token = event.split(':')[1].toUpperCase()
+                if token.match /-/
+                    _emit = false
+                    keys = token.split '-'
+                    for key in keys
+                        if Greenhorn.isDown[KEYS[key]]
+                            _emit = true
+                    if _emit then @emit event
+                else if token.match /\+/
+                    _emit = true
+                    keys = token.split '+'
+                    for key in keys
+                        unless Greenhorn.isDown[KEYS[key]]
+                            _emit = false
+                    if _emit then @emit event
+                else
+                    if Greenhorn.isDown[KEYS[token]]
+                        @emit event
             #fire 'isUp' event
             else if event.match /^isUp:(\w+|\d)$/
-                key = event.split(':')[1]
-                unless Greenhorn.isDown[KEYS[key]]
-                    @emit event
+                token = event.split(':')[1].toUpperCase()
+                if token.match /-/
+                    _emit = false
+                    keys = token.split '-'
+                    for key in keys
+                        unless Greenhorn.isDown[KEYS[key]]
+                            _emit = true
+                    if _emit then @emit event
+                else if token.match /\+/
+                    _emit = true
+                    keys = token.split '+'
+                    for key in keys
+                        if Greenhorn.isDown[KEYS[key]]
+                            _emit = false
+                    if _emit then @emit event
+                else
+                    unless Greenhorn.isDown[KEYS[token]]
+                        @emit event
             #fire 'collisionWith:other' events
             else if event.match /^collisionWith:\w+/
                 if @collidesWith listeners.other
