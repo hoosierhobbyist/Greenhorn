@@ -7,13 +7,14 @@ sedabull@gmail.com
 class Sprite
     #closures
     _list = []
+    _canvas = document.getElementById 'gh-canvas'
     _sortRule = (sp1, sp2) ->
         sp1._dis.level - sp2._dis.level
     _bounds =
-        top: document.getElementById('gh-canvas').height / 2
-        bottom: -document.getElementById('gh-canvas').height / 2
-        right: document.getElementById('gh-canvas').width / 2
-        left: -document.getElementById('gh-canvas').width / 2
+        top: _canvas.height / 2
+        bottom: -_canvas.height / 2
+        right: _canvas.width / 2
+        left: -_canvas.width / 2
     _boundaryCallback = (boundAction, side) ->
         #return appropriate callback function
         switch boundAction
@@ -119,7 +120,7 @@ class Sprite
         for own key, value of env.SPRITE_DEFAULT_CONFIG
             config[key] ?= value
 
-        #filter out magnitudes and angles of vectors
+        #process config object
         magnitudes = {}
         angles = {}
         for own key, value of config
@@ -129,20 +130,26 @@ class Sprite
             else if key.match /(^posAngle$|^motAngle$|^accAngle$)/
                 delete config[key]
                 angles[key] = value
+            else if key.match /^ba_all$/
+                delete config[key]
+                config.ba_top = value
+                config.ba_bottom = value
+                config.ba_right = value
+                config.ba_left = value
 
         #used to track asynchronous _update
         @_updateID = null
 
         #create primary objects
-        @_dis = {}
         @_pos = {}
         @_mot = {}
         @_acc = {}
+        @_dis = {}
         @_bas = {}
 
         #create secondary objects
         @_dis.image = new Image()
-        @_dis.context = document.getElementById('gh-canvas').getContext '2d'
+        @_dis.context = _canvas.getContext '2d'
 
         #set this sprite's configuration
         #"virtually" calls child's set method in derived classes
@@ -451,7 +458,7 @@ class Sprite
                     if Greenhorn.isDown[KEYS[token]]
                         @emit event
             #fire 'isUp' event
-            else if event.match /^isUp:(\w+|\d)$/
+            else if event.match /^isUp:(\w+|\d)/
                 token = event.split(':')[1].toUpperCase()
                 if token.match /-/
                     _emit = false
@@ -545,6 +552,16 @@ class Sprite
                     when 'ne'
                         if @get(tokens[0]) != tokens[2]
                             @emit event
+            else if event.match /^\w+-(eq|ne)-\w+/
+                tokens = event.split '-'
+                tokens[2] = eval tokens[2]
+                switch tokens[1]
+                    when 'eq'
+                        if @get(tokens[0]) is tokens[2]
+                            @emit event
+                    when 'ne'
+                        if @get(tokens[0]) isnt tokens[2]
+                            @emit event
         this
 
     #debugging
@@ -567,7 +584,11 @@ class Sprite
             width: #{Math.round @_dis.width}
             height: #{Math.round @_dis.height}
             visible: #{@_dis.visible}
-            boundAction: #{@_dis.boundAction}
+        bound actions:
+            top: #{@_bas.top.ba}
+            bottom: #{@_bas.bottom.ba}
+            right: #{@_bas.right.ba}
+            left: #{@_bas.left.ba}
         """
     log: ->
         console.log @report()
