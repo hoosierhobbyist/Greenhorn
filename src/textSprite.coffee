@@ -22,8 +22,7 @@ class TextSprite extends Sprite
         super(config)
 
     #getter
-    get: (what) ->
-        _emit = true
+    get: (what, _emit = true) ->
         if what.match /^text$/
             value = @_text.join '\n'
         else if what.match /^font\w+/
@@ -37,14 +36,12 @@ class TextSprite extends Sprite
         else if what.match /^background\w+/
             value = @_background[what.slice(10)]
         else
-            value = super what
-            _emit = false
+            value = super what, false
         if _emit then @emit "get:#{what}"
         return value
 
     #setter
-    set: (what, to) ->
-        _emit = true
+    set: (what, to, _emit = true) ->
         if what.match /^text$/
             @_text = to.split '\n'
         else if what.match /^font\w+/
@@ -58,15 +55,14 @@ class TextSprite extends Sprite
         else if what.match /^background\w+/
             @_background[what.slice(10)] = to
         else if what.match /(^font$|^border$|^outline$|^margins$|^background$)/
-            @set what.concat(k), v for own k, v of to
+            @set what.concat(k), v, false for own k, v of to
         else
-            super what, to
+            super what, to, _emit
             _emit = false
         if _emit then @emit "set:#{what}", to
-        this
+        return this
 
-    change: (what, step) ->
-        _emit = true
+    change: (what, step, _emit = true) ->
         if what.match /^text$/
             @_text = (@_text.join('\n').concat(step)).split('\n')
         else if what.match /^font\w+/
@@ -80,12 +76,12 @@ class TextSprite extends Sprite
         else if what.match /^background\w+/
             @_background[what.slice(10)] += step
         else if what.match /(^font$|^border$|^outline$|^margins$|^background$)/i
-            @change what.concat(k), v for own k, v of to
+            @change what.concat(k), v, false for own k, v of to
         else
-            super what, step
+            super what, step, _emit
             _emit = false
         if _emit then @emit "change:#{what}", step
-        this
+        return this
 
     #internal control
     _draw: ->
@@ -102,7 +98,6 @@ class TextSprite extends Sprite
 
             #draw background
             if @_background.visible
-                @_dis.context.save()
                 @_dis.context.fillStyle = @_background.color
                 @_dis.context.globalAlpha = @_background.alpha
                 @_dis.context.fillRect(
@@ -110,11 +105,9 @@ class TextSprite extends Sprite
                     -@_dis.height / 2, #top
                     @_dis.width, #width
                     @_dis.height) #height
-                @_dis.context.restore()
 
             #draw borders
             if @_border.visible
-                @_dis.context.save()
                 @_dis.context.strokeStyle = @_border.color
                 @_dis.context.lineWidth = @_border.size
                 @_dis.context.globalAlpha = @_border.alpha
@@ -123,7 +116,6 @@ class TextSprite extends Sprite
                     -@_dis.height / 2, #top
                     @_dis.width, #width
                     @_dis.height) #height
-                @_dis.context.restore()
 
             #calculate text yOffset
             yOffset = (@_text.length - 1) * @_font.size * .75
@@ -144,7 +136,7 @@ class TextSprite extends Sprite
             @_dis.context.textBaseline = 'middle'
             @_dis.context.fillStyle = @_font.color
             @_dis.context.globalAlpha = @_font.alpha
-            @_dis.context.textAlign = "#{@_font.align}"
+            @_dis.context.textAlign = @_font.align
             @_dis.context.font = "#{@_font.size}px #{@_font.name}"
 
             #draw text on canvas

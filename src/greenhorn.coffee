@@ -42,13 +42,15 @@ _masterUpdate = ->
 
     #draw all Sprites
     Sprite._drawAll()
-#end _masterUpdate
 
 #Engine class
 class Greenhorn
     #keyboard input tracking array
     @isDown = new Array 256
     key = false for key in @isDown
+    
+    #name of the current state
+    @currentState = 'STARTUP'
 
     #create Engine elements
     _elmnts =
@@ -151,7 +153,14 @@ class Greenhorn
 
         #append to an element
         _elmnts[config.parent].appendChild button
-
+    
+    #change state
+    @changeState = (stateName) ->
+        @emit "state-change-from:#{@currentState}"
+        @emit 'state-change', @currentState, stateName
+        @emit "state-change-to:#{stateName}"
+        @currentState = stateName
+    
     #execute start-up logic only once
     _firstTime = true
     
@@ -171,7 +180,7 @@ class Greenhorn
             -_elmnts.canvas.height / 2,
             _elmnts.canvas.width,
             _elmnts.canvas.height)
-    @start = =>
+    @start = (stateName = '') =>
         #prevent starting without properly stopping first
         unless @isRunning() or _elmnts.canvas.onclick?
             if _firstTime
@@ -212,6 +221,7 @@ class Greenhorn
                 #make the entire canvas a start button
                 _elmnts.canvas.onclick = ->
                     _startEverything()
+                    Greenhorn.changeState stateName ? 'GREENHORN'
                     _elmnts.canvas.onclick = (e) ->
                         Sprite.emitAll 'mouse:click'
 
@@ -219,6 +229,10 @@ class Greenhorn
                 _firstTime = false
             else
                 _startEverything()
+                if stateName then @changeState stateName
+
+#mixin EventEmitter
+_mixin Greenhorn, EventEmitter::
 
 #add to namespace object
 gh.Greenhorn = Greenhorn

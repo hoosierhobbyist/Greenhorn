@@ -8,15 +8,14 @@ class Sprite
     #closures
     _list = []
     _canvas = document.getElementById 'gh-canvas'
-    _sortRule = (sp1, sp2) ->
-        sp1._dis.level - sp2._dis.level
     _bounds =
         top: _canvas.height / 2
         bottom: -_canvas.height / 2
         right: _canvas.width / 2
         left: -_canvas.width / 2
+    _sortRule = (sp1, sp2) ->
+        sp1._dis.level - sp2._dis.level
     _boundaryCallback = (boundAction, side) ->
-        #return appropriate callback function
         switch boundAction
             when 'DIE'
                 -> @_dis.visible = off
@@ -153,9 +152,9 @@ class Sprite
 
         #set this sprite's configuration
         #"virtually" calls child's set method in derived classes
-        @set 'config', config
-        @set 'config', magnitudes
-        @set 'config', angles
+        @set 'config', config, false
+        @set 'config', magnitudes, false
+        @set 'config', angles, false
 
         #start updating if the engine is already running
         if Greenhorn.isRunning() then @_start()
@@ -176,7 +175,7 @@ class Sprite
         @_updateID = null
 
     #getter
-    get: (what) ->
+    get: (what, _emit = true) ->
         if what.match /^imageFile$/
             value = @_dis.image.src
         else if what.match /(^x$|^y$|^a$)/
@@ -211,11 +210,11 @@ class Sprite
             value = @_bas[what.split('_')[1]].ba
         else
             throw new Error "#{what} is not a get-able Sprite attribute"
-        @emit "get:#{what}"
+        if _emit then @emit "get:#{what}"
         return value
 
     #setter
-    set: (what, to) ->
+    set: (what, to, _emit = true) ->
         if what.match /(^x$|^y$|^a$)/
             @_pos[what] = to
         else if what.match /(^dx$|^dy$|^da$)/
@@ -243,34 +242,34 @@ class Sprite
             proxy =
                 x: to * Math.cos @get('posAngle')
                 y: to * Math.sin @get('posAngle')
-            @set '_pos', proxy
+            @set '_pos', proxy, false
         else if what.match /^speed$/
             proxy =
                 dx: to * Math.cos @get('motAngle')
                 dy: to * Math.sin @get('motAngle')
-            @set '_mot', proxy
+            @set '_mot', proxy, false
         else if what.match /^rate$/
             proxy =
                 ddx: to * Math.cos @get('accAngle')
                 ddy: to * Math.sin @get('accAngle')
-            @set '_acc', proxy
+            @set '_acc', proxy, false
         else if what.match /^posAngle$/
             proxy =
                 x: @get('distance') * Math.cos to
                 y: @get('distance') * Math.sin to
-            @set '_pos', proxy
+            @set '_pos', proxy, false
         else if what.match /^motAngle$/
             proxy =
                 dx: @get('speed') * Math.cos to
                 dy: @get('speed') * Math.sin to
-            @set '_mot', proxy
+            @set '_mot', proxy, false
         else if what.match /^accAngle$/
             proxy =
                 ddx: @get('rate') * Math.cos to
                 ddy: @get('rate') * Math.sin to
-            @set '_acc', proxy
+            @set '_acc', proxy, false
         else if what.match /(^_?dis|^_?pos|^_?mot|^_?acc|^config)/
-            @set k, v for own k, v of to
+            @set k, v, false for own k, v of to
         else if what.match /(^level$|^width$|^height$|^visible$)/
             @_dis[what] = to
             _list.sort _sortRule if what is 'level'
@@ -302,14 +301,14 @@ class Sprite
                     ba_bottom: to
                     ba_right: to
                     ba_left: to
-                @set 'config', proxy
+                @set 'config', proxy, false
         else
             throw new Error "#{what} is not a set-able Sprite attribute"
-        @emit "set:#{what}", to
-        this
+        if _emit then @emit "set:#{what}", to
+        return this
 
     #changer
-    change: (what, step) ->
+    change: (what, step, _emit = true) ->
         if what.match /(^x$|^y$|^a$)/
             @_pos[what] += step / env.FRAME_RATE
         else if what.match /(^dx$|^dy$|^da$)/
@@ -322,54 +321,56 @@ class Sprite
             proxy =
                 dx: step * Math.cos @get('posAngle')
                 dy: step * Math.sin @get('posAngle')
-            @change '_pos', proxy
+            @change '_pos', proxy, false
         else if what.match /^speed$/
             proxy =
                 ddx: step * Math.cos @get('motAngle')
                 ddy: step * Math.sin @get('motAngle')
-            @change '_mot', proxy
+            @change '_mot', proxy, false
         else if what.match /^rate$/
             proxy =
                 dddx: step * Math.cos @get('accAngle')
                 dddy: step * Math.sin @get('accAngle')
-            @change '_acc', proxy
+            @change '_acc', proxy, false
         else if what.match /^posAngle$/
             proxy =
                 dx: @get('distance') * Math.cos step
                 dy: @get('distance') * Math.sin step
-            @change '_pos', proxy
+            @change '_pos', proxy, false
         else if what.match /^motAngle$/
             proxy =
                 ddx: @get('speed') * Math.cos step
                 ddy: @get('speed') * Math.sin step
-            @change '_mot', proxy
+            @change '_mot', proxy, false
         else if what.match /^accAngle$/
             proxy =
                 dddx: @get('rate') * Math.cos step
                 dddy: @get('rate') * Math.sin step
-            @change '_acc', proxy
+            @change '_acc', proxy, false
         else if what.match /(^_?dis|^_?pos|^_?mot|^_?acc)/
-            @change k.slice(1), v for own k, v of step
+            @change k.slice(1), v, false for own k, v of step
         else
             throw new Error "#{what} is not a change-able Sprite attribute"
-        @emit "change:#{what}", step
-        this
+        if _emit then @emit "change:#{what}", step
+        return this
 
     #collision routines
     collidesWith: (other) ->
         if other is 'mouse'
             collision = false
             if @_dis.visible
-                if @get('left') < Greenhorn.getMouseX() < @get('right') and
-                @get('bottom') < Greenhorn.getMouseY() < @get('top')
+                if @get('left', false) < Greenhorn.getMouseX() < @get('right', false) and
+                @get('bottom', false) < Greenhorn.getMouseY() < @get('top', false)
                     collision = true
         else
             collision = true
-            if @_dis.visible and other.get('visible') and @_dis.level == other.get('level')
-                if @get('bottom') > other.get('top') or
-                @get('top') < other.get('bottom') or
-                @get('right') < other.get('left') or
-                @get('left') > other.get('right')
+            if @_dis.visible and
+            other._dis.visible and
+            @_dis.level == other._dis.level
+                if @get('bottom', false) > other.get('top', false) or
+                @get('top', false) < other.get('bottom', false) or
+                @get('right', false) < other.get('left', false) or
+                @get('left', false) > other.get('right', false)
                     collision = false
             else collision = false
         collision
@@ -379,8 +380,8 @@ class Sprite
             otherX = Greenhorn.getMouseX()
             otherY = Greenhorn.getMouseY()
         else
-            otherX = other.get 'x'
-            otherY = other.get 'y'
+            otherX = other._pos.x
+            otherY = other._pos.y
         Math.sqrt (@_pos.x - otherX)**2 + (@_pos.y - otherY)**2
     angleTo: (other) ->
         otherX = otherY = 0
@@ -388,8 +389,8 @@ class Sprite
             otherX = Greenhorn.getMouseX()
             otherY = Greenhorn.getMouseY()
         else
-            otherX = other.get 'x'
-            otherY = other.get 'y'
+            otherX = other._pos.x
+            otherY = other._pos.y
         Math.atan2 @_pos.y - otherY, @_pos.x - otherX
 
     #update routines
@@ -420,20 +421,20 @@ class Sprite
         @emit 'update'
         
         #accelerate and move
-        @change '_mot', @_acc
-        @change '_pos', @_mot
+        @change '_mot', @_acc, false
+        @change '_pos', @_mot, false
 
         #fire 'off:boundary' events
-        if @get('bottom') > _bounds.top then @emit 'off:top'
-        if @get('top') < _bounds.bottom then @emit 'off:bottom'
-        if @get('left') > _bounds.right then @emit 'off:right'
-        if @get('right') < _bounds.left then @emit 'off:left'
+        if @get('bottom', false) > _bounds.top then @emit 'off:top'
+        if @get('top', false) < _bounds.bottom then @emit 'off:bottom'
+        if @get('left', false) > _bounds.right then @emit 'off:right'
+        if @get('right', false) < _bounds.left then @emit 'off:left'
 
         #fire 'hit:boundary' events
-        if @get('top') >= _bounds.top then @emit 'hit:top'
-        if @get('bottom') <= _bounds.bottom then @emit 'hit:bottom'
-        if @get('right') >= _bounds.right then @emit 'hit:right'
-        if @get('left') <= _bounds.left then @emit 'hit:left'
+        if @get('top', false) >= _bounds.top then @emit 'hit:top'
+        if @get('bottom', false) <= _bounds.bottom then @emit 'hit:bottom'
+        if @get('right', false) >= _bounds.right then @emit 'hit:right'
+        if @get('left', false) <= _bounds.left then @emit 'hit:left'
         
         #determine other events to fire
         for own event, listeners of @_events
@@ -554,7 +555,8 @@ class Sprite
                             @emit event
             else if event.match /^\w+-(eq|ne)-\w+/
                 tokens = event.split '-'
-                tokens[2] = eval tokens[2]
+                if tokens[2].match /(^true$|^false$)/
+                    tokens[2] = eval tokens[2]
                 switch tokens[1]
                     when 'eq'
                         if @get(tokens[0]) is tokens[2]
@@ -592,7 +594,6 @@ class Sprite
         """
     log: ->
         console.log @report()
-        return
 
 #mixin EventEmitter
 _mixin Sprite::, EventEmitter::

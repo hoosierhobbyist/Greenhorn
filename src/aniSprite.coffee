@@ -37,24 +37,21 @@ class AniSprite extends Sprite
         super(config)
         
         #set initial cycle if one was provided
-        @set 'current', initialCycle if initialCycle?
+        @set 'current', initialCycle, false if initialCycle?
 
     #getter
-    get: (what) ->
-        _emit = true
+    get: (what, _emit = true) ->
         if what.match /(^current$|^animation$)/
             value = @_ani.current.name
         else if what.match /(^cellWidth$|^cellHeight$|^frameRate$|^orientation$)/
             value = @_ani[what]
         else
-            value = super what
-            _emit = false
+            value = super what, false
         if _emit then @emit "get:#{what}"
         return value
 
     #setter
-    set: (what, to) ->
-        _emit = true
+    set: (what, to, _emit = true) ->
         if what.match /(^current$|^animation$)/
             if to isnt @_ani.current.name
                 @_ani.current.frame = @_ani.current.start
@@ -71,21 +68,20 @@ class AniSprite extends Sprite
             @_ani.cycles.push(new AniCycle(to))
             @_ani.current ?= @_ani.cycles[0]
         else
-            super what, to
+            super what, to, _emit
             _emit = false
         if _emit then @emit "set:#{what}", to
-        this
+        return this
 
     #changer
-    change: (what, step) ->
-        _emit = true
+    change: (what, step, _emit = true) ->
         if what.match /^frameRate$/
             @_ani.frameRate += step
         else
-            super what, step
+            super what, step, _emit
             _emit = false
         if _emit then @emit "change:#{what}", step
-        this
+        return this
 
     #animation control
     play: ->
