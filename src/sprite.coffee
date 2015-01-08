@@ -18,54 +18,54 @@ class Sprite
     _boundaryCallback = (boundAction, side) ->
         switch boundAction
             when 'DIE'
-                -> @_dis.visible = off
+                -> @set 'visible', off, false
             when 'WRAP'
                 switch side
                     when 'top'
-                        -> @set 'top', _bounds.bottom
+                        -> @set 'top', _bounds.bottom, false
                     when 'bottom'
-                        -> @set 'bottom', _bounds.top
+                        -> @set 'bottom', _bounds.top, false
                     when 'right'
-                        -> @set 'right', _bounds.left
+                        -> @set 'right', _bounds.left, false
                     when 'left'
-                        -> @set 'left', _bounds.right
+                        -> @set 'left', _bounds.right, false
             when 'STOP'
                 switch side
                     when 'top'
-                        -> @set 'top', _bounds.top - 1
+                        -> @set 'top', _bounds.top - 1, false
                     when 'bottom'
-                        -> @set 'bottom', _bounds.bottom + 1
+                        -> @set 'bottom', _bounds.bottom + 1, false
                     when 'right'
-                        -> @set 'right', _bounds.right - 1
+                        -> @set 'right', _bounds.right - 1, false
                     when 'left'
-                        -> @set 'left', _bounds.left + 1
+                        -> @set 'left', _bounds.left + 1, false
             when 'SPRING'
                 switch side
                     when 'top'
-                        -> @change 'dy', env.SPRING_CONSTANT * (_bounds.top - @get('top'))
+                        -> @change 'dy', env.SPRING_CONSTANT * (_bounds.top - @get('top')), false
                     when 'bottom'
-                        -> @change 'dy', env.SPRING_CONSTANT * (_bounds.bottom - @get('bottom'))
+                        -> @change 'dy', env.SPRING_CONSTANT * (_bounds.bottom - @get('bottom')), false
                     when 'right'
-                        -> @change 'dx', env.SPRING_CONSTANT * (_bounds.right - @get('right'))
+                        -> @change 'dx', env.SPRING_CONSTANT * (_bounds.right - @get('right')), false
                     when 'left'
-                        -> @change 'dx', env.SPRING_CONSTANT * (_bounds.left - @get('left'))
+                        -> @change 'dx', env.SPRING_CONSTANT * (_bounds.left - @get('left')), false
             when 'BOUNCE'
                 switch side
                     when 'top'
                         ->
-                            @set 'top', _bounds.top - 1
+                            @set 'top', _bounds.top - 1, false
                             @_mot.dy *= -1 + env.BOUNCE_DECAY
                     when 'bottom'
                         ->
-                            @set 'bottom', _bounds.bottom + 1
+                            @set 'bottom', _bounds.bottom + 1, false
                             @_mot.dy *= -1 + env.BOUNCE_DECAY
                     when 'right'
                         ->
-                            @set 'right', _bounds.right - 1
+                            @set 'right', _bounds.right - 1, false
                             @_mot.dx *= -1 + env.BOUNCE_DECAY
                     when 'left'
                         ->
-                            @set 'left', _bounds.left + 1
+                            @set 'left', _bounds.left + 1, false
                             @_mot.dx *= -1 + env.BOUNCE_DECAY
 
     #class methods
