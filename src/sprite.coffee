@@ -147,7 +147,7 @@ class Sprite extends EventEmitter
                 if typeof value is 'function'
                     @on key.slice(2), value
                 else if value.length?
-                    @on key.slice(0, 2), value[0], value[1]
+                    @on key.slice(2), value[0], value[1]
 
         #used to track asynchronous _update
         @_updateID = null
