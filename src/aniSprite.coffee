@@ -37,27 +37,29 @@ class AniSprite extends Sprite
         super(config)
         
         #set initial cycle if one was provided
-        @set 'current', initialCycle if initialCycle?
+        @set 'current', initialCycle, false if initialCycle?
 
     #getter
-    get: (what) ->
-        if what.match /(^current$|^animation$)/i
-            @_ani.current.name
+    get: (what, _emit = true) ->
+        if what.match /(^current$|^animation$)/
+            value = @_ani.current.name
         else if what.match /(^cellWidth$|^cellHeight$|^frameRate$|^orientation$)/
-            @_ani[what]
+            value = @_ani[what]
         else
-            super what
+            value = super what, false
+        if _emit then @emit "get:#{what}"
+        return value
 
     #setter
-    set: (what, to) ->
-        if what.match /(^current$|^animation$)/i
+    set: (what, to, _emit = true) ->
+        if what.match /(^current$|^animation$)/
             if to isnt @_ani.current.name
                 @_ani.current.frame = @_ani.current.start
                 for cycle in @_ani.cycles when cycle.name is to
                     @_ani.current = cycle
         else if what.match /(^cellWidth$|^cellHeight$|^frameRate$|^orientation$)/
             @_ani[what] = to
-        else if what.match /^cycle/i
+        else if what.match /^cycle/
             to.index ?= env.ANICYCLE_DEFAULT_CONFIG.index
             to.start ?= env.ANICYCLE_DEFAULT_CONFIG.start
             to.stop ?= to.start + env.ANICYCLE_DEFAULT_CONFIG.numFrames - 1
@@ -66,24 +68,32 @@ class AniSprite extends Sprite
             @_ani.cycles.push(new AniCycle(to))
             @_ani.current ?= @_ani.cycles[0]
         else
-            super what, to
-        this
+            super what, to, _emit
+            _emit = false
+        if _emit then @emit "set:#{what}", to
+        return this
 
     #changer
-    change: (what, step) ->
-        if what.match /^frameRate$/i
-            @_ani.frameRate += step
+    change: (what, step, _emit = true) ->
+        if what.match /^frameRate$/
+            @_ani.frameRate += step / env.FRAME_RATE
         else
-            super what, step
+            super what, step, _emit
+            _emit = false
+        if _emit then @emit "change:#{what}", step
+        return this
 
     #animation control
     play: ->
+        @emit 'play'
         @_ani.timer.start()
         this
     pause: ->
+        @emit 'pause'
         @_ani.timer.pause()
         this
     stop: ->
+        @emit 'stop'
         @_ani.timer.stop()
         @_ani.current.frame = @_ani.current.start
         this
@@ -91,6 +101,9 @@ class AniSprite extends Sprite
     #update routines
     _draw: ->
         if @_dis.visible
+            #fire draw event
+            @emit 'draw'
+            
             #save current context
             @_dis.context.save()
 
@@ -121,20 +134,19 @@ class AniSprite extends Sprite
             #restore context
             @_dis.context.restore()
     _update: ->
-        if @_dis.visible
-            #determine if it's time to change frames
-            if @_ani.timer.getElapsedTime() >= (1000 / @_ani.frameRate)
-                #determine next frame in animation loop
-                if @_ani.current.frame < @_ani.current.stop
-                    @_ani.current.frame += 1
-                else
-                    @_ani.current.frame = @_ani.current.start
+        #call Sprite _update
+        super()
+            
+        #determine if it's time to change frames
+        if @_ani.timer.getElapsedTime() >= (1000 / @_ani.frameRate)
+            #determine next frame in animation loop
+            if @_ani.current.frame < @_ani.current.stop
+                @_ani.current.frame += 1
+            else
+                @_ani.current.frame = @_ani.current.start
 
-                #restart the timer
-                @_ani.timer.restart()
-
-            #call Sprite _update
-            super()
+            #restart the timer
+            @_ani.timer.restart()
 
 #add to namespace object
 gh.AniSprite = AniSprite

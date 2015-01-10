@@ -5,7 +5,7 @@ sedabull@gmail.com
 ###
 
 #keyboard value mapping object
-gh.KEYS =
+KEYS =
     ESC: 27, SPACE: 32, PGUP: 33
     PGDOWN: 34, END: 35, HOME: 36
     LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40
@@ -15,6 +15,7 @@ gh.KEYS =
     G: 71, H: 72, I: 73, J: 74, K: 75, L: 76, M: 77
     N: 78, O: 79, P: 80, Q: 81, R: 82, S: 83
     T: 84, U: 85, V: 86, W: 87, X: 88, Y: 89, Z: 90
+gh.KEYS = KEYS
 
 #automatic initialization
 document.onreadystatechange = ->
@@ -42,13 +43,15 @@ _masterUpdate = ->
 
     #draw all Sprites
     Sprite._drawAll()
-#end _masterUpdate
 
 #Engine class
 class Greenhorn
     #keyboard input tracking array
     @isDown = new Array 256
     key = false for key in @isDown
+    
+    #name of the current state
+    @currentState = 'STARTUP'
 
     #create Engine elements
     _elmnts =
@@ -84,10 +87,20 @@ class Greenhorn
     _elmnts.leftPanel.appendChild _elmnts.leftPanelHeader
     _elmnts.rightPanel.appendChild _elmnts.rightPanelHeader
     
-    #keep track of mouse position over canvas
+    #keep track of mouse events over canvas
     _elmnts.canvas.onmousemove = (e) ->
         @mouseX = e.pageX
         @mouseY = e.pageY
+        Sprite.emitAll 'mouse:move'
+    _elmnts.canvas.onmousedown = (e) ->
+        Sprite.emitAll 'mouse:down'
+    _elmnts.canvas.onmouseup = (e) ->
+        Sprite.emitAll 'mouse:up'
+    _elmnts.canvas.ondblclick = (e) ->
+        Sprite.emitAll 'mouse:doubleClick'
+    _elmnts.canvas.oncontextmenu = (e) ->
+        e.preventDefault()
+        Sprite.emitAll 'mouse:rightClick'
 
     #start all asynchronous functions
     _startEverything = ->
@@ -98,21 +111,10 @@ class Greenhorn
 
     #mouse position getters
     @getMouseX = ->
-        indexNode = _elmnts.canvas
-        mouseX = indexNode.mouseX - indexNode.offsetLeft - indexNode.width / 2
+        _elmnts.canvas.mouseX - _elmnts.canvas.offsetLeft - _elmnts.canvas.width / 2
         
-        while indexNode = indexNode.parentNode
-            mouseX -= indexNode.offsetLeft
-        
-        mouseX
     @getMouseY = ->
-        indexNode = _elmnts.canvas
-        mouseY = indexNode.mouseY - indexNode.offsetTop - indexNode.height / 2
-        
-        while indexNode = indexNode.parentNode
-            mouseY -= indexNode.offsetTop
-        
-        mouseY
+        -(_elmnts.canvas.mouseY - _elmnts.canvas.offsetTop - _elmnts.canvas.height / 2)
 
     #add button to one of the panels
     @addButton = (config = {}) ->
@@ -131,7 +133,14 @@ class Greenhorn
 
         #append to an element
         _elmnts[config.parent].appendChild button
-
+    
+    #change state
+    @changeState = (stateName) ->
+        @emit "state-change-from:#{@currentState}"
+        @emit 'state-change', @currentState, stateName
+        @emit "state-change-to:#{stateName}"
+        @currentState = stateName
+    
     #execute start-up logic only once
     _firstTime = true
     
@@ -151,9 +160,9 @@ class Greenhorn
             -_elmnts.canvas.height / 2,
             _elmnts.canvas.width,
             _elmnts.canvas.height)
-    @start = =>
+    @start = (stateName) =>
         #prevent starting without properly stopping first
-        unless @isRunning() or _elmnts.canvas.onclick?
+        unless @isRunning()
             if _firstTime
                 #add engine to a user defined '.gh' div or the document body
                 (document.querySelector('.gh') ? document.body).appendChild _elmnts.main
@@ -192,12 +201,18 @@ class Greenhorn
                 #make the entire canvas a start button
                 _elmnts.canvas.onclick = ->
                     _startEverything()
-                    _elmnts.canvas.onclick = undefined
+                    Greenhorn.changeState stateName ? 'GREENHORN'
+                    _elmnts.canvas.onclick = (e) ->
+                        Sprite.emitAll 'mouse:click'
 
                 #don't do all this a second time
                 _firstTime = false
             else
                 _startEverything()
+                if stateName then @changeState stateName
+
+#mixin EventEmitter
+_mixin Greenhorn, EventEmitter::
 
 #add to namespace object
 gh.Greenhorn = Greenhorn

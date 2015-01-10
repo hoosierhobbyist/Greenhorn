@@ -40,8 +40,11 @@ env =
         width: 64
         height: 64
         visible: yes
-        imageFile: ""
-        boundAction: "WRAP"
+        imageFile: ''
+        ba_top: 'WRAP'
+        ba_bottom: 'WRAP'
+        ba_right: 'WRAP'
+        ba_left: 'WRAP'
     #default TEXTSPRITE settings
     TEXTSPRITE_DEFAULT_CONFIG:
         level: -1

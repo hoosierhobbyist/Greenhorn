@@ -22,65 +22,73 @@ class TextSprite extends Sprite
         super(config)
 
     #getter
-    get: (what) ->
-        if what.match /^text$/i
-            @_text.join '\n'
-        else if what.match /^font\w+/i
-            @_font[what.slice(4).toLowerCase()]
-        else if what.match /^border\w+/i
-            @_border[what.slice(6).toLowerCase()]
-        else if what.match /^outline\w+/i
-            @_outline[what.slice(7).toLowerCase()]
-        else if what.match /^margins\w+/i
-            @_margins[what.slice(7).toLowerCase()]
-        else if what.match /^background\w+/i
-            @_background[what.slice(10).toLowerCase()]
+    get: (what, _emit = true) ->
+        if what.match /^text$/
+            value = @_text.join '\n'
+        else if what.match /^font\w+/
+            value = @_font[what.slice(4).toLowerCase()]
+        else if what.match /^border\w+/
+            value = @_border[what.slice(6).toLowerCase()]
+        else if what.match /^outline\w+/
+            value = @_outline[what.slice(7).toLowerCase()]
+        else if what.match /^margins\w+/
+            value = @_margins[what.slice(7).toLowerCase()]
+        else if what.match /^background\w+/
+            value = @_background[what.slice(10).toLowerCase()]
         else
-            super what
+            value = super what, false
+        if _emit then @emit "get:#{what}"
+        return value
 
     #setter
-    set: (what, to) ->
-        if what.match /^text$/i
+    set: (what, to, _emit = true) ->
+        if what.match /^text$/
             @_text = to.split '\n'
-        else if what.match /^font\w+/i
+        else if what.match /^font\w+/
             @_font[what.slice(4).toLowerCase()] = to
-        else if what.match /^border\w+/i
+        else if what.match /^border\w+/
             @_border[what.slice(6).toLowerCase()] = to
-        else if what.match /^outline\w+/i
+        else if what.match /^outline\w+/
             @_outline[what.slice(7).toLowerCase()] = to
-        else if what.match /^margins\w+/i
+        else if what.match /^margins\w+/
             @_margins[what.slice(7).toLowerCase()] = to
-        else if what.match /^background\w+/i
+        else if what.match /^background\w+/
             @_background[what.slice(10).toLowerCase()] = to
-        else if what.match /(^font$|^border$|^outline$|^margins$|^background$)/i
-            @set what.concat(k), v for own k, v of to
+        else if what.match /(^font$|^border$|^outline$|^margins$|^background$)/
+            @set what.concat(k), v, false for own k, v of to
         else
-            super what, to
-        this
+            super what, to, _emit
+            _emit = false
+        if _emit then @emit "set:#{what}", to
+        return this
 
-    change: (what, step) ->
-        if what.match /^text$/i
+    change: (what, step, _emit = true) ->
+        if what.match /^text$/
             @_text = (@_text.join('\n').concat(step)).split('\n')
-        else if what.match /^font\w+/i
-            @_font[what.slice(4).toLowerCase()] += step
-        else if what.match /^border\w+/i
-            @_border[what.slice(6).toLowerCase()] += step
-        else if what.match /^outline\w+/i
-            @_outline[what.slice(7).toLowerCase()] += step
-        else if what.match /^margins\w+/i
-            @_margins[what.slice(7).toLowerCase()] += step
-        else if what.match /^background\w+/i
-            @_background[what.slice(10).toLowerCase()] += step
+        else if what.match /^font\w+/
+            @_font[what.slice(4).toLowerCase()] += step / env.FRAME_RATE
+        else if what.match /^border\w+/
+            @_border[what.slice(6).toLowerCase()] += step / env.FRAME_RATE
+        else if what.match /^outline\w+/
+            @_outline[what.slice(7).toLowerCase()] += step / env.FRAME_RATE
+        else if what.match /^margins\w+/
+            @_margins[what.slice(7).toLowerCase()] += step / env.FRAME_RATE
+        else if what.match /^background\w+/
+            @_background[what.slice(10).toLowerCase()] += step / env.FRAME_RATE
         else if what.match /(^font$|^border$|^outline$|^margins$|^background$)/i
-            @change what.concat(k), v for own k, v of to
+            @change what.concat(k), v, false for own k, v of to
         else
-            super what, step
-        this
+            super what, step, _emit
+            _emit = false
+        if _emit then @emit "change:#{what}", step
+        return this
 
     #internal control
     _draw: ->
         if @_dis.visible
-
+            #fire draw event
+            @emit 'draw'
+            
             #save current context
             @_dis.context.save()
 
@@ -90,7 +98,6 @@ class TextSprite extends Sprite
 
             #draw background
             if @_background.visible
-                @_dis.context.save()
                 @_dis.context.fillStyle = @_background.color
                 @_dis.context.globalAlpha = @_background.alpha
                 @_dis.context.fillRect(
@@ -98,11 +105,9 @@ class TextSprite extends Sprite
                     -@_dis.height / 2, #top
                     @_dis.width, #width
                     @_dis.height) #height
-                @_dis.context.restore()
 
             #draw borders
             if @_border.visible
-                @_dis.context.save()
                 @_dis.context.strokeStyle = @_border.color
                 @_dis.context.lineWidth = @_border.size
                 @_dis.context.globalAlpha = @_border.alpha
@@ -111,7 +116,6 @@ class TextSprite extends Sprite
                     -@_dis.height / 2, #top
                     @_dis.width, #width
                     @_dis.height) #height
-                @_dis.context.restore()
 
             #calculate text yOffset
             yOffset = (@_text.length - 1) * @_font.size * .75
@@ -132,7 +136,7 @@ class TextSprite extends Sprite
             @_dis.context.textBaseline = 'middle'
             @_dis.context.fillStyle = @_font.color
             @_dis.context.globalAlpha = @_font.alpha
-            @_dis.context.textAlign = "#{@_font.align}"
+            @_dis.context.textAlign = @_font.align
             @_dis.context.font = "#{@_font.size}px #{@_font.name}"
 
             #draw text on canvas
@@ -156,6 +160,9 @@ class TextSprite extends Sprite
             #restore old context
             @_dis.context.restore()
     _update: ->
+        #call Sprite update
+        super()
+        
         #calculate new size
         @_dis.width = 0
         @_dis.height = @_font.size * 1.5 * @_text.length
@@ -174,9 +181,6 @@ class TextSprite extends Sprite
         if @_border.visible
             @_dis.width += 2 * @_border.size
             @_dis.height += 2 * @_border.size
-
-        #call Sprite update
-        super()
 
 #add to namespace object
 gh.TextSprite = TextSprite
