@@ -147,6 +147,23 @@ class AniSprite extends Sprite
 
             #restart the timer
             @_ani.timer.restart()
+    
+    #debugging
+    report: ->
+        """
+        #{super()}
+        animation:
+            frameRate: #{@_ani.frameRate}
+            cellWidth: #{@_ani.cellWidth}
+            cellHeight: #{@_ani.cellHeight}
+            orientation: #{@_ani.orientation}
+            current cycle:
+                frame: #{@_ani.current.frame}
+                index: #{@_ani.current.index}
+                start: #{@_ani.current.start}
+                stop: #{@_ani.current.stop}
+                name: #{@_ani.current.name}
+        """
 
 #add to namespace object
 gh.AniSprite = AniSprite
