@@ -181,6 +181,37 @@ class TextSprite extends Sprite
         if @_border.visible
             @_dis.width += 2 * @_border.size
             @_dis.height += 2 * @_border.size
+    
+    #debugging
+    report: ->
+        """
+        #{super()}
+        font:
+            size: #{@_font.size}
+            alpha: #{@_font.alpha}
+            color: #{@_font.color}
+            align: #{@_font.align}
+            name: #{@_font.name}
+        border:
+            size: #{@_border.size}
+            alpha: #{@_border.alpha}
+            visible: #{@_border.visible}
+            color: #{@_border.color}
+        outline:
+            size: #{@_outline.size}
+            alpha: #{@_outline.alpha}
+            visible: #{@_outline.visible}
+            color: #{@_outline.color}
+        margins:
+            top: #{@_margins.top}
+            bottom: #{@_margins.bottom}
+            right: #{@_margins.right}
+            left: #{@_margins.left}
+        background:
+            alpha: #{@_background.alpha}
+            visible: #{@_background.visible}
+            color: #{@_background.color}
+        """
 
 #add to namespace object
 gh.TextSprite = TextSprite
