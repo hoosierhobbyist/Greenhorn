@@ -4,18 +4,22 @@ Written by Seth Bullock
 sedabull@gmail.com
 ###
 
-class Sprite
+class Sprite extends EventEmitter
     #closures
     _list = []
-    _canvas = document.getElementById 'gh-canvas'
-    _bounds =
-        top: _canvas.height / 2
-        bottom: -_canvas.height / 2
-        right: _canvas.width / 2
-        left: -_canvas.width / 2
+    _canvas = null
+    _bounds = null
     _sortRule = (sp1, sp2) ->
         sp1._dis.level - sp2._dis.level
     _boundaryCallback = (boundAction, side) ->
+        #cache boundaries
+        _bounds ?=
+            top: _canvas.height / 2
+            bottom: -_canvas.height / 2
+            right: _canvas.width / 2
+            left: -_canvas.width / 2
+        
+        #return appropriate callback
         switch boundAction
             when 'DIE'
                 -> @set 'visible', off, false
@@ -42,13 +46,13 @@ class Sprite
             when 'SPRING'
                 switch side
                     when 'top'
-                        -> @change 'dy', env.SPRING_CONSTANT * (_bounds.top - @get('top')), false
+                        -> @change 'dy', env.SPRING_CONSTANT * (_bounds.top - @get('top', false)), false
                     when 'bottom'
-                        -> @change 'dy', env.SPRING_CONSTANT * (_bounds.bottom - @get('bottom')), false
+                        -> @change 'dy', env.SPRING_CONSTANT * (_bounds.bottom - @get('bottom', false)), false
                     when 'right'
-                        -> @change 'dx', env.SPRING_CONSTANT * (_bounds.right - @get('right')), false
+                        -> @change 'dx', env.SPRING_CONSTANT * (_bounds.right - @get('right', false)), false
                     when 'left'
-                        -> @change 'dx', env.SPRING_CONSTANT * (_bounds.left - @get('left')), false
+                        -> @change 'dx', env.SPRING_CONSTANT * (_bounds.left - @get('left', false)), false
             when 'BOUNCE'
                 switch side
                     when 'top'
@@ -115,6 +119,9 @@ class Sprite
 
     #instance methods
     constructor: (config = {}) ->
+        #cache class-level reference to gh-canvas
+        _canvas ?= document.getElementById 'gh-canvas'
+        
         #add missing keys to config
         for own key, value of env.SPRITE_DEFAULT_CONFIG
             config[key] ?= value
@@ -159,7 +166,7 @@ class Sprite
         #start updating if the engine is already running
         if Greenhorn.isRunning() then @_start()
 
-        #add to Sprite _list and sort by level
+        #add to class-level _list and sort by _dis.level
         _list.push this
         _list.sort _sortRule
 
@@ -240,33 +247,33 @@ class Sprite
                     @_dis.image.src = to
         else if what.match /^distance$/
             proxy =
-                x: to * Math.cos @get('posAngle')
-                y: to * Math.sin @get('posAngle')
+                x: to * Math.cos @get 'posAngle', false
+                y: to * Math.sin @get 'posAngle', false
             @set '_pos', proxy, false
         else if what.match /^speed$/
             proxy =
-                dx: to * Math.cos @get('motAngle')
-                dy: to * Math.sin @get('motAngle')
+                dx: to * Math.cos @get 'motAngle', false
+                dy: to * Math.sin @get 'motAngle', false
             @set '_mot', proxy, false
         else if what.match /^rate$/
             proxy =
-                ddx: to * Math.cos @get('accAngle')
-                ddy: to * Math.sin @get('accAngle')
+                ddx: to * Math.cos @get 'accAngle', false
+                ddy: to * Math.sin @get 'accAngle', false
             @set '_acc', proxy, false
         else if what.match /^posAngle$/
             proxy =
-                x: @get('distance') * Math.cos to
-                y: @get('distance') * Math.sin to
+                x: @get('distance', false) * Math.cos to
+                y: @get('distance', false) * Math.sin to
             @set '_pos', proxy, false
         else if what.match /^motAngle$/
             proxy =
-                dx: @get('speed') * Math.cos to
-                dy: @get('speed') * Math.sin to
+                dx: @get('speed', false) * Math.cos to
+                dy: @get('speed', false) * Math.sin to
             @set '_mot', proxy, false
         else if what.match /^accAngle$/
             proxy =
-                ddx: @get('rate') * Math.cos to
-                ddy: @get('rate') * Math.sin to
+                ddx: @get('rate', false) * Math.cos to
+                ddy: @get('rate', false) * Math.sin to
             @set '_acc', proxy, false
         else if what.match /(^_?dis|^_?pos|^_?mot|^_?acc|^config)/
             @set k, v, false for own k, v of to
@@ -319,33 +326,33 @@ class Sprite
             @_dis[what] += step / env.FRAME_RATE
         else if what.match /^distance$/
             proxy =
-                dx: step * Math.cos @get('posAngle')
-                dy: step * Math.sin @get('posAngle')
+                dx: step * Math.cos @get 'posAngle', false
+                dy: step * Math.sin @get 'posAngle', false
             @change '_pos', proxy, false
         else if what.match /^speed$/
             proxy =
-                ddx: step * Math.cos @get('motAngle')
-                ddy: step * Math.sin @get('motAngle')
+                ddx: step * Math.cos @get 'motAngle', false
+                ddy: step * Math.sin @get 'motAngle', false
             @change '_mot', proxy, false
         else if what.match /^rate$/
             proxy =
-                dddx: step * Math.cos @get('accAngle')
-                dddy: step * Math.sin @get('accAngle')
+                dddx: step * Math.cos @get 'accAngle', false
+                dddy: step * Math.sin @get 'accAngle', false
             @change '_acc', proxy, false
         else if what.match /^posAngle$/
             proxy =
-                dx: @get('distance') * Math.cos step
-                dy: @get('distance') * Math.sin step
+                dx: @get('distance', false) * Math.cos step
+                dy: @get('distance', false) * Math.sin step
             @change '_pos', proxy, false
         else if what.match /^motAngle$/
             proxy =
-                ddx: @get('speed') * Math.cos step
-                ddy: @get('speed') * Math.sin step
+                ddx: @get('speed', false) * Math.cos step
+                ddy: @get('speed', false) * Math.sin step
             @change '_mot', proxy, false
         else if what.match /^accAngle$/
             proxy =
-                dddx: @get('rate') * Math.cos step
-                dddy: @get('rate') * Math.sin step
+                dddx: @get('rate', false) * Math.cos step
+                dddy: @get('rate', false) * Math.sin step
             @change '_acc', proxy, false
         else if what.match /(^_?dis|^_?pos|^_?mot|^_?acc)/
             @change k.slice(1), v, false for own k, v of step
@@ -482,6 +489,10 @@ class Sprite
             else if event.match /^collisionWith:\w+/
                 if @collidesWith listeners.other
                     @emit event, listeners.other
+            #fire 'noCollisionWith:other' events
+            else if event.match /^noCollisionWith:\w+/
+                unless @collidesWith listeners.other
+                    @emit event, listeners.other
             #fire 'distanceTo:other-cmp-value' events
             else if event.match /^distanceTo:\w+-(gt|lt|eq|ge|le|ne)-\d*\.?\d*$/
                 tokens = event.split(':')[1]
@@ -536,22 +547,22 @@ class Sprite
                 tokens[2] = parseFloat tokens[2]
                 switch tokens[1]
                     when 'gt'
-                        if @get(tokens[0]) > tokens[2]
+                        if @get(tokens[0], false) > tokens[2]
                             @emit event
                     when 'lt'
-                        if @get(tokens[0]) < tokens[2]
+                        if @get(tokens[0], false) < tokens[2]
                             @emit event
                     when 'eq'
-                        if @get(tokens[0]) == tokens[2]
+                        if @get(tokens[0], false) == tokens[2]
                             @emit event
                     when 'ge'
-                        if @get(tokens[0]) >= tokens[2]
+                        if @get(tokens[0], false) >= tokens[2]
                             @emit event
                     when 'le'
-                        if @get(tokens[0]) <= tokens[2]
+                        if @get(tokens[0], false) <= tokens[2]
                             @emit event
                     when 'ne'
-                        if @get(tokens[0]) != tokens[2]
+                        if @get(tokens[0], false) != tokens[2]
                             @emit event
             else if event.match /^\w+-(eq|ne)-\w+/
                 tokens = event.split '-'
@@ -559,10 +570,10 @@ class Sprite
                     tokens[2] = eval tokens[2]
                 switch tokens[1]
                     when 'eq'
-                        if @get(tokens[0]) is tokens[2]
+                        if @get(tokens[0], false) is tokens[2]
                             @emit event
                     when 'ne'
-                        if @get(tokens[0]) isnt tokens[2]
+                        if @get(tokens[0], false) isnt tokens[2]
                             @emit event
         this
 
@@ -594,9 +605,6 @@ class Sprite
         """
     log: ->
         console.log @report()
-
-#mixin EventEmitter
-_mixin Sprite::, EventEmitter::
 
 #add to namespace object
 gh.Sprite = Sprite

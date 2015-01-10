@@ -5,7 +5,7 @@ sedabull@gmail.com
 ###
 
 #keyboard value mapping object
-gh.KEYS =
+KEYS =
     ESC: 27, SPACE: 32, PGUP: 33
     PGDOWN: 34, END: 35, HOME: 36
     LEFT: 37, UP: 38, RIGHT: 39, DOWN: 40
@@ -15,6 +15,7 @@ gh.KEYS =
     G: 71, H: 72, I: 73, J: 74, K: 75, L: 76, M: 77
     N: 78, O: 79, P: 80, Q: 81, R: 82, S: 83
     T: 84, U: 85, V: 86, W: 87, X: 88, Y: 89, Z: 90
+gh.KEYS = KEYS
 
 #automatic initialization
 document.onreadystatechange = ->
@@ -180,9 +181,9 @@ class Greenhorn
             -_elmnts.canvas.height / 2,
             _elmnts.canvas.width,
             _elmnts.canvas.height)
-    @start = (stateName = '') =>
+    @start = (stateName) =>
         #prevent starting without properly stopping first
-        unless @isRunning() or _elmnts.canvas.onclick?
+        unless @isRunning()
             if _firstTime
                 #add engine to a user defined '.gh' div or the document body
                 (document.querySelector('.gh') ? document.body).appendChild _elmnts.main

@@ -23,6 +23,8 @@ class EventEmitter
                 if listener.once?
                     i = @_events[event].indexOf listener
                     @_events[event].splice i, 1
+                    if @_events[event].length is 0
+                        delete @_events[event]
             return true
         return false
     remove: (event, listener) ->
