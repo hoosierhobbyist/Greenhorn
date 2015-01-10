@@ -76,7 +76,7 @@ class AniSprite extends Sprite
     #changer
     change: (what, step, _emit = true) ->
         if what.match /^frameRate$/
-            @_ani.frameRate += step
+            @_ani.frameRate += step / env.FRAME_RATE
         else
             super what, step, _emit
             _emit = false

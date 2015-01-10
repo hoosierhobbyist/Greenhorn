@@ -88,7 +88,6 @@ class Greenhorn
     _elmnts.rightPanel.appendChild _elmnts.rightPanelHeader
     
     #keep track of mouse events over canvas
-    _elmnts.canvas.draggable = true
     _elmnts.canvas.onmousemove = (e) ->
         @mouseX = e.pageX
         @mouseY = e.pageY
@@ -101,16 +100,7 @@ class Greenhorn
         Sprite.emitAll 'mouse:doubleClick'
     _elmnts.canvas.oncontextmenu = (e) ->
         e.preventDefault()
-        Sprite.emitAll 'mouse:contextMenu'
-    _elmnts.canvas.ondrag = (e) ->
-        e.preventDefault()
-        Sprite.emitAll 'mouse:drag'
-    _elmnts.canvas.ondragstart = (e) ->
-        e.preventDefault()
-        Sprite.emitAll 'mouse:dragStart'
-    _elmnts.canvas.ondragend = (e) ->
-        e.preventDefault()
-        Sprite.emitAll 'mouse:dragEnd'
+        Sprite.emitAll 'mouse:rightClick'
 
     #start all asynchronous functions
     _startEverything = ->
@@ -121,21 +111,10 @@ class Greenhorn
 
     #mouse position getters
     @getMouseX = ->
-        indexNode = _elmnts.canvas
-        mouseX = indexNode.mouseX - indexNode.offsetLeft - indexNode.width / 2
+        _elmnts.canvas.mouseX - _elmnts.canvas.offsetLeft - _elmnts.canvas.width / 2
         
-        while indexNode = indexNode.parentNode
-            mouseX -= indexNode.offsetLeft
-        
-        mouseX
     @getMouseY = ->
-        indexNode = _elmnts.canvas
-        mouseY = indexNode.mouseY - indexNode.offsetTop - indexNode.height / 2
-        
-        while indexNode = indexNode.parentNode
-            mouseY -= indexNode.offsetTop
-        
-        mouseY
+        -(_elmnts.canvas.mouseY - _elmnts.canvas.offsetTop - _elmnts.canvas.height / 2)
 
     #add button to one of the panels
     @addButton = (config = {}) ->

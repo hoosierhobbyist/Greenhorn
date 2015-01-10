@@ -142,6 +142,12 @@ class Sprite extends EventEmitter
                 config.ba_bottom = value
                 config.ba_right = value
                 config.ba_left = value
+            else if key.match /^on\w+/
+                delete config[key]
+                if typeof value is 'function'
+                    @on key.slice(2), value
+                else if value.length?
+                    @on key.slice(0, 2), value[0], value[1]
 
         #used to track asynchronous _update
         @_updateID = null
@@ -398,7 +404,7 @@ class Sprite extends EventEmitter
         else
             otherX = other._pos.x
             otherY = other._pos.y
-        Math.atan2 @_pos.y - otherY, @_pos.x - otherX
+        Math.atan2(@_pos.y - otherY, @_pos.x - otherX) + Math.PI
 
     #update routines
     _draw: ->
@@ -445,6 +451,14 @@ class Sprite extends EventEmitter
         
         #determine other events to fire
         for own event, listeners of @_events
+            #fire 'mouse:hover' event
+            if event.match /^mouse:hover$/
+                if @collidesWith 'mouse'
+                    @emit event
+            #fire 'mouse:noHover' event
+            if event.match /^mouse:noHover$/
+                unless @collidesWith 'mouse'
+                    @emit event
             #fire 'isDown' event
             if event.match /^isDown:(\w+|\d)/
                 token = event.split(':')[1].toUpperCase()
