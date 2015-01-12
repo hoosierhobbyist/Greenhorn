@@ -168,6 +168,14 @@ class Sprite extends EventEmitter
         @set 'config', config, false
         @set 'config', magnitudes, false
         @set 'config', angles, false
+        
+        #create default boundary if none was provided
+        unless @_bnd?
+            @_bnd = []
+            @_bnd.push new Point -@_dis.width / 2, @_dis.height /2, @_pos.x, @_pos.y
+            @_bnd.push new Point @_dis.width / 2, @_dis.height /2, @_pos.x, @_pos.y
+            @_bnd.push new Point @_dis.width / 2, -@_dis.height /2, @_pos.x, @_pos.y
+            @_bnd.push new Point -@_dis.width / 2, -@_dis.height /2, @_pos.x, @_pos.y
 
         #start updating if the engine is already running
         if Greenhorn.isRunning() then @_start()
@@ -198,13 +206,17 @@ class Sprite extends EventEmitter
         else if what.match /(^ddx$|^ddy$|^dda$)/
             value = @_acc[what]
         else if what.match /^top$/
-            value = @_pos.y + @_dis.height / 2
+            value = pt.y for pt in @_bnd
+            value = Math.max value...
         else if what.match /^bottom$/
-            value = @_pos.y - @_dis.height / 2
+            value = pt.y for pt in @_bnd
+            value = Math.min value...
         else if what.match /^right$/
-            value = @_pos.x + @_dis.width / 2
+            value = pt.x for pt in @_bnd
+            value = Math.max value...
         else if what.match /^left$/
-            value = @_pos.x - @_dis.width / 2
+            value = pt.x for pt in @_bnd
+            value = Math.min value...
         else if what.match /^distance$/
             value = Math.sqrt @_pos.x**2 + @_pos.y**2
         else if what.match /^speed$/
@@ -221,6 +233,8 @@ class Sprite extends EventEmitter
             value = @_dis[what]
         else if what.match /^ba_(top|bottom|right|left)/
             value = @_bas[what.split('_')[1]].ba
+        else if what.match /^bound/
+            value = @_bnd
         else
             throw new Error "#{what} is not a get-able Sprite attribute"
         if _emit then @emit "get:#{what}"
@@ -228,20 +242,43 @@ class Sprite extends EventEmitter
 
     #setter
     set: (what, to, _emit = true) ->
-        if what.match /(^x$|^y$|^a$)/
-            @_pos[what] = to
+        if what.match /^x$/
+            @_pos.x = to
+            for pt in @_bnd
+                pt.set 'org_x', to
+        else if what.match /^y$/
+            @_pos.y = to
+            for pt in @_bnd
+                pt.set 'org_y', to
+        else if what.match /^a$/
+            diff = to - @_pos.a
+            @_pos.a = to
+            for pt in @_bnd
+                pt.change 'a', diff
         else if what.match /(^dx$|^dy$|^da$)/
             @_mot[what] = to
         else if what.match /(^ddx$|^ddy$|^dda$)/
             @_acc[what] = to
         else if what.match /^top$/
-            @_pos.y = to - @_dis.height / 2
+            _top = @_bnd[0]
+            for pt in @_bnd when pt.y > _top.y
+                _top = pt
+            @set 'y', to - _top.get('dist') * Math.sin _top.get('a')
         else if what.match /^bottom$/
-            @_pos.y = to + @_dis.height / 2
+            _bottom = @_bnd[0]
+            for pt in @_bnd when pt.y < _bottom.y
+                _bottom = pt
+            @set 'y', to + _bottom.get('dist') * Math.sin _bottom.get('a')
         else if what.match /^right$/
-            @_pos.x = to - @_dis.width / 2
+            _right = @_bnd[0]
+            for pt in @_bnd when pt.x > _right.x
+                _right = pt
+            @set 'x', to - _right.get('dist') * Math.cos _right.get('a')
         else if what.match /^left$/
-            @_pos.x = to + @_dis.width / 2
+            _left = @_bnd[0]
+            for pt in @_bnd when pt.x < _left.x
+                _left = pt
+            @set 'x', to + _left.get('dist') * Math.cos _left.get('a')
         else if what.match /^imageFile$/
             if env.IMAGE_PATH.match /\/$/
                 @_dis.image.src = env.IMAGE_PATH.concat to
@@ -315,6 +352,10 @@ class Sprite extends EventEmitter
                     ba_right: to
                     ba_left: to
                 @set 'config', proxy, false
+        else if what.match /^bound/
+            @_bnd = []
+            for pt in to
+                @_bnd.push new Point pt.x, pt.y, @_pos.x, @_pos.y
         else
             throw new Error "#{what} is not a set-able Sprite attribute"
         if _emit then @emit "set:#{what}", to
@@ -322,8 +363,18 @@ class Sprite extends EventEmitter
 
     #changer
     change: (what, step, _emit = true) ->
-        if what.match /(^x$|^y$|^a$)/
-            @_pos[what] += step / env.FRAME_RATE
+        if what.match /^x$/
+            @_pos.x += step / env.FRAME_RATE
+            for pt in @_bnd
+                pt.change 'org_x', step / env.FRAME_RATE
+        else if what.match /^y$/
+            @_pos.y += step / env.FRAME_RATE
+            for pt in @_bnd
+                pt.change 'org_y', step / env.FRAME_RATE
+        else if what.match /^a$/
+            @_pos.a += step / env.FRAME_RATE
+            for pt in @_bnd
+                pt.change 'a', step / env.FRAME_RATE
         else if what.match /(^dx$|^dy$|^da$)/
             @_mot[what] += step / env.FRAME_RATE
         else if what.match /(^ddx$|^ddy$|^dda$)/
