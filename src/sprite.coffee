@@ -172,10 +172,10 @@ class Sprite extends EventEmitter
         #create default boundary if none was provided
         unless @_bnd?
             @_bnd = []
-            @_bnd.push new Point -@_dis.width / 2, @_dis.height /2, @_pos.x, @_pos.y
-            @_bnd.push new Point @_dis.width / 2, @_dis.height /2, @_pos.x, @_pos.y
-            @_bnd.push new Point @_dis.width / 2, -@_dis.height /2, @_pos.x, @_pos.y
-            @_bnd.push new Point -@_dis.width / 2, -@_dis.height /2, @_pos.x, @_pos.y
+            @_bnd.push new Point -@_dis.width / 2, @_dis.height / 2, @_pos.x, @_pos.y
+            @_bnd.push new Point @_dis.width / 2, @_dis.height / 2, @_pos.x, @_pos.y
+            @_bnd.push new Point @_dis.width / 2, -@_dis.height / 2, @_pos.x, @_pos.y
+            @_bnd.push new Point -@_dis.width / 2, -@_dis.height / 2, @_pos.x, @_pos.y
 
         #start updating if the engine is already running
         if Greenhorn.isRunning() then @_start()
@@ -217,6 +217,9 @@ class Sprite extends EventEmitter
         else if what.match /^left$/
             value = pt.x for pt in @_bnd
             value = Math.min value...
+        else if what.match /^radius$/
+            value = pt.get('dist') for pt in @_bnd
+            value = Math.max value...
         else if what.match /^distance$/
             value = Math.sqrt @_pos.x**2 + @_pos.y**2
         else if what.match /^speed$/
@@ -421,23 +424,38 @@ class Sprite extends EventEmitter
     #collision routines
     collidesWith: (other) ->
         if other is 'mouse'
-            collision = false
             if @_dis.visible
-                if @get('left', false) < Greenhorn.getMouseX() < @get('right', false) and
-                @get('bottom', false) < Greenhorn.getMouseY() < @get('top', false)
-                    collision = true
+                if @get('left', false) <= Greenhorn.getMouseX() <= @get('right', false) and
+                @get('bottom', false) <= Greenhorn.getMouseY() <= @get('top', false)
+                    return true
+            return false
         else
-            collision = true
-            if @_dis.visible and
-            other._dis.visible and
-            @_dis.level == other._dis.level
-                if @get('bottom', false) > other.get('top', false) or
-                @get('top', false) < other.get('bottom', false) or
-                @get('right', false) < other.get('left', false) or
-                @get('left', false) > other.get('right', false)
-                    collision = false
-            else collision = false
-        collision
+            if @_dis.visible
+                if other._dis.visible
+                    if @_dis.level == other._dis.level
+                        if @distanceTo(other) <= @get('radius', false) + other.get('radius', false)
+                            #declare arrays
+                            myLines = []
+                            otherLines = []
+                            
+                            #create lines representing boundaries
+                            for pt, i in @_bnd
+                                if i is @_bnd.length - 1
+                                    myLines.push new Line pt, @_bnds[0]
+                                else
+                                    myLines.push new Line pt, @_bnds[i+1]
+                            for pt, i in other._bnd
+                                if i is other._bnd.length - 1
+                                    otherLines.push new Line pt, other._bnd[0]
+                                else
+                                    otherLines.push new Line pt, other._bnd[i+1]
+                            
+                            #check for collisions
+                            for myLine in myLines
+                                for otherLine in otherLines
+                                    if myLine.collidesWith otherLine
+                                        return true
+            return false
     distanceTo: (other) ->
         otherX = otherY = 0
         if other is 'mouse'
@@ -460,11 +478,11 @@ class Sprite extends EventEmitter
     #update routines
     _draw: ->
         if @_dis.visible
-            #fire draw event
-            @emit 'draw'
-            
             #save context
             @_dis.context.save()
+            
+            #fire draw:before event
+            @emit 'draw:before'
 
             #translate and rotate
             @_dis.context.translate @_pos.x, -@_pos.y
@@ -477,9 +495,12 @@ class Sprite extends EventEmitter
                 -@_dis.height / 2, #top
                 @_dis.width, #width
                 @_dis.height) #height
-
+            
             #restore context
             @_dis.context.restore()
+            
+            #fire draw:after event
+            @emit 'draw:after'
     _update: =>
         #fire update event
         @emit 'update'
@@ -668,8 +689,18 @@ class Sprite extends EventEmitter
             right: #{@_bas.right.ba}
             left: #{@_bas.left.ba}
         """
-    log: ->
-        console.log @report()
+    highlight: ->
+        @on 'draw:after', ->
+            @_dis.context.save()
+            @_dis.context.lineWidth = 3
+            @_dis.context.strokeStyle = 'white'
+            @_dis.context.beginPath()
+            @_dis.context.moveTo(@_bnd[0].x, @_bnd[0].y)
+            for pt, i in @_bnd when i isnt 0
+                @dis.context.lineTo(pt.x, pt.y)
+            @_dis.context.closePath()
+            @_dis.context.stroke()
+            @_dis.context.restore()
 
 #add to namespace object
 gh.Sprite = Sprite
