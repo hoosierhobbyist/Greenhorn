@@ -148,6 +148,19 @@ class Sprite extends EventEmitter
                     @on key.slice(2), value
                 else if value.length?
                     @on key.slice(2), value[0], value[1]
+            else if key.match /^bounds$/
+                delete config[key]
+                @_bnd = []
+                for pt in value
+                    @_bnd.push new Point pt.x, pt.y, config.x, config.y
+        
+        #create default boundary if none was provided
+        unless @_bnd?
+            @_bnd = []
+            @_bnd.push new Point -config.width / 2, config.height / 2, config.x, config.y
+            @_bnd.push new Point config.width / 2, config.height / 2, config.x, config.y
+            @_bnd.push new Point config.width / 2, -config.height / 2, config.x, config.y
+            @_bnd.push new Point -config.width / 2, -config.height / 2, config.x, config.y
 
         #used to track asynchronous _update
         @_updateID = null
@@ -168,14 +181,6 @@ class Sprite extends EventEmitter
         @set 'config', config, false
         @set 'config', magnitudes, false
         @set 'config', angles, false
-        
-        #create default boundary if none was provided
-        unless @_bnd?
-            @_bnd = []
-            @_bnd.push new Point -@_dis.width / 2, @_dis.height / 2, @_pos.x, @_pos.y
-            @_bnd.push new Point @_dis.width / 2, @_dis.height / 2, @_pos.x, @_pos.y
-            @_bnd.push new Point @_dis.width / 2, -@_dis.height / 2, @_pos.x, @_pos.y
-            @_bnd.push new Point -@_dis.width / 2, -@_dis.height / 2, @_pos.x, @_pos.y
 
         #start updating if the engine is already running
         if Greenhorn.isRunning() then @_start()
@@ -206,19 +211,19 @@ class Sprite extends EventEmitter
         else if what.match /(^ddx$|^ddy$|^dda$)/
             value = @_acc[what]
         else if what.match /^top$/
-            value = pt.y for pt in @_bnd
+            value = (pt.y for pt in @_bnd)
             value = Math.max value...
         else if what.match /^bottom$/
-            value = pt.y for pt in @_bnd
+            value = (pt.y for pt in @_bnd)
             value = Math.min value...
         else if what.match /^right$/
-            value = pt.x for pt in @_bnd
+            value = (pt.x for pt in @_bnd)
             value = Math.max value...
         else if what.match /^left$/
-            value = pt.x for pt in @_bnd
+            value = (pt.x for pt in @_bnd)
             value = Math.min value...
         else if what.match /^radius$/
-            value = pt.get('dist') for pt in @_bnd
+            value = (pt.get('dist') for pt in @_bnd)
             value = Math.max value...
         else if what.match /^distance$/
             value = Math.sqrt @_pos.x**2 + @_pos.y**2
@@ -236,7 +241,7 @@ class Sprite extends EventEmitter
             value = @_dis[what]
         else if what.match /^ba_(top|bottom|right|left)/
             value = @_bas[what.split('_')[1]].ba
-        else if what.match /^bound/
+        else if what.match /^bounds$/
             value = @_bnd
         else
             throw new Error "#{what} is not a get-able Sprite attribute"
@@ -264,23 +269,19 @@ class Sprite extends EventEmitter
             @_acc[what] = to
         else if what.match /^top$/
             _top = @_bnd[0]
-            for pt in @_bnd when pt.y > _top.y
-                _top = pt
+            _top = pt for pt in @_bnd when pt.y > _top.y
             @set 'y', to - Math.abs(_top.get('y') - _top.get('org_y')), false
         else if what.match /^bottom$/
             _bottom = @_bnd[0]
-            for pt in @_bnd when pt.y < _bottom.y
-                _bottom = pt
+            _bottom = pt for pt in @_bnd when pt.y < _bottom.y
             @set 'y', to + Math.abs(_bottom.get('y') - _bottom.get('org_y')), false
         else if what.match /^right$/
             _right = @_bnd[0]
-            for pt in @_bnd when pt.x > _right.x
-                _right = pt
+            _right = pt for pt in @_bnd when pt.x > _right.x
             @set 'x', to - Math.abs(_right.get('x') - _right.get('org_x')), false
         else if what.match /^left$/
             _left = @_bnd[0]
-            for pt in @_bnd when pt.x < _left.x
-                _left = pt
+            _left = pt for pt in @_bnd when pt.x < _left.x
             @set 'x', to + Math.abs(_left.get('x') - _left.get('org_x')), false
         else if what.match /^imageFile$/
             if env.IMAGE_PATH.match /\/$/
@@ -355,7 +356,7 @@ class Sprite extends EventEmitter
                     ba_right: to
                     ba_left: to
                 @set 'config', proxy, false
-        else if what.match /^bound/
+        else if what.match /^bounds$/
             @_bnd = []
             for pt in to
                 @_bnd.push new Point pt.x, pt.y, @_pos.x, @_pos.y
@@ -492,7 +493,7 @@ class Sprite extends EventEmitter
         else
             otherX = other._pos.x
             otherY = other._pos.y
-        Math.atan2(@_pos.y - otherY, @_pos.x - otherX) + Math.PI
+        Math.atan2(otherY - @_pos.y, otherX - @_pos.x)
 
     #update routines
     _draw: ->
@@ -716,7 +717,7 @@ class Sprite extends EventEmitter
             @_dis.context.beginPath()
             @_dis.context.moveTo(@_bnd[0].x, @_bnd[0].y)
             for pt, i in @_bnd when i isnt 0
-                @dis.context.lineTo(pt.x, pt.y)
+                @_dis.context.lineTo(pt.x, pt.y)
             @_dis.context.closePath()
             @_dis.context.stroke()
             @_dis.context.restore()

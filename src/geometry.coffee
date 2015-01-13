@@ -4,7 +4,7 @@ Written by Seth Bullock
 sedabull@gmail.com
 ###
 
-class Point
+class @Point
     constructor: (@x, @y, @org_x, @org_y) ->
         @x += @org_x
         @y += @org_y
