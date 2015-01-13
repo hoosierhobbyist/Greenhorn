@@ -85,11 +85,7 @@ class Line
             [@p1, @p2] = [@p2, @p1]
     
     get: (what, roundOff = true) ->
-        if what is 'p1'
-            @p1
-        else if what is 'p2'
-            @p2
-        else if what is 'slope' or 'm'
+        if what is 'slope' or 'm'
             if @p1.get('x') == @p2.get('x')
                 undefined
             else
