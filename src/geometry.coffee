@@ -11,13 +11,13 @@ class @Point
     
     get: (what) ->
         if what is 'x'
-            @x.toFixed 2
+            Math.round @x
         else if what is 'y'
-            @y.toFixed 2
+            Math.round @y
         else if what is 'org_x'
-            @org_x.toFixed 2
+            Math.round @org_x
         else if what is 'org_y'
-            @org_y.toFixed 2
+            Math.round @org_y
         else if what is 'a'
             Math.atan2 @y - @org_y, @x - @org_x
         else if what is 'dist'
@@ -84,23 +84,17 @@ class Line
         else if @p1.get('x') == @p2.get('x') and @p1.get('y') > @p2.get('y')
             [@p1, @p2] = [@p2, @p1]
     
-    get: (what, roundOff = true) ->
+    get: (what) ->
         if what is 'slope' or 'm'
             if @p1.get('x') == @p2.get('x')
                 undefined
             else
-                if roundOff
-                    ((@p2.y - @p1.y) / (@p2.x - @p1.x)).toFixed 2
-                else
-                    (@p2.y - @p1.y) / (@p2.x - @p1.x)
+                (@p2.y - @p1.y) / (@p2.x - @p1.x)
         else if what is 'y-intercept' or 'b'
             if @p1.get('x') == @p2.get('x')
                 undefined
             else
-                if roundOff
-                    -((@p2.y - @p1.y) / (@p2.x - @p1.x) * @p1.x + @p1.y).toFixed 2
-                else
-                    -(@p2.y - @p1.y) / (@p2.x - @p1.x) * @p1.x + @p1.y
+                -@get('m') * @p1.x + @p1.y
         else
             throw new Error "#{what} is not a get-able Line attribute"
     
@@ -116,20 +110,20 @@ class Line
             if @p1.get('y') <= pt.get('y') <= @p2.get('y')
                 return true
         else if @p1.get('x') <= pt.get('x') <= @p2.get('x')
-            if (@get('m', false) * pt.x + @get('b', false)).toFixed(2) == pt.get('y')
+            if Math.round(@get('m') * pt.x + @get('b')) == pt.get('y')
                 return true
         return false
     
     _intersection: (other) ->
-        if @get('m') == other.get('m')
+        if Math.round(@get('m')) == Math.round(other.get('m'))
             return undefined
         else if @get('m') is undefined
             _x = @p1.x
-            _y = other.get('m', false) * _x + other.get('b', false)
+            _y = other.get('m') * _x + other.get('b')
         else if other.get('m') is undefined
             _x = other.p1.x
-            _y = @get('m', false) * _x + @get('b', false)
+            _y = @get('m') * _x + @get('b')
         else
-            _x = (other.get('b', false) - @get('b', false)) / (@get('m', false) - other.get('m', false))
-            _y = @get('m', false) * _x + @get('b', false)
+            _x = (other.get('b') - @get('b')) / (@get('m') - other.get('m'))
+            _y = @get('m') * _x + @get('b')
         return new Point _x, _y, 0, 0
