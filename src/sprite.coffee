@@ -266,22 +266,22 @@ class Sprite extends EventEmitter
             _top = @_bnd[0]
             for pt in @_bnd when pt.y > _top.y
                 _top = pt
-            @set 'y', to - _top.get('dist') * Math.sin _top.get('a')
+            @set 'y', to - Math.abs(_top.get('y') - _top.get('org_y')), false
         else if what.match /^bottom$/
             _bottom = @_bnd[0]
             for pt in @_bnd when pt.y < _bottom.y
                 _bottom = pt
-            @set 'y', to + _bottom.get('dist') * Math.sin _bottom.get('a')
+            @set 'y', to + Math.abs(_bottom.get('y') - _bottom.get('org_y')), false
         else if what.match /^right$/
             _right = @_bnd[0]
             for pt in @_bnd when pt.x > _right.x
                 _right = pt
-            @set 'x', to - _right.get('dist') * Math.cos _right.get('a')
+            @set 'x', to - Math.abs(_right.get('x') - _right.get('org_x')), false
         else if what.match /^left$/
             _left = @_bnd[0]
             for pt in @_bnd when pt.x < _left.x
                 _left = pt
-            @set 'x', to + _left.get('dist') * Math.cos _left.get('a')
+            @set 'x', to + Math.abs(_left.get('x') - _left.get('org_x')), false
         else if what.match /^imageFile$/
             if env.IMAGE_PATH.match /\/$/
                 @_dis.image.src = env.IMAGE_PATH.concat to
@@ -425,8 +425,27 @@ class Sprite extends EventEmitter
     collidesWith: (other) ->
         if other is 'mouse'
             if @_dis.visible
-                if @get('left', false) <= Greenhorn.getMouseX() <= @get('right', false) and
-                @get('bottom', false) <= Greenhorn.getMouseY() <= @get('top', false)
+                if @distanceTo('mouse') <= @get('radius', false)
+                    #declare Line arrays
+                    myLines = []
+                    otherLines = []
+                    mousePos = new Point Greenhorn.getMouseX(), Greenhorn.getMouseY(), 0, 0
+                    
+                    #create Lines to check for collisions
+                    for pt, i in @_bnd
+                        otherLines.push new Line pt, mousePos
+                        if i is @_bnd.length - 1
+                            myLines.push new Line pt, @_bnd[0]
+                        else
+                            myLines.push new Line pt, @_bnd[i+1]
+                    
+                    #check for collisions
+                    for myLine in myLines
+                        for otherLine in otherLines
+                            unless myLine.p1 is otherLine.p1 or myLine.p1 is otherLine.p2
+                                unless myLine.p2 is otherLine.p1 or myLine.p2 is otherLine.p2
+                                    if myLine.collidesWith otherLine
+                                        return false
                     return true
             return false
         else
@@ -434,16 +453,16 @@ class Sprite extends EventEmitter
                 if other._dis.visible
                     if @_dis.level == other._dis.level
                         if @distanceTo(other) <= @get('radius', false) + other.get('radius', false)
-                            #declare arrays
+                            #declare Line arrays
                             myLines = []
                             otherLines = []
                             
-                            #create lines representing boundaries
+                            #create Lines representing boundaries
                             for pt, i in @_bnd
                                 if i is @_bnd.length - 1
-                                    myLines.push new Line pt, @_bnds[0]
+                                    myLines.push new Line pt, @_bnd[0]
                                 else
-                                    myLines.push new Line pt, @_bnds[i+1]
+                                    myLines.push new Line pt, @_bnd[i+1]
                             for pt, i in other._bnd
                                 if i is other._bnd.length - 1
                                     otherLines.push new Line pt, other._bnd[0]
