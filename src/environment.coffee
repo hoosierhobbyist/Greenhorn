@@ -41,6 +41,7 @@ env =
         height: 64
         visible: yes
         imageFile: ''
+        highlight: false
         ba_top: 'WRAP'
         ba_bottom: 'WRAP'
         ba_right: 'WRAP'

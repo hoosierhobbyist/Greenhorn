@@ -4,75 +4,55 @@ Written by Seth Bullock
 sedabull@gmail.com
 ###
 
-class @Point
-    constructor: (@x, @y, @org_x, @org_y) ->
-        @x += @org_x
-        @y += @org_y
+class Point
+    constructor: (@_x, @_y, @_sprite) ->
     
     get: (what) ->
         if what is 'x'
-            Math.round @x
+            @_x + @_sprite._pos.x
         else if what is 'y'
-            Math.round @y
-        else if what is 'org_x'
-            Math.round @org_x
-        else if what is 'org_y'
-            Math.round @org_y
+            @_y + @_sprite._pos.y
         else if what is 'a'
-            Math.atan2 @y - @org_y, @x - @org_x
+            Math.atan2 @_y, @_x
         else if what is 'dist'
-            Math.sqrt (@y - @org_y)**2 + (@x - @org_x)**2
+            Math.sqrt @_y**2 + @_x**2
         else
             throw new Error "#{what} is not a get-able Point attribute"
     
     set: (what, to) ->
         if what is 'x'
-            @x = to + @org_x
+            @_x = to
         else if what is 'y'
-            @y = to + @org_y
-        else if what is 'org_x'
-            diff = to - @org_x
-            @org_x = to
-            @x += diff
-        else if what is 'org_y'
-            diff = to - @org_y
-            @org_y = to
-            @y += diff
+            @_y = to
         else if what is 'a'
             _x = @get('dist') * Math.cos to
             _y = @get('dist') * Math.sin to
-            @x = _x + @org_x
-            @y = _y + @org_y
+            @set 'x', _x
+            @set 'y', _y
         else if what is 'dist'
             _x = to * Math.cos @get 'a'
             _y = to * Math.sin @get 'a'
-            @x = _x + @org_x
-            @y = _y + @org_y
+            @set 'x', _x
+            @set 'y', _y
         else
             throw new Error "#{what} is not a set-able Point attribute"
         return this
     
     change: (what, step) ->
         if what is 'x'
-            @x += step
+            @_x += step
         else if what is 'y'
-            @y += step
-        else if what is 'org_x'
-            @x += step
-            @org_x += step
-        else if what is 'org_y'
-            @y += step
-            @org_y += step
+            @_y += step
         else if what is 'a'
-            _x = @get('dist') * Math.cos step + @get('a')
-            _y = @get('dist') * Math.sin step + @get('a')
-            @x = _x + @org_x
-            @y = _y + @org_y
+            _x = @get('dist') * Math.cos step
+            _y = @get('dist') * Math.sin step
+            @change 'x', _x
+            @change 'y', _y
         else if what is 'dist'
-            _x = (@get('dist') + step) * Math.cos @get('a')
-            _y = (@get('dist') + step) * Math.sin @get('a')
-            @x = _x + @org_x
-            @y = _y + @org_y
+            _x = step * Math.cos @get('a')
+            _y = step * Math.sin @get('a')
+            @change 'x', _x
+            @change 'y', _y
         else
             throw new Error "#{what} is not a change-able Point attribute"
         return this
@@ -81,20 +61,20 @@ class Line
     constructor: (@p1, @p2) ->
         if @p1.get('x') > @p2.get('x')
             [@p1, @p2] = [@p2, @p1]
-        else if @p1.get('x') == @p2.get('x') and @p1.get('y') > @p2.get('y')
+        else if Math.abs(@p1.get('x') - @p2.get('x')) < .1 and @p1.get('y') > @p2.get('y')
             [@p1, @p2] = [@p2, @p1]
     
     get: (what) ->
         if what is 'slope' or 'm'
-            if @p1.get('x') == @p2.get('x')
+            if Math.abs(@p1.get('x') - @p2.get('x')) < .1
                 undefined
             else
-                (@p2.y - @p1.y) / (@p2.x - @p1.x)
+                (@p2.get('y') - @p1.get('y')) / (@p2.get('x') - @p1.get('x'))
         else if what is 'y-intercept' or 'b'
-            if @p1.get('x') == @p2.get('x')
+            if Math.abs(@p1.get('x') - @p2.get('x')) < .1
                 undefined
             else
-                -@get('m') * @p1.x + @p1.y
+                -@get('m') * @p1.get('x') + @p1.get('y')
         else
             throw new Error "#{what} is not a get-able Line attribute"
     
@@ -106,24 +86,27 @@ class Line
         return false
     
     _contains: (pt) ->
-        if @p1.get('x') == @p2.get('x') == pt.get('x')
-            if @p1.get('y') <= pt.get('y') <= @p2.get('y')
-                return true
+        if Math.abs(@p1.get('x') - @p2.get('x')) < .1
+            if Math.abs(@p1.get('x')- pt.get('x')) < .1
+                if @p1.get('y') <= pt.get('y') <= @p2.get('y')
+                    return true
         else if @p1.get('x') <= pt.get('x') <= @p2.get('x')
-            if Math.round(@get('m') * pt.x + @get('b')) == pt.get('y')
+            if Math.abs((@get('m') * pt.get('x') + @get('b')) - pt.get('y')) < .1
                 return true
         return false
     
     _intersection: (other) ->
-        if Math.round(@get('m')) == Math.round(other.get('m'))
+        if @get('m') is undefined and other.get('m') is undefined
             return undefined
         else if @get('m') is undefined
-            _x = @p1.x
+            _x = @p1.get('x')
             _y = other.get('m') * _x + other.get('b')
         else if other.get('m') is undefined
-            _x = other.p1.x
+            _x = other.p1.get('x')
             _y = @get('m') * _x + @get('b')
+        else if Math.abs(@get('m') - other.get('m')) < .1
+            return undefined
         else
             _x = (other.get('b') - @get('b')) / (@get('m') - other.get('m'))
             _y = @get('m') * _x + @get('b')
-        return new Point _x, _y, 0, 0
+        return new Point _x, _y, _pos: {x: 0, y: 0}
