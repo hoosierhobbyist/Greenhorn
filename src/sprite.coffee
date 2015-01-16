@@ -248,8 +248,15 @@ class Sprite extends EventEmitter
 
     #setter
     set: (what, to, _emit = true) ->
-        if what.match /(^x$|^y$|^a$)/
+        if what.match /(^x$|^y$)/
             @_pos[what] = to
+        else if what.match /^a$/
+            if @_pos.a?
+                diff = to - @_pos.a
+            @_pos.a = to
+            if diff
+                for pt in @_bnd
+                    pt.change 'a', diff
         else if what.match /(^dx$|^dy$|^da$)/
             @_mot[what] = to
         else if what.match /(^ddx$|^ddy$|^dda$)/
@@ -356,6 +363,9 @@ class Sprite extends EventEmitter
     change: (what, step, _emit = true) ->
         if what.match /(^x$|^y$|^a$)/
             @_pos[what] += step / env.FRAME_RATE
+            if what is 'a'
+                for pt in @_bnd
+                    pt.change 'a', step / env.FRAME_RATE
         else if what.match /(^dx$|^dy$|^da$)/
             @_mot[what] += step / env.FRAME_RATE
         else if what.match /(^ddx$|^ddy$|^dda$)/
@@ -493,19 +503,21 @@ class Sprite extends EventEmitter
                 @_dis.width, #width
                 @_dis.height) #height
             
+            #restore context
+            @_dis.context.restore()
+            
             #highlight boundaries
             if @_dis.highlight
+                @_dis.context.save()
                 @_dis.context.lineWidth = 3
                 @_dis.context.strokeStyle = 'white'
                 @_dis.context.beginPath()
-                @_dis.context.moveTo(@_bnd[0]._x, -@_bnd[0]._y)
+                @_dis.context.moveTo @_bnd[0].get('x'), -@_bnd[0].get('y')
                 for pt, i in @_bnd when i isnt 0
-                    @_dis.context.lineTo(pt._x, -pt._y)
+                    @_dis.context.lineTo pt.get('x'), -pt.get('y')
                 @_dis.context.closePath()
                 @_dis.context.stroke()
-            
-            #restore context
-            @_dis.context.restore()
+                @_dis.context.restore()
             
             #fire draw:after event
             @emit 'draw:after'
