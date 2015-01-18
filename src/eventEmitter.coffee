@@ -7,7 +7,10 @@ sedabull@gmail.com
 class EventEmitter
     on: (event, listener, options = {}) ->
         @_events ?= {}
-        @_events[event] ?= []
+        unless @_events[event]
+            @emit 'event:added', event
+            @_events[event] = []
+        @emit 'listener:added', event, listener
         @_events[event].push listener
         for own key, value of options
             @_events[event][key] = value
@@ -32,15 +35,18 @@ class EventEmitter
         if @_events[event]?
             if listener?
                 for cb, i in @_events[event] when cb is listener
+                    @emit 'listener:removed', event, listener
                     @_events[event].splice i, 1
                     if @_events[event].length is 0
+                        @emit 'event:removed', event
                         delete @_events[event]
             else
+                @emit 'event:removed', event
                 delete @_events[event]
         return this
     listeners: (event) ->
         if event? then @_events[event]
-        else @_events
+        else @_events ?= {}
 
 _mixin = (dest, source) ->
     dest[key] = value for own key, value of source
