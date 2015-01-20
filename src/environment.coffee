@@ -37,6 +37,7 @@ env =
         ddy: 0
         dda: 0
         level: 0
+        scale: 1
         width: 64
         height: 64
         visible: yes

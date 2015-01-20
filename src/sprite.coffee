@@ -127,10 +127,14 @@ class Sprite extends EventEmitter
             config[key] ?= value
 
         #process config object
-        magnitudes = {}
+        size = {}
         angles = {}
+        magnitudes = {}
         for own key, value of config
-            if key.match /(^distance$|^speed$|^rate$)/i
+            if key.match /(^width$|^height$)/
+                delete config[key]
+                size[key] = value
+            else if key.match /(^distance$|^speed$|^rate$|^scale$)/i
                 delete config[key]
                 magnitudes[key] = value
             else if key.match /(^posAngle$|^motAngle$|^accAngle$)/
@@ -151,8 +155,8 @@ class Sprite extends EventEmitter
         
         #create default boundary if none was provided
         unless config.bounds?
-            _a = Math.atan2 config.height / 2, config.width / 2
-            _dist = Math.sqrt (config.height / 2)**2 + (config.width / 2)**2
+            _a = Math.atan2 size.height / 2, size.width / 2
+            _dist = Math.sqrt (size.height / 2)**2 + (size.width / 2)**2
             config.bounds = [
                 {x: _dist * Math.cos(config.a + _a), y: _dist * Math.sin(config.a + _a)}
                 {x: _dist * Math.cos(config.a - _a), y: _dist * Math.sin(config.a - _a)}
@@ -171,6 +175,8 @@ class Sprite extends EventEmitter
         @_bas = {}
 
         #create secondary objects
+        @_dis.width = size.width
+        @_dis.height = size.height
         @_dis.image = new Image()
         @_dis.context = _canvas.getContext '2d'
 
@@ -235,7 +241,9 @@ class Sprite extends EventEmitter
             value = Math.atan2 @_mot.dy, @_mot.dx
         else if what.match /^accAngle$/
             value = Math.atan2 @_acc.ddy, @_acc.ddx
-        else if what.match /(^level$|^width$|^height$|^visible$|^highlight$)/
+        else if what.match /(^width$|^height$)/
+            value = @_dis[what] * @_dis.scale
+        else if what.match /(^level$|^scale$|^visible$|^highlight$)/
             value = @_dis[what]
         else if what.match /^ba_(top|bottom|right|left)/
             value = @_bas[what.split('_')[1]].ba
@@ -318,9 +326,17 @@ class Sprite extends EventEmitter
             @set '_acc', proxy, false
         else if what.match /(^_?dis|^_?pos|^_?mot|^_?acc|^config)/
             @set k, v, false for own k, v of to
-        else if what.match /(^level$|^width$|^height$|^visible$|^highlight$)/
+        else if what.match /(^level$|^visible$|^highlight$)/
             @_dis[what] = to
-            _list.sort _sortRule if what is 'level'
+            if what is 'level'
+                _list.sort _sortRule
+        else if what.match /^scale$/
+            if @_dis.scale?
+                for pt in @_bnd
+                    pt.set 'dist', pt.get('dist') / @_dis.scale
+            @_dis.scale = to
+            for pt in @_bnd
+                pt.set 'dist', pt.get('dist') * @_dis.scale
         else if what.match /^ba_(all|top|bottom|right|left)$/
             side = what.split('_')[1]
             oldCollision =
@@ -364,14 +380,19 @@ class Sprite extends EventEmitter
         if what.match /(^x$|^y$|^a$)/
             @_pos[what] += step / env.FRAME_RATE
             if what is 'a'
-                for pt in @_bnd
-                    pt.change 'a', step / env.FRAME_RATE
+                pt.change('a', step / env.FRAME_RATE) for pt in @_bnd
         else if what.match /(^dx$|^dy$|^da$)/
             @_mot[what] += step / env.FRAME_RATE
         else if what.match /(^ddx$|^ddy$|^dda$)/
             @_acc[what] += step / env.FRAME_RATE
-        else if what.match /(^level$|^width$|^height$)/
-            @_dis[what] += step / env.FRAME_RATE
+        else if what.match /^level$/
+            @_dis.level += step / env.FRAME_RATE
+        else if what.match /^scale$/
+            for pt in @_bnd
+                pt.set 'dist', pt.get('dist') / @_dis.scale
+            @_dis.scale += step / env.FRAME_RATE
+            for pt in @_bnd
+                pt.set 'dist', pt.get('dist') * @_dis.scale
         else if what.match /^distance$/
             proxy =
                 dx: step * Math.cos @get 'posAngle', false
@@ -389,19 +410,19 @@ class Sprite extends EventEmitter
             @change '_acc', proxy, false
         else if what.match /^posAngle$/
             proxy =
-                dx: @get('distance', false) * Math.cos step
-                dy: @get('distance', false) * Math.sin step
-            @change '_pos', proxy, false
+                x: @get('distance', false) * Math.cos step + @get 'posAngle', false
+                y: @get('distance', false) * Math.sin step + @get 'posAngle', false
+            @set '_pos', proxy, false
         else if what.match /^motAngle$/
             proxy =
-                ddx: @get('speed', false) * Math.cos step
-                ddy: @get('speed', false) * Math.sin step
-            @change '_mot', proxy, false
+                dx: @get('speed', false) * Math.cos step + @get 'motAngle', false
+                dy: @get('speed', false) * Math.sin step + @get 'motAngle', false
+            @set '_mot', proxy, false
         else if what.match /^accAngle$/
             proxy =
-                dddx: @get('rate', false) * Math.cos step
-                dddy: @get('rate', false) * Math.sin step
-            @change '_acc', proxy, false
+                ddx: @get('rate', false) * Math.cos step + @get 'accAngle', false
+                ddy: @get('rate', false) * Math.sin step + @get 'accAngle', false
+            @set '_acc', proxy, false
         else if what.match /(^_?dis|^_?pos|^_?mot|^_?acc)/
             @change k.slice(1), v, false for own k, v of step
         else
@@ -462,6 +483,36 @@ class Sprite extends EventEmitter
                                 for otherLine in otherLines
                                     if myLine.collidesWith otherLine
                                         return true
+                            if @get('top') < other.get('top')
+                                if @get('bottom') > other.get('bottom')
+                                    if @get('right') < other.get('right')
+                                        if @get('left') > other.get('left')
+                                            myLines = []
+                                            for p1 in other._bnd
+                                                for p2 in @_bnd
+                                                    myLines.push new Line p1, p2
+                                            for myLine in myLines
+                                                for otherLine in otherLines
+                                                    unless myLine._contains otherLine.p1
+                                                        unless myLine._contains otherLine.p2
+                                                            if myLine.collidesWith otherLine
+                                                                return false
+                                            return true
+                            if other.get('top') < @get('top')
+                                if other.get('bottom') > @get('bottom')
+                                    if other.get('right') < @get('right')
+                                        if other.get('left') > @get('left')
+                                            otherLines = []
+                                            for p1 in @_bnd
+                                                for p2 in other._bnd
+                                                    otherLines.push new Line p1, p2
+                                            for otherLine in otherLines
+                                                for myLine in myLines
+                                                    unless otherLine._contains myLine.p1
+                                                        unless otherLine._contains myLine.p2
+                                                            if otherLine.collidesWith myLine
+                                                                return false
+                                            return true
             return false
     distanceTo: (other) ->
         otherX = otherY = 0
@@ -494,6 +545,7 @@ class Sprite extends EventEmitter
             #translate and rotate
             @_dis.context.translate @_pos.x, -@_pos.y
             @_dis.context.rotate -@_pos.a
+            @_dis.context.scale @_dis.scale, @_dis.scale
 
             #draw image
             @_dis.context.drawImage(
@@ -699,9 +751,10 @@ class Sprite extends EventEmitter
             ddy: #{@_acc.ddy.toFixed 2}
             dda: #{@_acc.dda.toFixed 2}
         display:
-            level: #{Math.round @_dis.level}
-            width: #{Math.round @_dis.width}
-            height: #{Math.round @_dis.height}
+            level: #{@_dis.level}
+            scale: #{@_dis.scale}
+            width: #{@_dis.width}
+            height: #{@_dis.height}
             visible: #{@_dis.visible}
             highlight: #{@_dis.highlight}
         bound actions:

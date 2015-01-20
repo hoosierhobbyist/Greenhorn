@@ -4,7 +4,7 @@ Written by Seth Bullock
 sedabull@gmail.com
 ###
 
-class Point
+class @Point
     constructor: (@_x, @_y, @_sprite) ->
     
     get: (what) ->
@@ -44,10 +44,10 @@ class Point
         else if what is 'y'
             @_y += step
         else if what is 'a'
-            _x = @get('dist') * Math.cos step
-            _y = @get('dist') * Math.sin step
-            @change 'x', _x
-            @change 'y', _y
+            _x = @get('dist') * Math.cos @get('a') + step
+            _y = @get('dist') * Math.sin @get('a') + step
+            @set 'x', _x
+            @set 'y', _y
         else if what is 'dist'
             _x = step * Math.cos @get('a')
             _y = step * Math.sin @get('a')
@@ -57,7 +57,7 @@ class Point
             throw new Error "#{what} is not a change-able Point attribute"
         return this
 
-class Line
+class @Line
     constructor: (@p1, @p2) ->
         if @p1.get('x') > @p2.get('x')
             [@p1, @p2] = [@p2, @p1]
@@ -65,12 +65,12 @@ class Line
             [@p1, @p2] = [@p2, @p1]
     
     get: (what) ->
-        if what is 'slope' or 'm'
+        if what is 'm'
             if Math.abs(@p1.get('x') - @p2.get('x')) < .1
                 undefined
             else
                 (@p2.get('y') - @p1.get('y')) / (@p2.get('x') - @p1.get('x'))
-        else if what is 'y-intercept' or 'b'
+        else if what is 'b'
             if Math.abs(@p1.get('x') - @p2.get('x')) < .1
                 undefined
             else
