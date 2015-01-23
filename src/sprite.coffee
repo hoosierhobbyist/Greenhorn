@@ -11,7 +11,7 @@ class Sprite extends EventEmitter
     _bounds = null
     _sortRule = (sp1, sp2) ->
         sp1._dis.level - sp2._dis.level
-    _boundaryCallback = (boundAction, side) ->
+    _boundaryCallback = (ba, side) ->
         #cache boundaries
         _bounds ?=
             top: _canvas.height / 2
@@ -20,7 +20,7 @@ class Sprite extends EventEmitter
             left: -_canvas.width / 2
         
         #return appropriate callback
-        switch boundAction
+        switch ba
             when 'DIE'
                 -> @set 'visible', off, false
             when 'WRAP'
@@ -140,7 +140,7 @@ class Sprite extends EventEmitter
             else if key.match /(^posAngle$|^motAngle$|^accAngle$)/
                 delete config[key]
                 angles[key] = value
-            else if key.match /^ba_all$/
+            else if key.match /^ba$/
                 delete config[key]
                 config.ba_top = value
                 config.ba_bottom = value
@@ -245,7 +245,7 @@ class Sprite extends EventEmitter
             value = @_dis[what] * @_dis.scale
         else if what.match /(^level$|^scale$|^visible$|^highlight$)/
             value = @_dis[what]
-        else if what.match /^ba_(top|bottom|right|left)/
+        else if what.match /^ba_(top|bottom|right|left)$/
             value = @_bas[what.split('_')[1]].ba
         else if what.match /^bounds$/
             value = @_bnd
@@ -337,11 +337,18 @@ class Sprite extends EventEmitter
             @_dis.scale = to
             for pt in @_bnd
                 pt.set 'dist', pt.get('dist') * @_dis.scale
-        else if what.match /^ba_(all|top|bottom|right|left)$/
+        else if what.match /^ba$/
+            proxy =
+                ba_top: to
+                ba_bottom: to
+                ba_right: to
+                ba_left: to
+            @set 'config', proxy, false
+        else if what.match /^ba_(top|bottom|right|left)$/
             side = what.split('_')[1]
             oldCollision =
                 if @_bas[side]?
-                    if @_bas[side].ba.match /(DIE|WRAP)/
+                    if @_bas[side].ba.match /^(DIE|WRAP)$/
                         'off'
                     else
                         'hit'
@@ -349,23 +356,15 @@ class Sprite extends EventEmitter
             newCollision = 
                 if to.match /(DIE|WRAP)/
                     'off'
-                else if to.match /(STOP|SPRING|BOUNCE)/
+                else if to.match /^(STOP|SPRING|BOUNCE)$/
                     'hit'
                 else
                     throw new Error "#{to} is not a valid boundary action"
-            unless side is 'all'
-                if @_bas[side]?
-                    @remove "#{oldCollision}:#{side}", @_bas[side]
-                @_bas[side] = _boundaryCallback to, side
-                @_bas[side].ba = to
-                @on "#{newCollision}:#{side}", @_bas[side]
-            else
-                proxy =
-                    ba_top: to
-                    ba_bottom: to
-                    ba_right: to
-                    ba_left: to
-                @set 'config', proxy, false
+            if @_bas[side]?
+                @remove "#{oldCollision}:#{side}", @_bas[side]
+            @_bas[side] = _boundaryCallback to, side
+            @_bas[side].ba = to
+            @on "#{newCollision}:#{side}", @_bas[side]
         else if what.match /^bounds$/
             @_bnd = []
             for pt in to
