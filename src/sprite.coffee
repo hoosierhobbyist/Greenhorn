@@ -250,7 +250,7 @@ class Sprite extends EventEmitter
         else if what.match /^bounds$/
             value = @_bnd
         else
-            throw new Error "#{what} is not a get-able Sprite attribute"
+            value = @[what]
         if _emit then @emit "get:#{what}"
         return value
 
@@ -370,7 +370,7 @@ class Sprite extends EventEmitter
             for pt in to
                 @_bnd.push new Point pt.x, pt.y, this
         else
-            throw new Error "#{what} is not a set-able Sprite attribute"
+            @[what] = to
         if _emit then @emit "set:#{what}", to
         return this
 
@@ -425,7 +425,7 @@ class Sprite extends EventEmitter
         else if what.match /(^_?dis|^_?pos|^_?mot|^_?acc)/
             @change k.slice(1), v, false for own k, v of step
         else
-            throw new Error "#{what} is not a change-able Sprite attribute"
+            @[what] += step / env.FRAME_RATE
         if _emit then @emit "change:#{what}", step
         return this
 
