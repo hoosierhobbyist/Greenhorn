@@ -42,6 +42,7 @@ env =
         height: 64
         visible: yes
         imageFile: ''
+        shape: 'polygon'
         highlight: false
         ba_top: 'WRAP'
         ba_bottom: 'WRAP'

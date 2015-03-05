@@ -173,6 +173,7 @@ class Sprite extends EventEmitter
         @_acc = {}
         @_dis = {}
         @_bas = {}
+        @_bnd = {}
 
         #create secondary objects
         @_dis.width = size.width
@@ -215,20 +216,35 @@ class Sprite extends EventEmitter
         else if what.match /(^ddx$|^ddy$|^dda$)/
             value = @_acc[what]
         else if what.match /^top$/
-            value = (pt.get('y') for pt in @_bnd)
-            value = Math.max value...
+            if @_bnd.shape is 'polygon'
+                value = (pt.get('y') for pt in @_bnd.points)
+                value = Math.max value...
+            else
+                value = @_pos.y + @_bnd.radius
         else if what.match /^bottom$/
-            value = (pt.get('y') for pt in @_bnd)
-            value = Math.min value...
+            if @_bnd.shape is 'polygon'
+                value = (pt.get('y') for pt in @_bnd.points)
+                value = Math.min value...
+            else
+                value = @_pos.y - @_bnd.radius
         else if what.match /^right$/
-            value = (pt.get('x') for pt in @_bnd)
-            value = Math.max value...
+            if @_bnd.shape is 'polygon'
+                value = (pt.get('x') for pt in @_bnd.points)
+                value = Math.max value...
+            else
+                value = @_pos.x + @_bnd.radius
         else if what.match /^left$/
-            value = (pt.get('x') for pt in @_bnd)
-            value = Math.min value...
+            if @_bnd.shape is 'polygon'
+                value = (pt.get('x') for pt in @_bnd.points)
+                value = Math.min value...
+            else
+                value = @_pos.x - @_bnd.radius
         else if what.match /^radius$/
-            value = (pt.get('dist') for pt in @_bnd)
-            value = Math.max value...
+            if @_bnd.radius?
+                value = @_bnd.radius
+            else
+                value = (pt.get('dist') for pt in @_bnd.points)
+                value = Math.max value...
         else if what.match /^distance$/
             value = Math.sqrt @_pos.x**2 + @_pos.y**2
         else if what.match /^speed$/
@@ -247,8 +263,8 @@ class Sprite extends EventEmitter
             value = @_dis[what]
         else if what.match /^ba_(top|bottom|right|left)$/
             value = @_bas[what.split('_')[1]].ba
-        else if what.match /^bounds$/
-            value = @_bnd
+        else if what.match /^shape$/
+            value = @_bnd.shape
         else
             value = @[what]
         if _emit then @emit "get:#{what}"
@@ -262,29 +278,44 @@ class Sprite extends EventEmitter
             if @_pos.a?
                 diff = to - @_pos.a
             @_pos.a = to
-            if diff
-                for pt in @_bnd
+            if diff and @_bnd.shape is 'polygon'
+                for pt in @_bnd.points
                     pt.change 'a', diff
         else if what.match /(^dx$|^dy$|^da$)/
             @_mot[what] = to
         else if what.match /(^ddx$|^ddy$|^dda$)/
             @_acc[what] = to
         else if what.match /^top$/
-            _top = @_bnd[0]
-            _top = pt for pt in @_bnd when pt._y > _top._y
-            @_pos.y = to - _top._y
+            if @_bnd.shape is 'polygon'
+                _top = @_bnd.points[0]
+                _top = pt for pt in @_bnd.points when pt._y > _top._y
+                @_pos.y = to - _top._y
+            else if @_bnd.shape is 'circle'
+                @_pos.y = to - @get 'radius'
         else if what.match /^bottom$/
-            _bottom = @_bnd[0]
-            _bottom = pt for pt in @_bnd when pt._y < _bottom._y
-            @_pos.y = to - _bottom._y
+            if @_bnd.shape is 'polygon'
+                _bottom = @_bnd.points[0]
+                _bottom = pt for pt in @_bnd.points when pt._y < _bottom._y
+                @_pos.y = to - _bottom._y
+            else if @_bnd.shape is 'circle'
+                @_pos.y = to + @get 'radius'
         else if what.match /^right$/
-            _right = @_bnd[0]
-            _right = pt for pt in @_bnd when pt._x > _right._x
-            @_pos.x = to - _right._x
+            if @_bnd.shape is 'polygon'
+                _right = @_bnd.points[0]
+                _right = pt for pt in @_bnd.points when pt._x > _right._x
+                @_pos.x = to - _right._x
+            else if @_bnd.shape is 'circle'
+                @_pos.x = to - @get 'radius'
         else if what.match /^left$/
-            _left = @_bnd[0]
-            _left = pt for pt in @_bnd when pt._x < _left._x
-            @_pos.x = to - _left._x
+            if @_bnd.shape is 'polygon'
+                _left = @_bnd.points[0]
+                _left = pt for pt in @_bnd.points when pt._x < _left._x
+                @_pos.x = to - _left._x
+            else if @_bnd.shape is 'circle'
+                @_pos.x = to + @get 'radius'
+        else if what.match /^radius$/
+            if @_bnd.shape is 'circle'
+                @_bnd.radius = to
         else if what.match /^imageFile$/
             if env.IMAGE_PATH.match /\/$/
                 @_dis.image.src = env.IMAGE_PATH.concat to
@@ -332,11 +363,17 @@ class Sprite extends EventEmitter
                 _list.sort _sortRule
         else if what.match /^scale$/
             if @_dis.scale?
-                for pt in @_bnd
-                    pt.set 'dist', pt.get('dist') / @_dis.scale
+                if @_bnd.shape is 'polygon'
+                    for pt in @_bnd.points
+                        pt.set 'dist', pt.get('dist') / @_dis.scale
+                else if @_bnd.shape is 'circle'
+                    @set 'radius', @get('radius') / @_dis.scale
             @_dis.scale = to
-            for pt in @_bnd
-                pt.set 'dist', pt.get('dist') * @_dis.scale
+            if @_bnd.shape is 'polygon'
+                for pt in @_bnd.points
+                    pt.set 'dist', pt.get('dist') * @_dis.scale
+            else if @_bnd.shape is 'circle'
+                @set 'radius', @get('radius') * @_dis.scale
         else if what.match /^ba$/
             proxy =
                 ba_top: to
@@ -365,10 +402,19 @@ class Sprite extends EventEmitter
             @_bas[side] = _boundaryCallback to, side
             @_bas[side].ba = to
             @on "#{newCollision}:#{side}", @_bas[side]
-        else if what.match /^bounds$/
-            @_bnd = []
+        else if what.match /^shape$/
+            if @_bnd.shape is 'circle'
+                if to is 'polygon'
+                    @_bnd.radius = null
+                    @_bnd.shape = to
+            else if @_bnd.shape is 'polygon'
+                if to is 'circle'
+                    @_bnd.radius = @get 'radius'
+                    @_bnd.shape = to
+        else if what.match /^points$/
+            @_bnd.points = []
             for pt in to
-                @_bnd.push new Point pt.x, pt.y, this
+                @_bnd.points.push new Point pt.x, pt.y, this
         else
             @[what] = to
         if _emit then @emit "set:#{what}", to
@@ -378,20 +424,14 @@ class Sprite extends EventEmitter
     change: (what, step, _emit = true) ->
         if what.match /(^x$|^y$|^a$)/
             @_pos[what] += step / env.FRAME_RATE
-            if what is 'a'
-                pt.change('a', step / env.FRAME_RATE) for pt in @_bnd
+            if what is 'a' and @_bnd.shape is 'polygon'
+                pt.change('a', step / env.FRAME_RATE) for pt in @_bnd.points
         else if what.match /(^dx$|^dy$|^da$)/
             @_mot[what] += step / env.FRAME_RATE
         else if what.match /(^ddx$|^ddy$|^dda$)/
             @_acc[what] += step / env.FRAME_RATE
         else if what.match /^level$/
             @_dis.level += step / env.FRAME_RATE
-        else if what.match /^scale$/
-            for pt in @_bnd
-                pt.set 'dist', pt.get('dist') / @_dis.scale
-            @_dis.scale += step / env.FRAME_RATE
-            for pt in @_bnd
-                pt.set 'dist', pt.get('dist') * @_dis.scale
         else if what.match /^distance$/
             proxy =
                 dx: step * Math.cos @get 'posAngle', false
@@ -434,84 +474,97 @@ class Sprite extends EventEmitter
         if other is 'mouse'
             if @_dis.visible
                 if @distanceTo('mouse') <= @get('radius', false)
-                    #declare Line arrays
-                    myLines = []
-                    otherLines = []
-                    mousePos = new Point Greenhorn.getMouseX(), Greenhorn.getMouseY(), _pos: {x: 0, y: 0}
-                    
-                    #create Lines to check for collisions
-                    for pt, i in @_bnd
-                        otherLines.push new Line pt, mousePos
-                        if i is @_bnd.length - 1
-                            myLines.push new Line pt, @_bnd[0]
-                        else
-                            myLines.push new Line pt, @_bnd[i+1]
-                    
-                    #check for collisions
-                    for myLine in myLines
-                        for otherLine in otherLines
-                            unless myLine._contains otherLine.p1
-                                unless myLine._contains otherLine.p2
-                                    if myLine.collidesWith otherLine
-                                        return false
-                    return true
+                    if @_bnd.shape is 'circle' 
+                        return true
+                    else
+                        #declare Line arrays
+                        myLines = []
+                        otherLines = []
+                        mousePos = new Point Greenhorn.getMouseX(), Greenhorn.getMouseY(), _pos: {x: 0, y: 0}
+                        
+                        #create Lines to check for collisions
+                        for pt, i in @_bnd
+                            otherLines.push new Line pt, mousePos
+                            if i is @_bnd.length - 1
+                                myLines.push new Line pt, @_bnd[0]
+                            else
+                                myLines.push new Line pt, @_bnd[i+1]
+                        
+                        #check for collisions
+                        for myLine in myLines
+                            for otherLine in otherLines
+                                unless myLine._contains otherLine.p1
+                                    unless myLine._contains otherLine.p2
+                                        if myLine.collidesWith otherLine
+                                            return false
+                        return true
             return false
         else
             if @_dis.visible
                 if other._dis.visible
                     if @_dis.level == other._dis.level
                         if @distanceTo(other) <= @get('radius', false) + other.get('radius', false)
-                            #declare Line arrays
-                            myLines = []
-                            otherLines = []
-                            
-                            #create Lines representing boundaries
-                            for pt, i in @_bnd
-                                if i is @_bnd.length - 1
-                                    myLines.push new Line pt, @_bnd[0]
-                                else
-                                    myLines.push new Line pt, @_bnd[i+1]
-                            for pt, i in other._bnd
-                                if i is other._bnd.length - 1
-                                    otherLines.push new Line pt, other._bnd[0]
-                                else
-                                    otherLines.push new Line pt, other._bnd[i+1]
-                            
-                            #check for collisions
-                            for myLine in myLines
-                                for otherLine in otherLines
-                                    if myLine.collidesWith otherLine
-                                        return true
-                            if @get('top') < other.get('top')
-                                if @get('bottom') > other.get('bottom')
-                                    if @get('right') < other.get('right')
-                                        if @get('left') > other.get('left')
-                                            myLines = []
-                                            for p1 in other._bnd
-                                                for p2 in @_bnd
-                                                    myLines.push new Line p1, p2
-                                            for myLine in myLines
-                                                for otherLine in otherLines
-                                                    unless myLine._contains otherLine.p1
-                                                        unless myLine._contains otherLine.p2
-                                                            if myLine.collidesWith otherLine
-                                                                return false
+                            if @_bnd.shape is 'circle' and other._bnd.shape is 'circle'
+                                return true
+                            else if @_bnd.shape is 'circle'
+                                if @distanceTo(other) <= @get 'radius', false
+                                    return true
+                                for pt in other._bnd.points
+                                    if#TODO
+                            else if other._bnd.shape is 'circle'
+                                
+                            else
+                                #declare Line arrays
+                                myLines = []
+                                otherLines = []
+                                
+                                #create Lines representing boundaries
+                                for pt, i in @_bnd
+                                    if i is @_bnd.length - 1
+                                        myLines.push new Line pt, @_bnd[0]
+                                    else
+                                        myLines.push new Line pt, @_bnd[i+1]
+                                for pt, i in other._bnd
+                                    if i is other._bnd.length - 1
+                                        otherLines.push new Line pt, other._bnd[0]
+                                    else
+                                        otherLines.push new Line pt, other._bnd[i+1]
+                                
+                                #check for collisions
+                                for myLine in myLines
+                                    for otherLine in otherLines
+                                        if myLine.collidesWith otherLine
                                             return true
-                            if other.get('top') < @get('top')
-                                if other.get('bottom') > @get('bottom')
-                                    if other.get('right') < @get('right')
-                                        if other.get('left') > @get('left')
-                                            otherLines = []
-                                            for p1 in @_bnd
-                                                for p2 in other._bnd
-                                                    otherLines.push new Line p1, p2
-                                            for otherLine in otherLines
+                                if @get('top') < other.get('top')
+                                    if @get('bottom') > other.get('bottom')
+                                        if @get('right') < other.get('right')
+                                            if @get('left') > other.get('left')
+                                                myLines = []
+                                                for p1 in other._bnd
+                                                    for p2 in @_bnd
+                                                        myLines.push new Line p1, p2
                                                 for myLine in myLines
-                                                    unless otherLine._contains myLine.p1
-                                                        unless otherLine._contains myLine.p2
-                                                            if otherLine.collidesWith myLine
-                                                                return false
-                                            return true
+                                                    for otherLine in otherLines
+                                                        unless myLine._contains otherLine.p1
+                                                            unless myLine._contains otherLine.p2
+                                                                if myLine.collidesWith otherLine
+                                                                    return false
+                                                return true
+                                if other.get('top') < @get('top')
+                                    if other.get('bottom') > @get('bottom')
+                                        if other.get('right') < @get('right')
+                                            if other.get('left') > @get('left')
+                                                otherLines = []
+                                                for p1 in @_bnd
+                                                    for p2 in other._bnd
+                                                        otherLines.push new Line p1, p2
+                                                for otherLine in otherLines
+                                                    for myLine in myLines
+                                                        unless otherLine._contains myLine.p1
+                                                            unless otherLine._contains myLine.p2
+                                                                if otherLine.collidesWith myLine
+                                                                    return false
+                                                return true
             return false
     distanceTo: (other) ->
         otherX = otherY = 0
