@@ -146,23 +146,37 @@ class Sprite extends EventEmitter
                 config.ba_bottom = value
                 config.ba_right = value
                 config.ba_left = value
-            else if key.match /^on\w+/
+            else if key.match /^on-\w+/
                 delete config[key]
                 if typeof value is 'function'
-                    @on key.slice(2), value
+                    @on key.slice(3), value
                 else if value.length?
-                    @on key.slice(2), value[0], value[1]
+                    @on key.slice(3), value[0], value[1]
+            else if key.match /^once-\w+/
+                delete config[key]
+                if typeof value is 'function'
+                    @once key.slice(5), value
+                else if value.length?
+                    @once key.slice(5), value[0], value[1]
         
         #create default boundary if none was provided
         unless config.bounds?
-            _a = Math.atan2 size.height / 2, size.width / 2
-            _dist = Math.sqrt (size.height / 2)**2 + (size.width / 2)**2
-            config.bounds = [
-                {x: _dist * Math.cos(config.a + _a), y: _dist * Math.sin(config.a + _a)}
-                {x: _dist * Math.cos(config.a - _a), y: _dist * Math.sin(config.a - _a)}
-                {x: _dist * Math.cos(config.a + Math.PI + _a), y: _dist * Math.sin(config.a + Math.PI + _a)}
-                {x: _dist * Math.cos(config.a + Math.PI - _a), y: _dist * Math.sin(config.a + Math.PI - _a)}
-            ]#end default boundary
+            if config.shape is 'polygon'
+                _a = Math.atan2 size.height / 2, size.width / 2
+                _dist = Math.sqrt (size.height / 2)**2 + (size.width / 2)**2
+                config.bounds = [
+                    {x: _dist * Math.cos(config.a + _a), y: _dist * Math.sin(config.a + _a)}
+                    {x: _dist * Math.cos(config.a - _a), y: _dist * Math.sin(config.a - _a)}
+                    {x: _dist * Math.cos(config.a + Math.PI + _a), y: _dist * Math.sin(config.a + Math.PI + _a)}
+                    {x: _dist * Math.cos(config.a + Math.PI - _a), y: _dist * Math.sin(config.a + Math.PI - _a)}
+                ]#end default boundary
+            else if config.shape is 'circle'
+                config.radius ?= Math.sqrt (size.height / 2)**2 + (size.width / 2)**2
+            else
+                throw new Error "config.shape must be either 'polygon' or 'circle'"
+        else
+            if config.shape isnt 'polygon'
+                throw new Error "if config.bounds is defined, config.shape must be 'polygon'"
         
         #used to track asynchronous _update
         @_updateID = null
@@ -178,11 +192,11 @@ class Sprite extends EventEmitter
         #create secondary objects
         @_dis.width = size.width
         @_dis.height = size.height
-        @_dis.image = new Image()
         @_dis.context = _canvas.getContext '2d'
+        @_dis.image = document.createElement 'img'
 
         #set this sprite's configuration
-        #"virtually" calls child's set method in derived classes
+        #"virtually" calls child's set method in "derived" classes
         @set 'config', config, false
         @set 'config', magnitudes, false
         @set 'config', angles, false
@@ -219,25 +233,25 @@ class Sprite extends EventEmitter
             if @_bnd.shape is 'polygon'
                 value = (pt.get('y') for pt in @_bnd.points)
                 value = Math.max value...
-            else
+            else if @_bnd.shape is 'circle'
                 value = @_pos.y + @_bnd.radius
         else if what.match /^bottom$/
             if @_bnd.shape is 'polygon'
                 value = (pt.get('y') for pt in @_bnd.points)
                 value = Math.min value...
-            else
+            else if @_bnd.shape is 'circle'
                 value = @_pos.y - @_bnd.radius
         else if what.match /^right$/
             if @_bnd.shape is 'polygon'
                 value = (pt.get('x') for pt in @_bnd.points)
                 value = Math.max value...
-            else
+            else if @_bnd.shape is 'circle'
                 value = @_pos.x + @_bnd.radius
         else if what.match /^left$/
             if @_bnd.shape is 'polygon'
                 value = (pt.get('x') for pt in @_bnd.points)
                 value = Math.min value...
-            else
+            else if @_bnd.shape is 'circle'
                 value = @_pos.x - @_bnd.radius
         else if what.match /^radius$/
             if @_bnd.radius?
@@ -267,25 +281,30 @@ class Sprite extends EventEmitter
             value = @_bnd.shape
         else
             value = @[what]
-        if _emit then @emit "get:#{what}"
+        if _emit then @emit "get:#{what}", value
         return value
 
     #setter
     set: (what, to, _emit = true) ->
         if what.match /(^x$|^y$)/
+            old = @_pos[what] if _emit
             @_pos[what] = to
         else if what.match /^a$/
             if @_pos.a?
                 diff = to - @_pos.a
+            old = @_pos.a if _emit
             @_pos.a = to
             if diff and @_bnd.shape is 'polygon'
                 for pt in @_bnd.points
                     pt.change 'a', diff
         else if what.match /(^dx$|^dy$|^da$)/
+            old = @_mot[what] if _emit
             @_mot[what] = to
         else if what.match /(^ddx$|^ddy$|^dda$)/
+            old = @_acc[what] if _emit
             @_acc[what] = to
         else if what.match /^top$/
+            old = @get 'top', false if _emit
             if @_bnd.shape is 'polygon'
                 _top = @_bnd.points[0]
                 _top = pt for pt in @_bnd.points when pt._y > _top._y
@@ -293,6 +312,7 @@ class Sprite extends EventEmitter
             else if @_bnd.shape is 'circle'
                 @_pos.y = to - @get 'radius'
         else if what.match /^bottom$/
+            old = @get 'bottom', false if _emit
             if @_bnd.shape is 'polygon'
                 _bottom = @_bnd.points[0]
                 _bottom = pt for pt in @_bnd.points when pt._y < _bottom._y
@@ -300,6 +320,7 @@ class Sprite extends EventEmitter
             else if @_bnd.shape is 'circle'
                 @_pos.y = to + @get 'radius'
         else if what.match /^right$/
+            old = @get 'right', false if _emit
             if @_bnd.shape is 'polygon'
                 _right = @_bnd.points[0]
                 _right = pt for pt in @_bnd.points when pt._x > _right._x
@@ -307,6 +328,7 @@ class Sprite extends EventEmitter
             else if @_bnd.shape is 'circle'
                 @_pos.x = to - @get 'radius'
         else if what.match /^left$/
+            old = @get 'left', false if _emit
             if @_bnd.shape is 'polygon'
                 _left = @_bnd.points[0]
                 _left = pt for pt in @_bnd.points when pt._x < _left._x
@@ -314,9 +336,13 @@ class Sprite extends EventEmitter
             else if @_bnd.shape is 'circle'
                 @_pos.x = to + @get 'radius'
         else if what.match /^radius$/
+            old = @get 'radius', false if _emit
             if @_bnd.shape is 'circle'
                 @_bnd.radius = to
+            else
+                throw new Error "Cannot set radius when shape isnt 'circle'"
         else if what.match /^imageFile$/
+            old = @get 'imageFile', false if _emit
             if env.IMAGE_PATH.match /\/$/
                 @_dis.image.src = env.IMAGE_PATH.concat to
             else
@@ -326,38 +352,46 @@ class Sprite extends EventEmitter
                 else
                     @_dis.image.src = to
         else if what.match /^distance$/
+            old = @get 'distance', false if _emit
             proxy =
                 x: to * Math.cos @get 'posAngle', false
                 y: to * Math.sin @get 'posAngle', false
             @set '_pos', proxy, false
         else if what.match /^speed$/
+            old = @get 'speed', false if _emit
             proxy =
                 dx: to * Math.cos @get 'motAngle', false
                 dy: to * Math.sin @get 'motAngle', false
             @set '_mot', proxy, false
         else if what.match /^rate$/
+            old = @get 'rate', false if _emit
             proxy =
                 ddx: to * Math.cos @get 'accAngle', false
                 ddy: to * Math.sin @get 'accAngle', false
             @set '_acc', proxy, false
         else if what.match /^posAngle$/
+            old = @get 'posAngle', false if _emit
             proxy =
                 x: @get('distance', false) * Math.cos to
                 y: @get('distance', false) * Math.sin to
             @set '_pos', proxy, false
         else if what.match /^motAngle$/
+            old = @get 'motAngle', false if _emit
             proxy =
                 dx: @get('speed', false) * Math.cos to
                 dy: @get('speed', false) * Math.sin to
             @set '_mot', proxy, false
         else if what.match /^accAngle$/
+            old = @get 'accAngle', false if _emit
             proxy =
                 ddx: @get('rate', false) * Math.cos to
                 ddy: @get('rate', false) * Math.sin to
             @set '_acc', proxy, false
         else if what.match /(^_?dis|^_?pos|^_?mot|^_?acc|^config)/
+            #set old to what here?
             @set k, v, false for own k, v of to
         else if what.match /(^level$|^visible$|^highlight$)/
+            old = @_dis[what] if _emit
             @_dis[what] = to
             if what is 'level'
                 _list.sort _sortRule
@@ -368,6 +402,7 @@ class Sprite extends EventEmitter
                         pt.set 'dist', pt.get('dist') / @_dis.scale
                 else if @_bnd.shape is 'circle'
                     @set 'radius', @get('radius') / @_dis.scale
+            old = @_dis.scale if _emit
             @_dis.scale = to
             if @_bnd.shape is 'polygon'
                 for pt in @_bnd.points
@@ -375,6 +410,12 @@ class Sprite extends EventEmitter
             else if @_bnd.shape is 'circle'
                 @set 'radius', @get('radius') * @_dis.scale
         else if what.match /^ba$/
+            if _emit
+                old = #deep copy?
+                    ba_top: @bas['top']
+                    ba_bottom: @bas['bottom']
+                    ba_right: @bas['right']
+                    ba_left: @bas['left']
             proxy =
                 ba_top: to
                 ba_bottom: to
@@ -397,12 +438,14 @@ class Sprite extends EventEmitter
                     'hit'
                 else
                     throw new Error "#{to} is not a valid boundary action"
+            old = @_bas[side] if _emit #deep copy?
             if @_bas[side]?
                 @remove "#{oldCollision}:#{side}", @_bas[side]
             @_bas[side] = _boundaryCallback to, side
             @_bas[side].ba = to
             @on "#{newCollision}:#{side}", @_bas[side]
-        else if what.match /^shape$/
+        else if what.match /^shape$/ #needs refining
+            old = @_bnd.shape if _emit
             if @_bnd.shape is 'circle'
                 if to is 'polygon'
                     @_bnd.radius = null
@@ -412,15 +455,19 @@ class Sprite extends EventEmitter
                     @_bnd.radius = @get 'radius'
                     @_bnd.shape = to
         else if what.match /^points$/
+            old = @_bnd.points.slice 0 if _emit
             @_bnd.points = []
             for pt in to
-                @_bnd.points.push new Point pt.x, pt.y, this
+                if pt.x? and pt.y?
+                    @_bnd.points.push new Point pt.x, pt.y, this
         else
+            old = @[what] if _emit
             @[what] = to
-        if _emit then @emit "set:#{what}", to
+        if _emit then @emit "set:#{what}", old, to
         return this
 
     #changer
+    #emit virtual change, real change or both?
     change: (what, step, _emit = true) ->
         if what.match /(^x$|^y$|^a$)/
             @_pos[what] += step / env.FRAME_RATE
@@ -473,29 +520,29 @@ class Sprite extends EventEmitter
     collidesWith: (other) ->
         if other is 'mouse'
             if @_dis.visible
-                if @distanceTo('mouse') <= @get('radius', false)
+                if @distanceTo('mouse') <= @get 'radius', false
                     if @_bnd.shape is 'circle' 
                         return true
                     else
                         #declare Line arrays
-                        myLines = []
-                        otherLines = []
+                        outerLines = []
+                        innerLines = []
                         mousePos = new Point Greenhorn.getMouseX(), Greenhorn.getMouseY(), _pos: {x: 0, y: 0}
                         
                         #create Lines to check for collisions
-                        for pt, i in @_bnd
-                            otherLines.push new Line pt, mousePos
-                            if i is @_bnd.length - 1
-                                myLines.push new Line pt, @_bnd[0]
+                        for pt, i in @_bnd.points
+                            innerLines.push new Line pt, mousePos
+                            if i is @_bnd.points.length - 1
+                                outerLines.push new Line pt, @_bnd.points[0]
                             else
-                                myLines.push new Line pt, @_bnd[i+1]
+                                outerLines.push new Line pt, @_bnd.points[i+1]
                         
                         #check for collisions
-                        for myLine in myLines
-                            for otherLine in otherLines
-                                unless myLine._contains otherLine.p1
-                                    unless myLine._contains otherLine.p2
-                                        if myLine.collidesWith otherLine
+                        for innerLine in innerLines
+                            for outerLine in outerLines
+                                unless innerLine._contains outerLine.p1
+                                    unless innerLine._contains outerLine.p2
+                                        if innerLine.collidesWith outerLine
                                             return false
                         return true
             return false
@@ -506,29 +553,27 @@ class Sprite extends EventEmitter
                         if @distanceTo(other) <= @get('radius', false) + other.get('radius', false)
                             if @_bnd.shape is 'circle' and other._bnd.shape is 'circle'
                                 return true
-                            else if @_bnd.shape is 'circle'
-                                if @distanceTo(other) <= @get 'radius', false
-                                    return true
-                                for pt in other._bnd.points
-                                    if#TODO
-                            else if other._bnd.shape is 'circle'
-                                
                             else
+                                #define points if circular
+                                if @_bnd.shape is 'circle'
+                                    unless @_bnd.points?
+                                        #TODO figure out a good way to do this...
+                                
                                 #declare Line arrays
                                 myLines = []
                                 otherLines = []
                                 
                                 #create Lines representing boundaries
-                                for pt, i in @_bnd
-                                    if i is @_bnd.length - 1
-                                        myLines.push new Line pt, @_bnd[0]
+                                for pt, i in @_bnd.points
+                                    if i is @_bnd.points.length - 1
+                                        myLines.push new Line pt, @_bnd.points[0]
                                     else
-                                        myLines.push new Line pt, @_bnd[i+1]
-                                for pt, i in other._bnd
-                                    if i is other._bnd.length - 1
-                                        otherLines.push new Line pt, other._bnd[0]
+                                        myLines.push new Line pt, @_bnd.points[i+1]
+                                for pt, i in other._bnd.points
+                                    if i is other._bnd.points.length - 1
+                                        otherLines.push new Line pt, other._bnd.points[0]
                                     else
-                                        otherLines.push new Line pt, other._bnd[i+1]
+                                        otherLines.push new Line pt, other._bnd.points[i+1]
                                 
                                 #check for collisions
                                 for myLine in myLines
@@ -540,8 +585,8 @@ class Sprite extends EventEmitter
                                         if @get('right') < other.get('right')
                                             if @get('left') > other.get('left')
                                                 myLines = []
-                                                for p1 in other._bnd
-                                                    for p2 in @_bnd
+                                                for p1 in other._bnd.points
+                                                    for p2 in @_bnd.points
                                                         myLines.push new Line p1, p2
                                                 for myLine in myLines
                                                     for otherLine in otherLines
@@ -555,8 +600,8 @@ class Sprite extends EventEmitter
                                         if other.get('right') < @get('right')
                                             if other.get('left') > @get('left')
                                                 otherLines = []
-                                                for p1 in @_bnd
-                                                    for p2 in other._bnd
+                                                for p1 in @_bnd.points
+                                                    for p2 in other._bnd.points
                                                         otherLines.push new Line p1, p2
                                                 for otherLine in otherLines
                                                     for myLine in myLines
@@ -616,8 +661,8 @@ class Sprite extends EventEmitter
                 @_dis.context.lineWidth = 3
                 @_dis.context.strokeStyle = 'white'
                 @_dis.context.beginPath()
-                @_dis.context.moveTo @_bnd[0].get('x'), -@_bnd[0].get('y')
-                for pt, i in @_bnd when i isnt 0
+                @_dis.context.moveTo @_bnd.points[0].get('x'), -@_bnd.points[0].get('y')
+                for pt, i in @_bnd.points when i isnt 0
                     @_dis.context.lineTo pt.get('x'), -pt.get('y')
                 @_dis.context.closePath()
                 @_dis.context.stroke()
@@ -652,7 +697,7 @@ class Sprite extends EventEmitter
                 if @collidesWith 'mouse'
                     @emit event
             #fire 'mouse:noHover' event
-            if event.match /^mouse:noHover$/
+            if event.match /^mouse:!hover$/
                 unless @collidesWith 'mouse'
                     @emit event
             #fire 'isDown' event
@@ -700,7 +745,7 @@ class Sprite extends EventEmitter
                 if @collidesWith listeners.other
                     @emit event, listeners.other
             #fire 'noCollisionWith:other' events
-            else if event.match /^noCollisionWith:\w+/
+            else if event.match /^!collisionWith:\w+/
                 unless @collidesWith listeners.other
                     @emit event, listeners.other
             #fire 'distanceTo:other-cmp-value' events
