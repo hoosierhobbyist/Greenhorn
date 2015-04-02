@@ -554,11 +554,6 @@ class Sprite extends EventEmitter
                             if @_bnd.shape is 'circle' or other._bnd.shape is 'circle'
                                 return true
                             else
-                                #define points if circular
-                                if @_bnd.shape is 'circle'
-                                    unless @_bnd.points?
-                                        #TODO figure out a good way to do this...
-
                                 #declare Line arrays
                                 myLines = []
                                 otherLines = []
@@ -822,7 +817,7 @@ class Sprite extends EventEmitter
             else if event.match /^\w+-(eq|ne)-\w+/
                 tokens = event.split '-'
                 if tokens[2].match /(^true$|^false$)/
-                    tokens[2] = (0, eval)(tokens[2])
+                    `tokens[2] = (0, eval)(tokens[2])`
                 switch tokens[1]
                     when 'eq'
                         if @get(tokens[0], false) is tokens[2]
