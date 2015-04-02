@@ -18,7 +18,7 @@ class Sprite extends EventEmitter
             bottom: -_canvas.height / 2
             right: _canvas.width / 2
             left: -_canvas.width / 2
-        
+
         #return appropriate callback
         switch ba
             when 'DIE'
@@ -98,7 +98,7 @@ class Sprite extends EventEmitter
     @removeAll = (excep...) ->
         for sp in _list when sp not in excep
             sp._stop() if sp.isRunning()
-        
+
         _list = []
         for sp in excep
             _list.push sp
@@ -121,7 +121,7 @@ class Sprite extends EventEmitter
     constructor: (config = {}) ->
         #cache class-level reference to gh-canvas
         _canvas ?= document.getElementById 'gh-canvas'
-        
+
         #add missing keys to config
         for own key, value of env.SPRITE_DEFAULT_CONFIG
             config[key] ?= value
@@ -158,7 +158,7 @@ class Sprite extends EventEmitter
                     @once key.slice(5), value
                 else if value.length?
                     @once key.slice(5), value[0], value[1]
-        
+
         #create default boundary if none was provided
         unless config.bounds?
             if config.shape is 'polygon'
@@ -177,7 +177,7 @@ class Sprite extends EventEmitter
         else
             if config.shape isnt 'polygon'
                 throw new Error "if config.bounds is defined, config.shape must be 'polygon'"
-        
+
         #used to track asynchronous _update
         @_updateID = null
 
@@ -431,7 +431,7 @@ class Sprite extends EventEmitter
                     else
                         'hit'
                 else ''
-            newCollision = 
+            newCollision =
                 if to.match /(DIE|WRAP)/
                     'off'
                 else if to.match /^(STOP|SPRING|BOUNCE)$/
@@ -521,14 +521,14 @@ class Sprite extends EventEmitter
         if other is 'mouse'
             if @_dis.visible
                 if @distanceTo('mouse') <= @get 'radius', false
-                    if @_bnd.shape is 'circle' 
+                    if @_bnd.shape is 'circle'
                         return true
                     else
                         #declare Line arrays
                         outerLines = []
                         innerLines = []
                         mousePos = new Point Greenhorn.getMouseX(), Greenhorn.getMouseY(), _pos: {x: 0, y: 0}
-                        
+
                         #create Lines to check for collisions
                         for pt, i in @_bnd.points
                             innerLines.push new Line pt, mousePos
@@ -536,7 +536,7 @@ class Sprite extends EventEmitter
                                 outerLines.push new Line pt, @_bnd.points[0]
                             else
                                 outerLines.push new Line pt, @_bnd.points[i+1]
-                        
+
                         #check for collisions
                         for innerLine in innerLines
                             for outerLine in outerLines
@@ -551,18 +551,18 @@ class Sprite extends EventEmitter
                 if other._dis.visible
                     if @_dis.level == other._dis.level
                         if @distanceTo(other) <= @get('radius', false) + other.get('radius', false)
-                            if @_bnd.shape is 'circle' and other._bnd.shape is 'circle'
+                            if @_bnd.shape is 'circle' or other._bnd.shape is 'circle'
                                 return true
                             else
                                 #define points if circular
                                 if @_bnd.shape is 'circle'
                                     unless @_bnd.points?
                                         #TODO figure out a good way to do this...
-                                
+
                                 #declare Line arrays
                                 myLines = []
                                 otherLines = []
-                                
+
                                 #create Lines representing boundaries
                                 for pt, i in @_bnd.points
                                     if i is @_bnd.points.length - 1
@@ -574,7 +574,7 @@ class Sprite extends EventEmitter
                                         otherLines.push new Line pt, other._bnd.points[0]
                                     else
                                         otherLines.push new Line pt, other._bnd.points[i+1]
-                                
+
                                 #check for collisions
                                 for myLine in myLines
                                     for otherLine in otherLines
@@ -635,7 +635,7 @@ class Sprite extends EventEmitter
         if @_dis.visible
             #save context
             @_dis.context.save()
-            
+
             #fire draw:before event
             @emit 'draw:before'
 
@@ -651,10 +651,10 @@ class Sprite extends EventEmitter
                 -@_dis.height / 2, #top
                 @_dis.width, #width
                 @_dis.height) #height
-            
+
             #restore context
             @_dis.context.restore()
-            
+
             #highlight boundaries
             if @_dis.highlight
                 @_dis.context.save()
@@ -667,13 +667,13 @@ class Sprite extends EventEmitter
                 @_dis.context.closePath()
                 @_dis.context.stroke()
                 @_dis.context.restore()
-            
+
             #fire draw:after event
             @emit 'draw:after'
     _update: =>
         #fire update event
         @emit 'update'
-        
+
         #accelerate and move
         @change '_mot', @_acc, false
         @change '_pos', @_mot, false
@@ -689,7 +689,7 @@ class Sprite extends EventEmitter
         if @get('bottom', false) <= _bounds.bottom then @emit 'hit:bottom'
         if @get('right', false) >= _bounds.right then @emit 'hit:right'
         if @get('left', false) <= _bounds.left then @emit 'hit:left'
-        
+
         #determine other events to fire
         for own event, listeners of @_events
             #fire 'mouse:hover' event
@@ -822,7 +822,7 @@ class Sprite extends EventEmitter
             else if event.match /^\w+-(eq|ne)-\w+/
                 tokens = event.split '-'
                 if tokens[2].match /(^true$|^false$)/
-                    tokens[2] = eval tokens[2]
+                    tokens[2] = (0, eval)(tokens[2])
                 switch tokens[1]
                     when 'eq'
                         if @get(tokens[0], false) is tokens[2]
