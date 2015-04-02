@@ -120,7 +120,7 @@ class Sprite extends EventEmitter
     #instance methods
     constructor: (config = {}) ->
         #cache class-level reference to gh-canvas
-        _canvas ?= document.getElementById 'gh-canvas'
+        _canvas ?= document.getElementById('gh-canvas') or document.createElement('canvas')
 
         #add missing keys to config
         for own key, value of env.SPRITE_DEFAULT_CONFIG

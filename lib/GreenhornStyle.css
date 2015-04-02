@@ -3,38 +3,38 @@ style.less
 Written by Seth Bullock
 sedabull@gmail.com
 */
-body {
-  background-color: #006400;
-}
-.gh {
+/*body{
+    background-color: @fgColor;
+}//end body*/
+#gh {
   border-radius: 15px;
   background-color: #656565;
   border: 5px groove #c0c0c0;
   min-height: 615px;
 }
-.gh .gh-a {
+#gh .gh-a {
   cursor: pointer;
   font-weight: 500;
   text-decoration: underline;
   font-size: 1.05em;
 }
-.gh .gh-a:link {
+#gh .gh-a:link {
   color: #c0c0c0;
 }
-.gh .gh-a:visited {
+#gh .gh-a:visited {
   color: #808080;
 }
-.gh .gh-a:hover {
+#gh .gh-a:hover {
   color: #ffffff;
 }
-.gh .gh-a:active {
+#gh .gh-a:active {
   color: #000000;
 }
-.gh .gh-p {
+#gh .gh-p {
   margin: 0;
   font-size: 0.7em;
 }
-.gh .gh-button {
+#gh .gh-button {
   margin: 1%;
   width: 98%;
   font-size: small;
@@ -43,7 +43,7 @@ body {
   outline-style: none;
   background-color: #000000;
 }
-.gh .gh-h {
+#gh .gh-h {
   margin-top: 0px;
   text-align: center;
   margin-bottom: 5px;
@@ -51,13 +51,13 @@ body {
   font-size: 0.805em;
   border-bottom: 2px solid #c0c0c0;
 }
-.gh .gh-sub-h {
+#gh .gh-sub-h {
   margin: 5px 0px;
   font-weight: bold;
   text-decoration: underline;
   font-size: 0.77em;
 }
-.gh #gh-main {
+#gh #gh-main {
   margin: 2.5% auto;
   color: #c0c0c0;
   background-color: #006400;
@@ -70,7 +70,7 @@ body {
   min-width: 1140px;
   max-width: 1140px;
 }
-.gh #gh-main #gh-title {
+#gh #gh-main #gh-title {
   width: 100%;
   float: left;
   clear: both;
@@ -82,7 +82,7 @@ body {
   padding-bottom: 9px;
   border-bottom: 1px solid #c0c0c0;
 }
-.gh #gh-main #gh-left-panel {
+#gh #gh-main #gh-left-panel {
   float: left;
   clear: left;
   overflow: auto;
@@ -91,7 +91,7 @@ body {
   height: 430px;
   margin-right: 9px;
 }
-.gh #gh-main #gh-canvas {
+#gh #gh-main #gh-canvas {
   float: left;
   width: 800px;
   height: 450px;
@@ -99,7 +99,7 @@ body {
   border-left: 1px solid #c0c0c0;
   border-right: 1px solid #c0c0c0;
 }
-.gh #gh-main #gh-right-panel {
+#gh #gh-main #gh-right-panel {
   float: left;
   clear: right;
   overflow: auto;
@@ -108,7 +108,7 @@ body {
   height: 430px;
   margin-left: 9px;
 }
-.gh #gh-main #gh-footer {
+#gh #gh-main #gh-footer {
   width: 100%;
   float: left;
   clear: both;

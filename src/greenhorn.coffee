@@ -49,7 +49,7 @@ class Greenhorn
     #keyboard input tracking array
     @isDown = new Array 256
     key = false for key in @isDown
-    
+
     #name of the current state
     @currentState = 'STARTUP'
 
@@ -71,7 +71,7 @@ class Greenhorn
     _elmnts.canvas.id = 'gh-canvas'
     _elmnts.rightPanel.id = 'gh-right-panel'
     _elmnts.footer.id = 'gh-footer'
-    
+
     #assign gh-h class to panelHeaders
     _elmnts.leftPanelHeader.classList.add 'gh-h'
     _elmnts.rightPanelHeader.classList.add 'gh-h'
@@ -86,7 +86,7 @@ class Greenhorn
     #append headers to panels
     _elmnts.leftPanel.appendChild _elmnts.leftPanelHeader
     _elmnts.rightPanel.appendChild _elmnts.rightPanelHeader
-    
+
     #keep track of mouse events over canvas
     _elmnts.canvas.onmousemove = (e) ->
         @mouseX = e.pageX
@@ -112,7 +112,7 @@ class Greenhorn
     #mouse position getters
     @getMouseX = ->
         _elmnts.canvas.mouseX - _elmnts.canvas.offsetLeft - _elmnts.canvas.width / 2
-        
+
     @getMouseY = ->
         -(_elmnts.canvas.mouseY - _elmnts.canvas.offsetTop - _elmnts.canvas.height / 2)
 
@@ -133,17 +133,17 @@ class Greenhorn
 
         #append to an element
         _elmnts[config.parent].appendChild button
-    
+
     #change state
     @changeState = (stateName) ->
         @emit "state-change-from:#{@currentState}"
         @emit 'state-change', @currentState, stateName
         @emit "state-change-to:#{stateName}"
         @currentState = stateName
-    
+
     #execute start-up logic only once
     _firstTime = true
-    
+
     #game control
     @isRunning = ->
         _masterID?
@@ -164,11 +164,13 @@ class Greenhorn
         #prevent starting without properly stopping first
         unless @isRunning()
             if _firstTime
-                #add engine to a user defined '.gh' div or the document body
-                (document.querySelector('.gh') ? document.body).appendChild _elmnts.main
-                if _elmnts.main.parentNode is document.body
-                    document.body.classList.add 'gh'
-                
+                #add engine to a user defined '#gh' div
+                mainDiv = document.querySelector '#gh'
+                if mainDiv?
+                    mainDiv.appendChild _elmnts.main
+                else
+                    console.log "There is no '#gh' element!"
+
                 #set the innerHTML of each element
                 _elmnts.title.innerHTML = document.title
                 _elmnts.leftPanelHeader.innerHTML = env.ENGINE.leftHeader

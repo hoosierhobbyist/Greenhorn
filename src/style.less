@@ -26,17 +26,17 @@ sedabull@gmail.com
 @panelFontSize: .7em;
 
 //rules
-body{
+/*body{
     background-color: @fgColor;
-}//end body
+}//end body*/
 
-.gh{
+#gh{
     //gh class style
     border-radius: @borderRadius;
     background-color: @extrnlBgColor;
     border: @extrnlBorderWidth @extrnlBorderStyle @acntColor;
     min-height: @canvasHeight + @titleHeight + @footerHeight + @intrnlPadding * 4 + 50;
-    
+
     //gh sub-classes
     .gh-ol{}//end .gh-ol class
     .gh-ul{}//end .gh-ul class
@@ -46,7 +46,7 @@ body{
         font-weight: 500;
         text-decoration: underline;
         font-size: 1.05em;
-        
+
         &:link{
             color: @acntColor;
         }
@@ -87,7 +87,7 @@ body{
         text-decoration: underline;
         font-size: @panelFontSize * 1.10;
     }//end .gh-panel-sub-header
-    
+
     //gh named elements
     #gh-main{
         //main div style
@@ -102,7 +102,7 @@ body{
         max-height: @canvasHeight + @titleHeight + @footerHeight + @intrnlPadding * 4;
         min-width: @canvasWidth + @leftPanelWidth + @rightPanelWidth + @intrnlPadding * 4;
         max-width: @canvasWidth + @leftPanelWidth + @rightPanelWidth + @intrnlPadding * 4;
-        
+
         //child elements style
         #gh-title{
             width: 100%;
