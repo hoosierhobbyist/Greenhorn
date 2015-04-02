@@ -37,10 +37,13 @@ env =
         ddy: 0
         dda: 0
         level: 0
+        scale: 1
         width: 64
         height: 64
         visible: yes
         imageFile: ''
+        shape: 'polygon'
+        highlight: false
         ba_top: 'WRAP'
         ba_bottom: 'WRAP'
         ba_right: 'WRAP'
