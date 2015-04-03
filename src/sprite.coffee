@@ -119,6 +119,9 @@ class Sprite extends EventEmitter
 
     #instance methods
     constructor: (config = {}) ->
+        #call EventEmitter constructor
+        super()
+
         #cache class-level reference to gh-canvas
         _canvas ?= document.getElementById('gh-canvas') or document.createElement('canvas')
 
