@@ -48,6 +48,5 @@ class EventEmitter
         if event? then @_events[event]
         else @_events ?= {}
 
-_mixin = (dest, source) ->
-    dest[key] = value for own key, value of source
-    return dest
+#conditionally add to namespace object
+gh.EventEmitter = EventEmitter if GH_INCLUDE_PRIVATE_API

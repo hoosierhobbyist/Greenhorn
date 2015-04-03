@@ -29,7 +29,7 @@ concat = (callback) ->
 
 build = (callback) ->
     coffee = spawn 'coffee', ['-c', '-o', 'lib/', 'src/Greenhorn.coffee']
-    
+
     coffee.stderr.on 'data', (data) ->
         process.stderr.write data.toString()
     coffee.stdout.on 'data', (data) ->
@@ -45,7 +45,7 @@ clean = (callback) ->
             callback?()
 
 lessc = (callback) ->
-    exec 'lessc src/style.less > lib/GreenhornStyle.css', (error) ->
+    exec 'lessc src/style.less > styles/GreenhornStyle.css', (error) ->
         if error?
             console.log "exec error: #{error}"
         else

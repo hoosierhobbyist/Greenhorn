@@ -45,7 +45,7 @@ _masterUpdate = ->
     Sprite._drawAll()
 
 #Engine class
-class Greenhorn
+class Greenhorn extends EventEmitter
     #keyboard input tracking array
     @isDown = new Array 256
     key = false for key in @isDown
@@ -212,9 +212,6 @@ class Greenhorn
             else
                 _startEverything()
                 if stateName then @changeState stateName
-
-#mixin EventEmitter
-_mixin Greenhorn, EventEmitter::
 
 #add to namespace object
 gh.Greenhorn = Greenhorn

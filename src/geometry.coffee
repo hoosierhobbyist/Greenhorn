@@ -6,7 +6,7 @@ sedabull@gmail.com
 
 class @Point
     constructor: (@_x, @_y, @_sprite) ->
-    
+
     get: (what) ->
         if what is 'x'
             @_x + @_sprite._pos.x
@@ -18,7 +18,7 @@ class @Point
             Math.sqrt @_y**2 + @_x**2
         else
             throw new Error "#{what} is not a get-able Point attribute"
-    
+
     set: (what, to) ->
         if what is 'x'
             @_x = to
@@ -37,7 +37,7 @@ class @Point
         else
             throw new Error "#{what} is not a set-able Point attribute"
         return this
-    
+
     change: (what, step) ->
         if what is 'x'
             @_x += step
@@ -57,13 +57,16 @@ class @Point
             throw new Error "#{what} is not a change-able Point attribute"
         return this
 
+#conditionally add to namespace object
+gh.Point = Point if GH_INCLUDE_PRIVATE_API
+
 class @Line
     constructor: (@p1, @p2) ->
         if @p1.get('x') > @p2.get('x')
             [@p1, @p2] = [@p2, @p1]
         else if Math.abs(@p1.get('x') - @p2.get('x')) < .1 and @p1.get('y') > @p2.get('y')
             [@p1, @p2] = [@p2, @p1]
-    
+
     get: (what) ->
         if what is 'm'
             if Math.abs(@p1.get('x') - @p2.get('x')) < .1
@@ -77,14 +80,14 @@ class @Line
                 -@get('m') * @p1.get('x') + @p1.get('y')
         else
             throw new Error "#{what} is not a get-able Line attribute"
-    
+
     collidesWith: (other) ->
         if _int = @_intersection other
             if @_contains _int
                 if other._contains _int
                     return true
         return false
-    
+
     _contains: (pt) ->
         if Math.abs(@p1.get('x') - @p2.get('x')) < .1
             if Math.abs(@p1.get('x')- pt.get('x')) < .1
@@ -94,7 +97,7 @@ class @Line
             if Math.abs((@get('m') * pt.get('x') + @get('b')) - pt.get('y')) < .1
                 return true
         return false
-    
+
     _intersection: (other) ->
         if @get('m') is undefined and other.get('m') is undefined
             return undefined
@@ -110,3 +113,6 @@ class @Line
             _x = (other.get('b') - @get('b')) / (@get('m') - other.get('m'))
             _y = @get('m') * _x + @get('b')
         return new Point _x, _y, _pos: {x: 0, y: 0}
+
+#conditionally add to namespace object
+gh.Line = Line if GH_INCLUDE_PRIVATE_API

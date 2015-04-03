@@ -13,12 +13,15 @@ class AniCycle
         @stop = data.stop
         @name = data.name
 
+#conditionally add to namespace object
+gh.AniCycle = AniCycle if GH_INCLUDE_PRIVATE_API
+
 class AniSprite extends Sprite
     constructor: (config = {}) ->
         #add missing keys to config
         for own key, value of env.ANISPRITE_DEFAULT_CONFIG
             config[key] ?= value
-        
+
         #filter out initial cycle if one is provided
         initialCycle = null
         for own key, value of config
@@ -35,7 +38,7 @@ class AniSprite extends Sprite
 
         #call the Sprite constructor
         super(config)
-        
+
         #set initial cycle if one was provided
         @set 'current', initialCycle, false if initialCycle?
 
@@ -103,7 +106,7 @@ class AniSprite extends Sprite
         if @_dis.visible
             #fire draw event
             @emit 'draw'
-            
+
             #save current context
             @_dis.context.save()
 
@@ -136,7 +139,7 @@ class AniSprite extends Sprite
     _update: ->
         #call Sprite _update
         super()
-            
+
         #determine if it's time to change frames
         if @_ani.timer.getElapsedTime() >= (1000 / @_ani.frameRate)
             #determine next frame in animation loop
@@ -147,7 +150,7 @@ class AniSprite extends Sprite
 
             #restart the timer
             @_ani.timer.restart()
-    
+
     #debugging
     report: ->
         """

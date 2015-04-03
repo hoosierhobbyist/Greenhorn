@@ -3,20 +3,18 @@
     <head>
         <meta charset="utf-8">
         <title>Greenhorn Tests</title>
-        <link rel="stylesheet" href="../lib/GreenhornStyle.css"/>
-        <link rel="stylesheet" href="../node_modules/mocha/mocha.css"/>
+        <link rel="stylesheet" href="../styles/mocha.css"/>
+        <link rel="stylesheet" href="../styles/GreenhornStyle.css"/>
     </head>
     <body>
         <div id="mocha"></div>
+        <script>GH_INCLUDE_PRIVATE_API = true;</script>
+        <script src="../lib/mocha.js"></script>
+        <script src="../lib/should.js"></script>
         <script src="../lib/Greenhorn.js"></script>
-        <script src="../node_modules/mocha/mocha.js"></script>
-        <script src="../node_modules/should/should.js"></script>
+
         <script>mocha.setup('bdd');</script>
         <script src="./timer-spec.js"></script>
-        <script>
-            mocha.checkLeaks();
-            mocha.globals(['gh']);
-            mocha.run();
-        </script>
+        <script>mocha.run();</script>
     </body onload="mocha.run">
 </html>
