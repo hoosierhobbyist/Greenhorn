@@ -11,7 +11,7 @@ called src/Greenhorn.coffee. That one large
 file is then feed to the coffeeScript compiler
 which creates lib/Greenhorn.js. Afterwards,
 the temporary file src/Greenhorn.coffee is removed.
-To create lib/GreenhornStyle.css, src/style.less
+To create styles/GreenhornStyle.css, styles/GreenhornStyle.less
 is fed into lessc and the output is redirected.
 ###
 
