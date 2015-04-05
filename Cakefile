@@ -45,7 +45,7 @@ clean = (callback) ->
             callback?()
 
 lessc = (callback) ->
-    exec 'lessc src/style.less > styles/GreenhornStyle.css', (error) ->
+    exec 'lessc styles/GreenhornStyle.less > styles/GreenhornStyle.css', (error) ->
         if error?
             console.log "exec error: #{error}"
         else
