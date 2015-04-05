@@ -44,46 +44,6 @@ describe('EventEmitter', function(){
             ee.listeners('test').should.be.an.Array;
         });
 
-        it('should fire an event:added event when a new event is registered', function(){
-            var fired = false;
-
-            ee.on('event:added', function(eventName){
-                fired = true;
-                eventName.should.equal('test');
-            });
-
-            ee.on('test', function(){});
-            fired.should.be.true;
-        });
-
-        it('should not fire and event:added event when a new listener is added to an existing event', function(){
-            var fired = false;
-
-            ee.on('test', function(){});
-            ee.on('event:added', function(eventName){fired = true;});
-
-            ee.on('test', function(){});
-            fired.should.be.false;
-        });
-
-        it('should fire a listener:added event whenever a new listener is added', function(){
-            var fired = false;
-            var test = function(){};
-
-            ee.on('listener:added', function(eventName, listener){
-                fired = true;
-                eventName.should.equal('test');
-                listener.should.equal(test);
-            });
-
-            ee.on('test', test);
-            fired.should.be.true;
-
-            fired = false;
-            ee.on('test', test);
-            fired.should.be.true;
-        });
-
         it('should store listeners for the same event in the order given', function(){
             var test1 = function(){};
             var test2 = function(){};
@@ -155,6 +115,143 @@ describe('EventEmitter', function(){
             ee.once('test', test);
             ee.emit('test');
             ee.listeners('test').should.have.length(1);
+        });
+    });
+
+    describe('::emit', function(){
+        var ee;
+
+        beforeEach(function(){
+            ee = new EventEmitter();
+        });
+
+        it('should return true if there are registered listeners', function(){
+            ee.on('test', function(){});
+            ee.emit('test').should.be.true;
+        });
+
+        it('should return false if there are no registered listeners', function(){
+            ee.emit('test').should.be.false;
+        });
+
+        it('should pass arguments on to the listeners', function(){
+            var fired = false;
+            ee.on('test', function(one, two, three){
+                fired = true;
+                one.should.equal(1);
+                two.should.equal(2);
+                three.should.equal(3);
+            });
+
+            ee.emit('test', 1, 2, 3);
+            fired.should.be.true;
+        });
+    });
+
+    describe('::remove', function(){
+        var ee;
+
+        beforeEach(function(){
+            ee = new EventEmitter();
+        });
+
+        it('should unregister a listener when called with two arguments', function(){
+            var test1 = function(){};
+            var test2 = function(){};
+
+            ee.on('test', test1);
+            ee.on('test', test2);
+            ee.listeners('test').should.have.length(2);
+
+            ee.remove('test', test1);
+            ee.listeners('test').should.have.length(1);
+            ee.listeners('test')[0].should.equal(test2);
+        });
+
+        it('should return true when removing a registered listener', function(){
+            var test = function(){};
+
+            ee.on('test', test);
+            ee.remove('test', test).should.be.true;
+        });
+
+        it('should return false when trying to remove an unregistered listener', function(){
+            var test = function(){};
+
+            ee.on('test', test);
+            ee.remove('test', function(){}).should.be.false;
+        });
+
+        it('should delete the event if removing the last listener', function(){
+            var test = function(){};
+
+            ee.on('test', test);
+            ee.listeners('test').should.have.length(1);
+
+            ee.remove('test', test);
+            ee.listeners('test').should.be.false;
+        });
+
+        it('should unregister an event when called with one argument', function(){
+            ee.on('test', function(){});
+            ee.once('test', function(){});
+
+            ee.listeners('test').should.have.length(2);
+            ee.remove('test');
+            ee.listeners('test').should.be.false;
+        });
+
+        it('should return true when removing a registered event', function(){
+            ee.on('test', function(){});
+            ee.remove('test').should.be.true;
+        });
+
+        it('should return false when trying to remove an unregistered event', function(){
+            ee.remove('test').should.be.false;
+        });
+    });
+
+    describe('::listeners', function(){
+        var ee;
+
+        beforeEach(function(){
+            ee = new EventEmitter();
+        });
+
+        it('should return the entire events object when called with zero arguments', function(){
+            var test1 = function(){};
+            var test2 = function(){};
+            var test3 = function(){};
+
+            ee.listeners().should.be.an.Object;
+
+            ee.on('test1', test1);
+            ee.on('test2', test2);
+            ee.on('test2', test3);
+            ee.listeners().should.have.properties({
+                'test1': [
+                    test1
+                ],
+                'test2': [
+                    test2,
+                    test3
+                ]
+            });
+        });
+
+        it('should return an array of listeners when accessing a registered event', function(){
+            var test1 = function(){};
+            var test2 = function(){};
+            var test3 = function(){};
+
+            ee.on('test', test1);
+            ee.on('test', test2);
+            ee.on('test', test3);
+            ee.listeners('test').should.containDeepOrdered([test1, test2, test3]);
+        });
+
+        it('should return false when trying to access an unregistered event', function(){
+            ee.listeners('test').should.be.false;
         });
     });
 });
