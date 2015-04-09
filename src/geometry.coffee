@@ -82,13 +82,13 @@ class @Line
             throw new Error "#{what} is not a get-able Line attribute"
 
     collidesWith: (other) ->
-        if _int = @_intersection other
-            if @_contains _int
-                if other._contains _int
+        if int = @intersection other
+            if @contains int
+                if other.contains int
                     return true
         return false
 
-    _contains: (pt) ->
+    contains: (pt) ->
         if Math.abs(@p1.get('x') - @p2.get('x')) < .1
             if Math.abs(@p1.get('x')- pt.get('x')) < .1
                 if @p1.get('y') <= pt.get('y') <= @p2.get('y')
@@ -98,7 +98,7 @@ class @Line
                 return true
         return false
 
-    _intersection: (other) ->
+    intersection: (other) ->
         if @get('m') is undefined and other.get('m') is undefined
             return undefined
         else if @get('m') is undefined

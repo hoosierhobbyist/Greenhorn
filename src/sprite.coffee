@@ -543,8 +543,8 @@ class Sprite extends EventEmitter
                         #check for collisions
                         for innerLine in innerLines
                             for outerLine in outerLines
-                                unless innerLine._contains outerLine.p1
-                                    unless innerLine._contains outerLine.p2
+                                unless innerLine.contains outerLine.p1
+                                    unless innerLine.contains outerLine.p2
                                         if innerLine.collidesWith outerLine
                                             return false
                         return true
@@ -588,8 +588,8 @@ class Sprite extends EventEmitter
                                                         myLines.push new Line p1, p2
                                                 for myLine in myLines
                                                     for otherLine in otherLines
-                                                        unless myLine._contains otherLine.p1
-                                                            unless myLine._contains otherLine.p2
+                                                        unless myLine.contains otherLine.p1
+                                                            unless myLine.contains otherLine.p2
                                                                 if myLine.collidesWith otherLine
                                                                     return false
                                                 return true
@@ -603,8 +603,8 @@ class Sprite extends EventEmitter
                                                         otherLines.push new Line p1, p2
                                                 for otherLine in otherLines
                                                     for myLine in myLines
-                                                        unless otherLine._contains myLine.p1
-                                                            unless otherLine._contains myLine.p2
+                                                        unless otherLine.contains myLine.p1
+                                                            unless otherLine.contains myLine.p2
                                                                 if otherLine.collidesWith myLine
                                                                     return false
                                                 return true
