@@ -52,5 +52,5 @@ class EventEmitter
         else
             @_events
 
-#conditionally add to namespace object
-gh.EventEmitter = EventEmitter if GH_INCLUDE_PRIVATE_API
+#add to namespace object
+gh.EventEmitter = EventEmitter
