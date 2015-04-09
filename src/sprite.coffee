@@ -831,7 +831,7 @@ class Sprite extends EventEmitter
         this
 
     #debugging
-    report: ->
+    toString: ->
         """
         position:
             x: #{@_pos.x.toFixed 2}

@@ -88,7 +88,7 @@ class TextSprite extends Sprite
         if @_dis.visible
             #fire draw event
             @emit 'draw'
-            
+
             #save current context
             @_dis.context.save()
 
@@ -162,7 +162,7 @@ class TextSprite extends Sprite
     _update: ->
         #call Sprite update
         super()
-        
+
         #calculate new size
         @_dis.width = 0
         @_dis.height = @_font.size * 1.5 * @_text.length
@@ -181,9 +181,9 @@ class TextSprite extends Sprite
         if @_border.visible
             @_dis.width += 2 * @_border.size
             @_dis.height += 2 * @_border.size
-    
+
     #debugging
-    report: ->
+    toString: ->
         """
         #{super()}
         font:

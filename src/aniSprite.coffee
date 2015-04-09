@@ -152,7 +152,7 @@ class AniSprite extends Sprite
             @_ani.timer.restart()
 
     #debugging
-    report: ->
+    toString: ->
         """
         #{super()}
         animation:
