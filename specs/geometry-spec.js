@@ -143,15 +143,12 @@ describe('Point (private class)', function(){
 });
 
 describe('Line (private class)', function(){
+    var Point = gh.Point;
     var Line = gh.Line;
 
     describe('API', function(){
         it('should have a get method', function(){
             Should.exist(Line.prototype.get);
-        });
-
-        it('should have a collidesWith method', function(){
-            Should.exist(Line.prototype.collidesWith);
         });
 
         it('should have a contains method', function(){
@@ -160,6 +157,83 @@ describe('Line (private class)', function(){
 
         it('should have an intersection method', function(){
             Should.exist(Line.prototype.intersection);
+        });
+
+        it('should have a collidesWith method', function(){
+            Should.exist(Line.prototype.collidesWith);
+        });
+    });
+
+    describe('constructor', function(){
+        var origin = {_pos: {x: 0, y: 0}};
+        var p1 = new Point(-1, -1, origin);
+        var p2 = new Point(1, 1, origin);
+        var p3 = new Point(0, -1, origin);
+        var p4 = new Point(0, 1, origin);
+
+        it('should preserve the order when points are listed in ascending x order', function(){
+            var line = new Line(p1, p2);
+
+            line.p1.should.equal(p1);
+            line.p2.should.equal(p2);
+        });
+
+        it('should reverse the order when points are listed in decending x order', function(){
+            var line = new Line(p2, p1);
+
+            line.p1.should.equal(p1);
+            line.p2.should.equal(p2);
+        });
+
+        it('should preserve the order when points are listed in ascending y order', function(){
+            var line = new Line(p3, p4);
+
+            line.p1.should.equal(p3);
+            line.p2.should.equal(p4);
+        });
+
+        it('should reverse the order when points are listed in decending y order', function(){
+            var line = new Line(p4, p3);
+
+            line.p1.should.equal(p3);
+            line.p2.should.equal(p4);
+        });
+    });
+
+    describe('::get', function(){
+        var origin = {_pos: {x: 0, y: 0}};
+        var p1 = new Point(-1, -1, origin);
+        var p2 = new Point(1, 1, origin);
+        var p3 = new Point(0, -1, origin);
+        var p4 = new Point(0, 1, origin);
+
+        it('should allow get("m")', function(){
+            var line = new Line(p1, p2);
+            (function(){line.get('m');}).should.not.throw();
+        });
+
+        it('should allow get("b")', function(){
+            var line = new Line(p1, p2);
+            (function(){line.get('b');}).should.not.throw();
+        });
+
+        it('should not allow get("anythingElse")', function(){
+            var line = new Line(p1, p2);
+            (function(){line.get('somethingNotAllowed');}).should.throw();
+        });
+
+        it('should return a Number when get("m") or get("b") is called on a non-vertical line', function(){
+            var line = new Line(p1, p2);
+
+            line.get('m').should.be.a.Number;
+            line.get('b').should.be.a.Number;
+        });
+
+        it('should return undefined when get("m") or get("b") is called on a vertical line', function(){
+            var line = new Line(p3, p4);
+
+            Should.equal(line.get('m'), undefined);
+            Should.equal(line.get('b'), undefined);
         });
     });
 });

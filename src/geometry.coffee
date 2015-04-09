@@ -81,13 +81,6 @@ class @Line
         else
             throw new Error "#{what} is not a get-able Line attribute"
 
-    collidesWith: (other) ->
-        if int = @intersection other
-            if @contains int
-                if other.contains int
-                    return true
-        return false
-
     contains: (pt) ->
         if Math.abs(@p1.get('x') - @p2.get('x')) < .1
             if Math.abs(@p1.get('x')- pt.get('x')) < .1
@@ -113,6 +106,13 @@ class @Line
             _x = (other.get('b') - @get('b')) / (@get('m') - other.get('m'))
             _y = @get('m') * _x + @get('b')
         return new Point _x, _y, _pos: {x: 0, y: 0}
+
+    collidesWith: (other) ->
+        if int = @intersection other
+            if @contains int
+                if other.contains int
+                    return true
+        return false
 
 #conditionally add to namespace object
 gh.Line = Line if GH_INCLUDE_PRIVATE_API
