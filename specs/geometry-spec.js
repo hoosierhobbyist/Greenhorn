@@ -236,4 +236,42 @@ describe('Line (private class)', function(){
             Should.equal(line.get('b'), undefined);
         });
     });
+    
+    describe('::contains', function(){
+        var origin = {_pos: {x: 0, y: 0}};
+        var p1 = new Point(-1, -1, origin);
+        var p2 = new Point(1, 1, origin);
+        var p3 = new Point(0, -1, origin);
+        var p4 = new Point(0, 1, origin);
+        var line1 = new Line(p1, p2);
+        var line2 = new Line(p3, p4);
+        
+        it('should return true if a point is on the line and within it\'s bounds', function(){
+            line1.contains(new Point(-.5, -.5, origin)).should.be.true;
+            line1.contains(new Point(0, 0, origin)).should.be.true;
+            line1.contains(new Point(.5, .5, origin)).should.be.true;
+            
+            line2.contains(new Point(0, -.5, origin)).should.be.true;
+            line2.contains(new Point(0, 0, origin)).should.be.true;
+            line2.contains(new Point(0, .5, origin)).should.be.true;
+        });
+        
+        it('should return false if a point is on the line, but not within it\'s bounds', function(){
+            line1.contains(new Point(-2, -2, origin)).should.be.false;
+            line1.contains(new Point(2, 2, origin)).should.be.false;
+            
+            line2.contains(new Point(0, -2, origin)).should.be.false;
+            line2.contains(new Point(0, 2, origin)).should.be.false;
+        });
+        
+        it('should return false if a point is within it\'s bounds, but not on the line', function(){
+            line1.contains(new Point(0, -.5, origin)).should.be.false;
+            line1.contains(new Point(0, .5, origin)).should.be.false;
+        });
+        
+        it('should return false if a point is not within it\'s bounds and not on the line', function(){
+            line1.contains(new Point(-5, -2, origin)).should.be.false;
+            line1.contains(new Point(2, 5, origin)).should.be.false;
+        });
+    });
 });
