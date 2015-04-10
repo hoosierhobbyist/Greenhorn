@@ -236,7 +236,7 @@ describe('Line (private class)', function(){
             Should.equal(line.get('b'), undefined);
         });
     });
-    
+
     describe('::contains', function(){
         var origin = {_pos: {x: 0, y: 0}};
         var p1 = new Point(-1, -1, origin);
@@ -245,33 +245,86 @@ describe('Line (private class)', function(){
         var p4 = new Point(0, 1, origin);
         var line1 = new Line(p1, p2);
         var line2 = new Line(p3, p4);
-        
+
         it('should return true if a point is on the line and within it\'s bounds', function(){
             line1.contains(new Point(-.5, -.5, origin)).should.be.true;
             line1.contains(new Point(0, 0, origin)).should.be.true;
             line1.contains(new Point(.5, .5, origin)).should.be.true;
-            
+
             line2.contains(new Point(0, -.5, origin)).should.be.true;
             line2.contains(new Point(0, 0, origin)).should.be.true;
             line2.contains(new Point(0, .5, origin)).should.be.true;
         });
-        
+
         it('should return false if a point is on the line, but not within it\'s bounds', function(){
             line1.contains(new Point(-2, -2, origin)).should.be.false;
             line1.contains(new Point(2, 2, origin)).should.be.false;
-            
+
             line2.contains(new Point(0, -2, origin)).should.be.false;
             line2.contains(new Point(0, 2, origin)).should.be.false;
         });
-        
+
         it('should return false if a point is within it\'s bounds, but not on the line', function(){
             line1.contains(new Point(0, -.5, origin)).should.be.false;
             line1.contains(new Point(0, .5, origin)).should.be.false;
         });
-        
+
         it('should return false if a point is not within it\'s bounds and not on the line', function(){
             line1.contains(new Point(-5, -2, origin)).should.be.false;
             line1.contains(new Point(2, 5, origin)).should.be.false;
+        });
+    });
+
+    describe('::intersection', function(){
+        var origin = {_pos: {x: 0, y: 0}};
+        var p1 = new Point(-1, -1, origin);
+        var p2 = new Point(1, 1, origin);
+        var p3 = new Point(0, -1, origin);
+        var p4 = new Point(0, 1, origin);
+        var p5 = new Point(-1, 0, origin);
+        var p6 = new Point(1, 0, origin);
+        var line1 = new Line(p1, p2);
+        var line2 = new Line(p3, p4);
+        var line3 = new Line(p1, p4);
+        var line4 = new Line(p3, p2);
+        var line5 = new Line(p1, p3);
+        var line6 = new Line(p4, p2);
+        var line7 = new Line(p1, p5);
+        var line8 = new Line(p6, p2);
+
+        it('should return undefined when two lines are parallel', function(){
+            Should.equal(line3.intersection(line4), undefined);
+            Should.equal(line5.intersection(line6), undefined);
+            Should.equal(line7.intersection(line8), undefined);
+        });
+
+        it('should return a Point when two lines are not parallel', function(){
+            line1.intersection(line2).should.be.an.instanceof(Point);
+            line1.intersection(line3).should.be.an.instanceof(Point);
+            line1.intersection(line5).should.be.an.instanceof(Point);
+            line2.intersection(line5).should.be.an.instanceof(Point);
+        });
+    });
+
+    describe('::collidesWith', function(){
+        var origin = {_pos: {x: 0, y: 0}};
+        var p1 = new Point(-1, -1, origin);
+        var p2 = new Point(1, 1, origin);
+        var p3 = new Point(0, -1, origin);
+        var p4 = new Point(0, 1, origin);
+        var p5 = new Point(-1, 2, origin);
+        var p6 = new Point(1, 2, origin);
+        var line1 = new Line(p1, p2);
+        var line2 = new Line(p3, p4);
+        var line3 = new Line(p5, p6);
+
+        it('should return true when two lines overlap', function(){
+            line1.collidesWith(line2).should.be.true;
+        });
+
+        it('should return false when two lines do not overlap', function(){
+            line1.collidesWith(line3).should.be.false;
+            line2.collidesWith(line3).should.be.false;
         });
     });
 });
