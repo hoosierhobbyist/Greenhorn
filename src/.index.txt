@@ -1,4 +1,3 @@
-environment.coffee
 eventEmitter.coffee
 greenhorn.coffee
 geometry.coffee

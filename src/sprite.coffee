@@ -7,18 +7,15 @@ sedabull@gmail.com
 class Sprite extends EventEmitter
     #closures
     _list = []
-    _canvas = null
-    _bounds = null
+    _canvas = Greenhorn.canvas
+    _bounds =
+        top: _canvas.height / 2
+        bottom: -_canvas.height / 2
+        right: _canvas.width / 2
+        left: -_canvas.width / 2
     _sortRule = (sp1, sp2) ->
         sp1._dis.level - sp2._dis.level
     _boundaryCallback = (ba, side) ->
-        #cache boundaries
-        _bounds ?=
-            top: _canvas.height / 2
-            bottom: -_canvas.height / 2
-            right: _canvas.width / 2
-            left: -_canvas.width / 2
-
         #return appropriate callback
         switch ba
             when 'DIE'
@@ -46,31 +43,59 @@ class Sprite extends EventEmitter
             when 'SPRING'
                 switch side
                     when 'top'
-                        -> @change 'dy', env.SPRING_CONSTANT * (_bounds.top - @get('top', false)), false
+                        -> @change 'dy', Sprite.config.springConstant * (_bounds.top - @get('top', false)), false
                     when 'bottom'
-                        -> @change 'dy', env.SPRING_CONSTANT * (_bounds.bottom - @get('bottom', false)), false
+                        -> @change 'dy', Sprite.config.springConstant * (_bounds.bottom - @get('bottom', false)), false
                     when 'right'
-                        -> @change 'dx', env.SPRING_CONSTANT * (_bounds.right - @get('right', false)), false
+                        -> @change 'dx', Sprite.config.springConstant * (_bounds.right - @get('right', false)), false
                     when 'left'
-                        -> @change 'dx', env.SPRING_CONSTANT * (_bounds.left - @get('left', false)), false
+                        -> @change 'dx', Sprite.config.springConstant * (_bounds.left - @get('left', false)), false
             when 'BOUNCE'
                 switch side
                     when 'top'
                         ->
                             @set 'top', _bounds.top - 1, false
-                            @_mot.dy *= -1 + env.BOUNCE_DECAY
+                            @_mot.dy *= -1 + Sprite.config.bounceDecay
                     when 'bottom'
                         ->
                             @set 'bottom', _bounds.bottom + 1, false
-                            @_mot.dy *= -1 + env.BOUNCE_DECAY
+                            @_mot.dy *= -1 + Sprite.config.bounceDecay
                     when 'right'
                         ->
                             @set 'right', _bounds.right - 1, false
-                            @_mot.dx *= -1 + env.BOUNCE_DECAY
+                            @_mot.dx *= -1 + Sprite.config.bounceDecay
                     when 'left'
                         ->
                             @set 'left', _bounds.left + 1, false
-                            @_mot.dx *= -1 + env.BOUNCE_DECAY
+                            @_mot.dx *= -1 + Sprite.config.bounceDecay
+
+    #class objects
+    @config:
+        path: './'
+        bounceDecay: 0
+        springConstant: 25
+    @defaults:
+        x: 0
+        y: 0
+        a: 0
+        dx: 0
+        dy: 0
+        da: 0
+        ddx: 0
+        ddy: 0
+        dda: 0
+        level: 0
+        scale: 1
+        width: 64
+        height: 64
+        visible: yes
+        imageFile: ''
+        shape: 'polygon'
+        highlight: false
+        ba_top: 'WRAP'
+        ba_bottom: 'WRAP'
+        ba_right: 'WRAP'
+        ba_left: 'WRAP'
 
     #class methods
     @howMany = ->
@@ -122,11 +147,8 @@ class Sprite extends EventEmitter
         #call EventEmitter constructor
         super()
 
-        #cache class-level reference to gh-canvas
-        _canvas ?= document.getElementById('gh-canvas') or document.createElement('canvas')
-
         #add missing keys to config
-        for own key, value of env.SPRITE_DEFAULT_CONFIG
+        for own key, value of Sprite.defaults
             config[key] ?= value
 
         #process config object
@@ -216,7 +238,7 @@ class Sprite extends EventEmitter
         @_updateID?
     _start: ->
         @emit 'start'
-        @_updateID = setInterval @_update, 1000 / env.FRAME_RATE
+        @_updateID = setInterval @_update, 1000 / Greenhorn.config.frameRate
     _stop: ->
         @emit 'stop'
         clearInterval @_updateID
@@ -346,12 +368,12 @@ class Sprite extends EventEmitter
                 throw new Error "Cannot set radius when shape isnt 'circle'"
         else if what.match /^imageFile$/
             old = @get 'imageFile', false if _emit
-            if env.IMAGE_PATH.match /\/$/
-                @_dis.image.src = env.IMAGE_PATH.concat to
+            if Sprite.config.imagePath.match /\/$/
+                @_dis.image.src = Sprite.config.imagePath.concat to
             else
-                if env.IMAGE_PATH
-                    env.IMAGE_PATH += '/'
-                    @_dis.image.src = env.IMAGE_PATH.concat to
+                if Sprite.config.imagePath
+                    Sprite.config.imagePath += '/'
+                    @_dis.image.src = Sprite.config.imagePath.concat to
                 else
                     @_dis.image.src = to
         else if what.match /^distance$/
@@ -473,15 +495,15 @@ class Sprite extends EventEmitter
     #emit virtual change, real change or both?
     change: (what, step, _emit = true) ->
         if what.match /(^x$|^y$|^a$)/
-            @_pos[what] += step / env.FRAME_RATE
+            @_pos[what] += step / Greenhorn.config.frameRate
             if what is 'a' and @_bnd.shape is 'polygon'
-                pt.change('a', step / env.FRAME_RATE) for pt in @_bnd.points
+                pt.change('a', step / Greenhorn.config.frameRate) for pt in @_bnd.points
         else if what.match /(^dx$|^dy$|^da$)/
-            @_mot[what] += step / env.FRAME_RATE
+            @_mot[what] += step / Greenhorn.config.frameRate
         else if what.match /(^ddx$|^ddy$|^dda$)/
-            @_acc[what] += step / env.FRAME_RATE
+            @_acc[what] += step / Greenhorn.config.frameRate
         else if what.match /^level$/
-            @_dis.level += step / env.FRAME_RATE
+            @_dis.level += step / Greenhorn.config.frameRate
         else if what.match /^distance$/
             proxy =
                 dx: step * Math.cos @get 'posAngle', false
@@ -515,7 +537,7 @@ class Sprite extends EventEmitter
         else if what.match /(^_?dis|^_?pos|^_?mot|^_?acc)/
             @change k.slice(1), v, false for own k, v of step
         else
-            @[what] += step / env.FRAME_RATE
+            @[what] += step / Greenhorn.config.frameRate
         if _emit then @emit "change:#{what}", step
         return this
 

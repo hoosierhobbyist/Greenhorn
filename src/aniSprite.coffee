@@ -6,6 +6,12 @@ sedabull@gmail.com
 
 #closed over helper class
 class AniCycle
+    @defaults:
+        index: 1
+        start: 1
+        numFrames: 8
+        name: 'cycle'
+
     constructor: (data) ->
         @frame = data.start
         @index = data.index
@@ -17,9 +23,16 @@ class AniCycle
 gh.AniCycle = AniCycle if GH_INCLUDE_PRIVATE_API
 
 class AniSprite extends Sprite
+    #class level object
+    @defaults:
+        cellWidth: 32
+        cellHeight: 32
+        frameRate: 20
+        orientation: 'horizontal'
+
     constructor: (config = {}) ->
         #add missing keys to config
-        for own key, value of env.ANISPRITE_DEFAULT_CONFIG
+        for own key, value of AniSprite.defaults
             config[key] ?= value
 
         #filter out initial cycle if one is provided
@@ -63,10 +76,10 @@ class AniSprite extends Sprite
         else if what.match /(^cellWidth$|^cellHeight$|^frameRate$|^orientation$)/
             @_ani[what] = to
         else if what.match /^cycle/
-            to.index ?= env.ANICYCLE_DEFAULT_CONFIG.index
-            to.start ?= env.ANICYCLE_DEFAULT_CONFIG.start
-            to.stop ?= to.start + env.ANICYCLE_DEFAULT_CONFIG.numFrames - 1
-            to.name ?= what.slice(5) ? env.ANICYCLE_DEFAULT_CONFIG.name
+            to.index ?= AniCycle.defaults.index
+            to.start ?= AniCycle.defaults.start
+            to.stop ?= to.start + AniCycle.defaults.numFrames - 1
+            to.name ?= what.slice(5) ? AniCycle.defaults.name
 
             @_ani.cycles.push(new AniCycle(to))
             @_ani.current ?= @_ani.cycles[0]
@@ -79,7 +92,7 @@ class AniSprite extends Sprite
     #changer
     change: (what, step, _emit = true) ->
         if what.match /^frameRate$/
-            @_ani.frameRate += step / env.FRAME_RATE
+            @_ani.frameRate += step / Greenhorn.config.frameRate
         else
             super what, step, _emit
             _emit = false

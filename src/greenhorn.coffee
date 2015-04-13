@@ -37,14 +37,14 @@ class Greenhorn extends EventEmitter
             color: '#006400'
             font: 'sans-serif'
             text: 'CLICK HERE TO START!'
-    
+
     #Greenhorn button defaults
     @buttonDefaults:
         type: 'button'
         onclick: undefined
         parent: 'gh-right-panel'
         label: 'Launch the Missiles!'
-    
+
     #asynchronous ID
     _masterID = null
     #draws on canvas once per frame
@@ -52,11 +52,11 @@ class Greenhorn extends EventEmitter
         Greenhorn.clear()
         Greenhorn.emit 'update'
         Sprite._drawAll()
-    
+
     #keyboard input tracking array (read only)
     _isDown = new Array 128
     key = false for key in _isDown
-    
+
     #listen for key events
     document.onkeydown = (e) ->
         e.preventDefault()
@@ -64,6 +64,9 @@ class Greenhorn extends EventEmitter
     document.onkeyup = (e) ->
         e.preventDefault()
         _isDown[e.keyCode] = false
+
+    #call EventEmitter constructor
+    constructor: -> super()
 
     #raw DOM manipulation
     _main = document.createElement 'div'
@@ -113,7 +116,7 @@ class Greenhorn extends EventEmitter
     @canvas.oncontextmenu = (e) ->
         e.preventDefault()
         Sprite.emitAll 'mouse:rightClick', e
-    
+
     #keyPress tester
     @isDown = (key) ->
         _isDown[key]
@@ -141,7 +144,7 @@ class Greenhorn extends EventEmitter
 
         #append to an element
         main.getElementById(config.parent).appendChild button
-    
+
     #game state functions + helper
     _currentState = 'INITIALIZING'
     @currentState = -> _currentState
@@ -161,7 +164,7 @@ class Greenhorn extends EventEmitter
         _masterID = null
     @clear = ->
         _context.clearRect -@canvas.width / 2, -@canvas.height / 2, @canvas.width, @canvas.height
-    
+
     #start function + helpers
     _firstTime = true
     _start = ->

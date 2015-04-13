@@ -4,6 +4,9 @@ Written by Seth Bullock
 sedabull@gmail.com
 ###
 
+#namespace object
+@gh = Object.create null
+
 class EventEmitter
     constructor: ->
         @_events = {}

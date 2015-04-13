@@ -5,9 +5,34 @@ sedabull@gmail.com
 ###
 
 class TextSprite extends Sprite
+    #class level object
+    @defaults:
+        level: -1
+        text: "*-TEXTSPRITE-*"
+        fontSize: 12
+        fontAlpha: 1.0
+        fontColor: "white"
+        fontAlign: "left"
+        fontName: "sans-serif"
+        borderSize: 5
+        borderAlpha: 1.0
+        borderVisible: yes
+        borderColor: "white"
+        outlineSize: 1
+        outlineAlpha: 1.0
+        outlineVisible: no
+        outlineColor: "grey"
+        marginsTop: 5
+        marginsBottom: 5
+        marginsRight: 5
+        marginsLeft: 5
+        backgroundAlpha: 1.0
+        backgroundVisible: yes
+        backgroundColor: "black"
+
     constructor: (config = {}) ->
         #add missing keys to config
-        for own key, value of env.TEXTSPRITE_DEFAULT_CONFIG
+        for own key, value of TextSprite.defaults
             config[key] ?= value
 
         #create primary objects
@@ -66,15 +91,15 @@ class TextSprite extends Sprite
         if what.match /^text$/
             @_text = (@_text.join('\n').concat(step)).split('\n')
         else if what.match /^font\w+/
-            @_font[what.slice(4).toLowerCase()] += step / env.FRAME_RATE
+            @_font[what.slice(4).toLowerCase()] += step / Greenhorn.config.frameRate
         else if what.match /^border\w+/
-            @_border[what.slice(6).toLowerCase()] += step / env.FRAME_RATE
+            @_border[what.slice(6).toLowerCase()] += step / Greenhorn.config.frameRate
         else if what.match /^outline\w+/
-            @_outline[what.slice(7).toLowerCase()] += step / env.FRAME_RATE
+            @_outline[what.slice(7).toLowerCase()] += step / Greenhorn.config.frameRate
         else if what.match /^margins\w+/
-            @_margins[what.slice(7).toLowerCase()] += step / env.FRAME_RATE
+            @_margins[what.slice(7).toLowerCase()] += step / Greenhorn.config.frameRate
         else if what.match /^background\w+/
-            @_background[what.slice(10).toLowerCase()] += step / env.FRAME_RATE
+            @_background[what.slice(10).toLowerCase()] += step / Greenhorn.config.frameRate
         else if what.match /(^font$|^border$|^outline$|^margins$|^background$)/i
             @change what.concat(k), v, false for own k, v of to
         else

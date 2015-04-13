@@ -4,16 +4,26 @@ Written by Seth Bullock
 sedabull@gmail.com
 ###
 
-#determine what kind of AudioContext is avaliable
-if window.AudioContext? or window.webkitAudioContext?
-    AudioContext = window.AudioContext ? window.webkitAudioContext
-    _audioContext = new AudioContext()
-else
-    env.USE_AUDIO_TAG = true
-
 class Sound
     #closure
     _list = []
+
+    #class level objects
+    @config:
+        path: './'
+        useAudioTag: false
+    @defaults:
+        url: ""
+        loop: false
+        volume: 1.0
+        autoplay: false
+
+    #determine what kind of AudioContext is avaliable
+    if window.AudioContext? or window.webkitAudioContext?
+        AudioContext = window.AudioContext ? window.webkitAudioContext
+        audioContext = new AudioContext()
+    else
+        Sound.config.useAudioTag = true
 
     #Sound class methods
     @_playAll = ->
@@ -34,19 +44,19 @@ class Sound
     #<---INSTANCE LEVEL--->
     constructor: (@_config = {}) ->
         #assign default values if they have been omitted
-        for own key, value of env.SOUND_DEFAULT_CONFIG
+        for own key, value of Sound.defaults
             @_config[key] ?= value
 
-        #prefix the environment sound path
-        if env.SOUND_PATH.match /\/$/
-            @_config.url = env.SOUND_PATH.concat @_config.url
+        #prefix the sound path
+        if Sound.config.path.match /\/$/
+            @_config.url = Sound.config.path.concat @_config.url
         else
-            if env.SOUND_PATH
-                env.SOUND_PATH += '/'
-                @_config.url = env.SOUND_PATH.concat @_config.url
+            if Sound.config.path
+                Sound.config.path += '/'
+                @_config.url = Sound.config.path.concat @_config.url
 
         #not using web audio api
-        if env.USE_AUDIO_TAG
+        if Sound.config.useAudioTag
             #instance variable
             @_audio = document.createElement 'audio'
             #source elements for this._audio
@@ -106,7 +116,7 @@ class Sound
             request.errorCallback = ->
                 throw new Error "AJAX request Error"
             request.onload = ->
-                _audioContext.decodeAudioData @response, @successCallback, @errorCallback
+                audioContext.decodeAudioData @response, @successCallback, @errorCallback
 
             #send request
             request.send()
@@ -117,7 +127,7 @@ class Sound
     #sound control
     play: (opt = {}) =>
         if Greenhorn.isRunning()
-            if env.USE_AUDIO_TAG
+            if Sound.config.useAudioTag
                 @_audio.loop = opt.loop ? @_config.loop
                 @_audio.volume = opt.volume ? @_config.volume
                 @_audio.play()
@@ -127,15 +137,15 @@ class Sound
                     @_isEnded = false
 
                     #create audio nodes
-                    gainNode = _audioContext.createGain()
-                    @_source = _audioContext.createBufferSource()
+                    gainNode = audioContext.createGain()
+                    @_source = audioContext.createBufferSource()
 
                     #set values on source node
                     @_source.buffer = @_buffer
                     @_source.loop = opt.loop ? @_config.loop
                     @_source.onended = =>
                         @_isEnded = true
-                        @_elapsedTime += _audioContext.currentTime - @_startTime
+                        @_elapsedTime += audioContext.currentTime - @_startTime
                         if @_elapsedTime >= @_buffer.duration
                             @_elapsedTime = 0
 
@@ -144,16 +154,16 @@ class Sound
 
                     #connect nodes
                     @_source.connect gainNode
-                    gainNode.connect _audioContext.destination
-                    
+                    gainNode.connect audioContext.destination
+
                     #record start time
-                    @_startTime = _audioContext.currentTime
+                    @_startTime = audioContext.currentTime
 
                     #start playing
                     @_source.start @_startTime, @_elapsedTime
     restart: (opt = {}) =>
         if Greenhorn.isRunning()
-            if env.USE_AUDIO_TAG
+            if Sound.config.useAudioTag
                 @_audio.currentTime = 0
                 @_audio.loop = opt.loop ? @_config.loop
                 @_audio.volume = opt.volume ? @_config.volume
@@ -162,10 +172,10 @@ class Sound
                 #stop source
                 @_source.stop()
                 @_elapsedTime = 0
-                
+
                 #create audio nodes
-                gainNode = _audioContext.createGain()
-                @_source = _audioContext.createBufferSource()
+                gainNode = audioContext.createGain()
+                @_source = audioContext.createBufferSource()
 
                 #set values on source node
                 @_source.buffer = @_buffer
@@ -179,22 +189,22 @@ class Sound
 
                 #connect nodes
                 @_source.connect gainNode
-                gainNode.connect _audioContext.destination
-                
+                gainNode.connect audioContext.destination
+
                 #record start time
-                @_startTime = _audioContext.currentTime
+                @_startTime = audioContext.currentTime
 
                 #start playing
                 @_source.start @_startTime, @_elapsedTime
     pause: =>
         if Greenhorn.isRunning()
-            if env.USE_AUDIO_TAG
+            if Sound.config.useAudioTag
                 @_audio.pause()
             else
                 @_source.stop()
     stop: =>
         if Greenhorn.isRunning()
-            if env.USE_AUDIO_TAG
+            if Sound.config.useAudioTag
                 @_audio.pause()
                 @_audio.currentTime = 0
             else
