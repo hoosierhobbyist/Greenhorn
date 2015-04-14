@@ -15,59 +15,40 @@ class Sprite extends EventEmitter
         left: -_canvas.width / 2
     _sortRule = (sp1, sp2) ->
         sp1._dis.level - sp2._dis.level
-    _boundaryCallback = (ba, side) ->
-        #return appropriate callback
-        switch ba
-            when 'DIE'
-                -> @set 'visible', off, false
-            when 'WRAP'
-                switch side
-                    when 'top'
-                        -> @set 'top', _bounds.bottom, false
-                    when 'bottom'
-                        -> @set 'bottom', _bounds.top, false
-                    when 'right'
-                        -> @set 'right', _bounds.left, false
-                    when 'left'
-                        -> @set 'left', _bounds.right, false
-            when 'STOP'
-                switch side
-                    when 'top'
-                        -> @set 'top', _bounds.top - 1, false
-                    when 'bottom'
-                        -> @set 'bottom', _bounds.bottom + 1, false
-                    when 'right'
-                        -> @set 'right', _bounds.right - 1, false
-                    when 'left'
-                        -> @set 'left', _bounds.left + 1, false
-            when 'SPRING'
-                switch side
-                    when 'top'
-                        -> @change 'dy', Sprite.config.springConstant * (_bounds.top - @get('top', false)), false
-                    when 'bottom'
-                        -> @change 'dy', Sprite.config.springConstant * (_bounds.bottom - @get('bottom', false)), false
-                    when 'right'
-                        -> @change 'dx', Sprite.config.springConstant * (_bounds.right - @get('right', false)), false
-                    when 'left'
-                        -> @change 'dx', Sprite.config.springConstant * (_bounds.left - @get('left', false)), false
-            when 'BOUNCE'
-                switch side
-                    when 'top'
-                        ->
-                            @set 'top', _bounds.top - 1, false
-                            @_mot.dy *= -1 + Sprite.config.bounceDecay
-                    when 'bottom'
-                        ->
-                            @set 'bottom', _bounds.bottom + 1, false
-                            @_mot.dy *= -1 + Sprite.config.bounceDecay
-                    when 'right'
-                        ->
-                            @set 'right', _bounds.right - 1, false
-                            @_mot.dx *= -1 + Sprite.config.bounceDecay
-                    when 'left'
-                        ->
-                            @set 'left', _bounds.left + 1, false
-                            @_mot.dx *= -1 + Sprite.config.bounceDecay
+    _boundaryCallbacks =
+        'DIE':
+            'top': -> @set 'visible', off, false
+            'bottom': -> @set 'visible', off, false
+            'right': -> @set 'visible', off, false
+            'left': -> @set 'visible', off, false
+        'WRAP':
+            'top': -> @set 'top', _bounds.bottom, false
+            'bottom': -> @set 'bottom', _bounds.top, false
+            'right': -> @set 'right', _bounds.left, false
+            'left': -> @set 'left', _bounds.right, false
+        'STOP':
+            'top': -> @set 'top', _bounds.top - 1, false
+            'bottom': -> @set 'bottom', _bounds.bottom + 1, false
+            'right': -> @set 'right', _bounds.right - 1, false
+            'left': -> @set 'left', _bounds.left + 1, false
+        'SPRING':
+            'top': -> @change 'dy', Sprite.config.springConstant * (_bounds.top - @get('top', false)), false
+            'bottom': -> @change 'dy', Sprite.config.springConstant * (_bounds.bottom - @get('bottom', false)), false
+            'right': -> @change 'dx', Sprite.config.springConstant * (_bounds.right - @get('right', false)), false
+            'left': -> @change 'dx', Sprite.config.springConstant * (_bounds.left - @get('left', false)), false
+        'BOUNCE':
+            'top': ->
+                @set 'top', _bounds.top - 1, false
+                @_mot.dy *= -1 + Sprite.config.bounceDecay
+            'bottom': ->
+                @set 'bottom', _bounds.bottom + 1, false
+                @_mot.dy *= -1 + Sprite.config.bounceDecay
+            'right': ->
+                @set 'right', _bounds.right - 1, false
+                @_mot.dx *= -1 + Sprite.config.bounceDecay
+            'left': ->
+                @set 'left', _bounds.left + 1, false
+                @_mot.dx *= -1 + Sprite.config.bounceDecay
 
     #class objects
     @config:
@@ -98,29 +79,29 @@ class Sprite extends EventEmitter
         ba_left: 'WRAP'
 
     #class methods
-    @howMany = ->
+    @howMany: ->
         _list.length
-    @getAll = (what, excep...) ->
+    @getAll: (what, excep...) ->
         for sp in _list when sp not in excep
             sp.get what
-    @setAll = (what, to, excep...) ->
+    @setAll: (what, to, excep...) ->
         for sp in _list when sp not in excep
             sp.set what, to
         return
-    @changeAll = (what, step, excep...) ->
+    @changeAll: (what, step, excep...) ->
         for sp in _list when sp not in excep
             sp.change what, step
         return
-    @emitAll = (event, args...) ->
+    @emitAll: (event, args...) ->
         for sp in _list
             sp.emit event, args...
         return
-    @remove = (sprite) ->
+    @remove: (sprite) ->
         sprite._stop() if sprite.isRunning()
         for sp, i in _list when sp is sprite
             _list.splice i, 1
             return
-    @removeAll = (excep...) ->
+    @removeAll: (excep...) ->
         for sp in _list when sp not in excep
             sp._stop() if sp.isRunning()
 
@@ -129,15 +110,15 @@ class Sprite extends EventEmitter
             _list.push sp
         _list.sort _sortRule
         return
-    @_drawAll = ->
+    @_drawAll: ->
         for sp in _list
             sp._draw()
         return
-    @_startAll = ->
+    @_startAll: ->
         for sp in _list
             sp._start()
         return
-    @_stopAll = ->
+    @_stopAll: ->
         for sp in _list
             sp._stop()
         return
@@ -466,7 +447,7 @@ class Sprite extends EventEmitter
             old = @_bas[side] if _emit #deep copy?
             if @_bas[side]?
                 @remove "#{oldCollision}:#{side}", @_bas[side]
-            @_bas[side] = _boundaryCallback to, side
+            @_bas[side] = _boundaryCallbacks[to][side]
             @_bas[side].ba = to
             @on "#{newCollision}:#{side}", @_bas[side]
         else if what.match /^shape$/ #needs refining
