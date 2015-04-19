@@ -7,9 +7,9 @@ describe('Timer', function(){
     }//end wait function
 
     describe('API', function(){
-        it('should have a DEFAULTS object', function(){
-            Should.exist(Timer.DEFAULTS);
-            Timer.DEFAULTS.should.have.property('startImmediately').equal(true);
+        it('should have a defaults object', function(){
+            Should.exist(Timer.defaults);
+            Timer.defaults.should.have.property('startImmediately').equal(true);
         });
 
         it('should have an isRunning method', function(){
@@ -38,24 +38,24 @@ describe('Timer', function(){
     });
 
     describe('constructor', function(){
-        it('should start running if feed true', function(){
+        it('should start running if fed true', function(){
             var timer = new Timer(true);
             timer.isRunning().should.be.true;
         });
 
-        it('should not start running if feed false', function(){
+        it('should not start running if fed false', function(){
             var timer = new Timer(false);
             timer.isRunning().should.be.false;
         });
 
-        it('should use Timer.DEFAULTS.startImmediately if feed nothing', function(){
+        it('should use Timer.DEFAULTS.startImmediately if fed nothing', function(){
+            Timer.defaults.startImmediately = false
             var timer = new Timer();
-
-            if(Timer.DEFAULTS.startImmediately){
-                timer.isRunning().should.be.true;
-            } else{
-                timer.isRunning().should.be.false;
-            }//end if/else
+            timer.isRunning().should.be.false;
+            
+            Timer.defaults.startImmediately = true;
+            timer = new Timer();
+            timer.isRunning().should.be.true;
         });
     });
 
