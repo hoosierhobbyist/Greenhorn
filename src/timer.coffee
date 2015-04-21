@@ -8,12 +8,15 @@ class Timer
     #helper function (closed over)
     currentTime = -> (new Date()).getTime()
 
-    @DEFAULTS:
+    @defaults:
         startImmediately: true
 
-    constructor: (startImmediately = Timer.DEFAULTS.startImmediately) ->
+    constructor: (config = {}) ->
+        for own key, value of Timer.defaults
+            config[key] ?= value
+        
         @_elapsedTime = 0
-        @_startTime = if startImmediately then currentTime() else null
+        @_startTime = if config.startImmediately then currentTime() else null
 
     #getters
     isRunning: ->
