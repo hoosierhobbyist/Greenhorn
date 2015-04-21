@@ -156,13 +156,13 @@ class Sprite extends EventEmitter
                 delete config[key]
                 if typeof value is 'function'
                     @on key.slice(3), value
-                else if value.length?
+                else if Object.prototype.toString.call(value) is '[object Array]'
                     @on key.slice(3), value[0], value[1]
             else if key.match /^once-\w+/
                 delete config[key]
                 if typeof value is 'function'
                     @once key.slice(5), value
-                else if value.length?
+                else if Object.prototype.toString.call(value) is '[object Array]'
                     @once key.slice(5), value[0], value[1]
 
         #create default boundary if none was provided
