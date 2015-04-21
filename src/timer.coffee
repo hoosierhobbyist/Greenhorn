@@ -6,17 +6,17 @@ sedabull@gmail.com
 
 class Timer
     #helper function (closed over)
-    currentTime = -> (new Date()).getTime()
+    now = -> (new Date()).getTime()
 
     @defaults:
-        startImmediately: true
+        startNow: true
 
     constructor: (config = {}) ->
         for own key, value of Timer.defaults
             config[key] ?= value
-        
+
         @_elapsedTime = 0
-        @_startTime = if config.startImmediately then currentTime() else null
+        @_startTime = if config.startNow then now() else null
 
     #getters
     isRunning: ->
@@ -25,19 +25,19 @@ class Timer
         unless @_startTime
             @_elapsedTime
         else
-            @_elapsedTime + currentTime() - @_startTime
+            @_elapsedTime + now() - @_startTime
 
     #timer control
     start: ->
         unless @_startTime
-            @_startTime = currentTime()
+            @_startTime = now()
     pause: ->
         if @_startTime
-            @_elapsedTime += currentTime() - @_startTime
+            @_elapsedTime += now() - @_startTime
             @_startTime = null
     restart: ->
         @_elapsedTime = 0
-        @_startTime = currentTime()
+        @_startTime = now()
     stop: ->
         @_elapsedTime = 0
         @_startTime = null

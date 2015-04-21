@@ -9,7 +9,7 @@ describe('Timer', function(){
     describe('API', function(){
         it('should have a defaults object', function(){
             Should.exist(Timer.defaults);
-            Timer.defaults.should.have.property('startImmediately').equal(true);
+            Timer.defaults.should.have.property('startNow').equal(true);
         });
 
         it('should have an isRunning method', function(){
@@ -39,21 +39,21 @@ describe('Timer', function(){
 
     describe('constructor', function(){
         it('should start running if fed true', function(){
-            var timer = new Timer(true);
+            var timer = new Timer({startNow: true});
             timer.isRunning().should.be.true;
         });
 
         it('should not start running if fed false', function(){
-            var timer = new Timer(false);
+            var timer = new Timer({startNow: false});
             timer.isRunning().should.be.false;
         });
 
         it('should use Timer.DEFAULTS.startImmediately if fed nothing', function(){
-            Timer.defaults.startImmediately = false
+            Timer.defaults.startNow = false
             var timer = new Timer();
             timer.isRunning().should.be.false;
-            
-            Timer.defaults.startImmediately = true;
+
+            Timer.defaults.startNow = true;
             timer = new Timer();
             timer.isRunning().should.be.true;
         });
@@ -61,7 +61,7 @@ describe('Timer', function(){
 
     describe('::isRunning', function(){
         it('should return true if the elapsed time is increasing with time', function(){
-            var timer = new Timer(true);
+            var timer = new Timer({startNow: true});
             var control = timer.getElapsedTime();
 
             wait(5);
@@ -70,7 +70,7 @@ describe('Timer', function(){
         });
 
         it('should return false if the elapsed time is not increasing with time', function(){
-            var timer = new Timer(false);
+            var timer = new Timer({startNow: false});
             var control = timer.getElapsedTime();
 
             wait(5);
@@ -81,14 +81,14 @@ describe('Timer', function(){
 
     describe('::getElapsedTime', function(){
         it('should return zero if the timer hasn\'t run', function(){
-            var timer = new Timer(false);
+            var timer = new Timer({startNow: false});
 
             wait(5);
             timer.getElapsedTime().should.equal(0);
         });
 
         it('should return more than zero if the timer has run', function(){
-            var timer = new Timer(true);
+            var timer = new Timer({startNow: true});
 
             wait(5);
             timer.getElapsedTime().should.be.greaterThan(0);
@@ -97,7 +97,7 @@ describe('Timer', function(){
 
     describe('::start', function(){
         it('should start the timer if not running', function(){
-            var timer = new Timer(false);
+            var timer = new Timer({startNow: false});
             timer.isRunning().should.be.false;
 
             timer.start();
@@ -105,7 +105,7 @@ describe('Timer', function(){
         });
 
         it('should not stop the timer if it is running', function(){
-            var timer = new Timer(true);
+            var timer = new Timer({startNow: true});
             timer.isRunning().should.be.true;
 
             timer.start();
@@ -114,7 +114,7 @@ describe('Timer', function(){
 
         it('should not reset the elapsed time', function(){
             var control;
-            var timer = new Timer(true);
+            var timer = new Timer({startNow: true});
 
             wait(10);
             control = timer.getElapsedTime();
@@ -126,7 +126,7 @@ describe('Timer', function(){
 
         it('should resume from the current elapsed time when started from a pause', function(){
             var control;
-            var timer = new Timer(true);
+            var timer = new Timer({startNow: true});
 
             wait(10);
             timer.pause();
@@ -139,7 +139,7 @@ describe('Timer', function(){
 
     describe('::pause', function(){
         it('should stop the timer if it is running', function(){
-            var timer = new Timer(true);
+            var timer = new Timer({startNow: true});
             timer.isRunning().should.be.true;
 
             timer.pause();
@@ -147,7 +147,7 @@ describe('Timer', function(){
         });
 
         it('should not start the timer if it isn\'t running', function(){
-            var timer = new Timer(false);
+            var timer = new Timer({startNow: false});
             timer.isRunning().should.be.false;
 
             timer.pause();
@@ -155,7 +155,7 @@ describe('Timer', function(){
         });
 
         it('should preserve the elapsed time', function(){
-            var timer = new Timer(true);
+            var timer = new Timer({startNow: true});
 
             wait(5);
             timer.pause();
@@ -164,7 +164,7 @@ describe('Timer', function(){
 
         it('should not overwrite the elapsed time when already paused', function(){
             var control;
-            var timer = new Timer(true);
+            var timer = new Timer({startNow: true});
 
             wait(5);
             timer.pause();
@@ -176,7 +176,7 @@ describe('Timer', function(){
 
     describe('::restart', function(){
         it('should start the timer if not running', function(){
-            var timer = new Timer(false);
+            var timer = new Timer({startNow: false});
             timer.isRunning().should.be.false;
 
             timer.restart();
@@ -184,7 +184,7 @@ describe('Timer', function(){
         });
 
         it('should not stop the timer if it is running', function(){
-            var timer = new Timer(true);
+            var timer = new Timer({startNow: true});
             timer.isRunning().should.be.true;
 
             timer.restart();
@@ -193,7 +193,7 @@ describe('Timer', function(){
 
         it('should reset the elapsed time when running', function(){
             var control;
-            var timer = new Timer(true);
+            var timer = new Timer({startNow: true});
 
             wait(5);
             control = timer.getElapsedTime();
@@ -203,7 +203,7 @@ describe('Timer', function(){
 
         it('should reset the elapsed time when not running', function(){
             var control;
-            var timer = new Timer(true);
+            var timer = new Timer({startNow: true});
 
             wait(5);
             timer.pause();
@@ -215,7 +215,7 @@ describe('Timer', function(){
 
     describe('::stop', function(){
         it('should stop the timer if it is running', function(){
-            var timer = new Timer(true);
+            var timer = new Timer({startNow: true});
             timer.isRunning().should.be.true;
 
             timer.stop();
@@ -223,7 +223,7 @@ describe('Timer', function(){
         });
 
         it('should not start the timer if it isn\'t running', function(){
-            var timer = new Timer(false);
+            var timer = new Timer({startNow: false});
             timer.isRunning().should.be.false;
 
             timer.stop();
@@ -231,7 +231,7 @@ describe('Timer', function(){
         });
 
         it('should reset the elapsed time when running', function(){
-            var timer = new Timer(true);
+            var timer = new Timer({startNow: true});
 
             wait(5);
             timer.stop();
@@ -239,7 +239,7 @@ describe('Timer', function(){
         });
 
         it('should reset the elapsed time when not running', function(){
-            var timer = new Timer(true);
+            var timer = new Timer({startNow: true});
 
             wait(5);
             timer.pause();

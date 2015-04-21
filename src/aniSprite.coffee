@@ -47,7 +47,7 @@ class AniSprite extends Sprite
 
         #create secondary objects
         @_ani.cycles = []
-        @_ani.timer = new Timer(on)
+        @_ani.timer = new gh.Timer startNow: true
 
         #call the Sprite constructor
         super(config)
