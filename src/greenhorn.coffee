@@ -7,7 +7,7 @@ sedabull@gmail.com
 #automatic initialization
 document.onreadystatechange = ->
     if @readyState is 'interactive'
-        Greenhorn.emit 'ready'
+        Greenhorn.emit 'init'
 
 #keyboard value mapping object
 KEYS =
@@ -23,10 +23,11 @@ KEYS =
     T: 84, U: 85, V: 86, W: 87, X: 88, Y: 89, Z: 90
 gh.KEYS = KEYS
 
-#Engine class
-class Greenhorn extends EventEmitter
+Greenhorn = new gh.EventEmitter()
+
+do(Greenhorn) ->
     #Greenhorn configuration object
-    @config:
+    Greenhorn.config =
         frameRate: 25
         title: 'GH-TITLE'
         leftHeader: 'GH-LEFT-PANEL'
@@ -39,51 +40,38 @@ class Greenhorn extends EventEmitter
             text: 'CLICK HERE TO START!'
 
     #Greenhorn button defaults
-    @buttonDefaults:
+    Greenhorn.buttonDefaults =
         type: 'button'
         onclick: undefined
         parent: 'gh-right-panel'
         label: 'Launch the Missiles!'
 
-    #asynchronous ID
+    #master event loop
     _masterID = null
-    #draws on canvas once per frame
     _masterUpdate = ->
         Greenhorn.clear()
         Greenhorn.emit 'update'
         Sprite._drawAll()
 
-    #keyboard input tracking array (read only)
-    _isDown = new Array 128
-    key = false for key in _isDown
-
-    #listen for key events
-    document.onkeydown = (e) ->
-        e.preventDefault()
-        _isDown[e.keyCode] = true
-    document.onkeyup = (e) ->
-        e.preventDefault()
-        _isDown[e.keyCode] = false
-
-    #call EventEmitter constructor
-    constructor: -> super()
-
-    #raw DOM manipulation
+    #raw DOM elements
     _main = document.createElement 'div'
     _title = document.createElement 'h1'
     _leftPanel = document.createElement 'div'
     _leftPanelHeader = document.createElement 'h3'
-    @canvas = document.createElement 'canvas'
+    _canvas = document.createElement 'canvas'
     _rightPanel = document.createElement 'div'
     _rightPanelHeader = document.createElement 'h3'
     _footer = document.createElement 'div'
-    _context = @canvas.getContext '2d'
+    _context = _canvas.getContext '2d'
+
+    #add reference to canvas
+    Greenhorn.canvas = _canvas
 
     #give id's to primary children
     _main.id = 'gh-main'
     _title.id = 'gh-title'
     _leftPanel.id = 'gh-left-panel'
-    @canvas.id = 'gh-canvas'
+    _canvas.id = 'gh-canvas'
     _rightPanel.id = 'gh-right-panel'
     _footer.id = 'gh-footer'
 
@@ -94,7 +82,7 @@ class Greenhorn extends EventEmitter
     #append all primary children to main div
     _main.appendChild _title
     _main.appendChild _leftPanel
-    _main.appendChild @canvas
+    _main.appendChild _canvas
     _main.appendChild _rightPanel
     _main.appendChild _footer
 
@@ -103,32 +91,40 @@ class Greenhorn extends EventEmitter
     _rightPanel.appendChild _rightPanelHeader
 
     #keep track of mouse events over canvas
-    @canvas.onmousemove = (e) ->
+    Greenhorn.canvas.onmousemove = (e) ->
         @mouseX = e.pageX
         @mouseY = e.pageY
         Sprite.emitAll 'mouse:move', e
-    @canvas.onmousedown = (e) ->
+    Greenhorn.canvas.onmousedown = (e) ->
         Sprite.emitAll 'mouse:down', e
-    @canvas.onmouseup = (e) ->
+    Greenhorn.canvas.onmouseup = (e) ->
         Sprite.emitAll 'mouse:up', e
-    @canvas.ondblclick = (e) ->
+    Greenhorn.canvas.ondblclick = (e) ->
         Sprite.emitAll 'mouse:doubleClick', e
-    @canvas.oncontextmenu = (e) ->
+    Greenhorn.canvas.oncontextmenu = (e) ->
         e.preventDefault()
         Sprite.emitAll 'mouse:rightClick', e
 
-    #keyPress tester
-    @isDown = (key) ->
-        _isDown[key]
-
-    #mouse position getters
-    @getMouseX = ->
+    #mouse tracking
+    Greenhorn.getMouseX = ->
         @canvas.mouseX - @canvas.offsetLeft - @canvas.width / 2
-    @getMouseY = ->
+    Greenhorn.getMouseY = ->
         -@canvas.mouseY + @canvas.offsetTop + @canvas.height / 2
 
+    #keyboard tracking
+    _isDown = new Array 128
+    key = false for key in _isDown
+    document.onkeydown = (e) ->
+        e.preventDefault()
+        _isDown[e.keyCode] = true
+    document.onkeyup = (e) ->
+        e.preventDefault()
+        _isDown[e.keyCode] = false
+    Greenhorn.isDown = (key) ->
+        _isDown[key]
+
     #add button to one of the panels
-    @addButton = (config = {}) ->
+    Greenhorn.addButton = (config = {}) ->
         #add missing keys to config
         for own key, value of @buttonDefaults
             config[key] ?= value
@@ -147,32 +143,32 @@ class Greenhorn extends EventEmitter
 
     #game state functions + helper
     _currentState = 'INITIALIZING'
-    @currentState = -> _currentState
-    @changeState = (newState) ->
+    Greenhorn.currentState = -> _currentState
+    Greenhorn.changeState = (newState) ->
         @emit "state-change-from:#{_currentState}"
         @emit 'state-change', _currentState, newState
         @emit "state-change-to:#{newState}"
         _currentState = newState
 
     #game control
-    @isRunning = ->
+    Greenhorn.isRunning = ->
         _masterID?
-    @stop = ->
+    Greenhorn.stop = ->
         Sprite._stopAll()
         Sound._pauseAll()
         clearInterval _masterID
         _masterID = null
-    @clear = ->
+    Greenhorn.clear = ->
         _context.clearRect -@canvas.width / 2, -@canvas.height / 2, @canvas.width, @canvas.height
 
     #start function + helpers
     _firstTime = true
     _start = ->
-        _masterID = setInterval _masterUpdate, 1000 / @config.frameRate
+        _masterID = setInterval _masterUpdate, 1000 / Greenhorn.config.frameRate
         Sprite._startAll()
         Sound._playAll()
         return
-    @start = (stateName) =>
+    Greenhorn.start = (stateName) ->
         #prevent starting without properly stopping first
         unless @isRunning()
             if _firstTime
@@ -187,7 +183,7 @@ class Greenhorn extends EventEmitter
                 _leftPanelHeader.innerHTML = @config.leftHeader
                 _rightPanelHeader.innerHTML = @config.rightHeader
                 _footer.innerHTML = @config.footer
-                @canvas.innerHTML = 'Your browser does not support the &ltcanvas&gt tag'
+                _canvas.innerHTML = 'Your browser does not support the &ltcanvas&gt tag'
 
                 #set the size of the canvas
                 @canvas.width = @canvas.clientWidth
@@ -210,7 +206,7 @@ class Greenhorn extends EventEmitter
                 @canvas.onclick = ->
                     _start()
                     Greenhorn.changeState stateName ? 'GREENHORN'
-                    @canvas.onclick = (e) ->
+                    _canvas.onclick = (e) ->
                         Sprite.emitAll 'mouse:click', e
 
                 #don't do all this a second time
