@@ -6,34 +6,36 @@ describe('Timer', function(){
         return;
     }//end wait function
 
-    describe('API', function(){
+    describe('Public API', function(){
         it('should have a defaults object', function(){
-            Should.exist(Timer.defaults);
-            Timer.defaults.should.have.property('startNow').equal(true);
+            Timer.defaults.should.be.an.Object;
+            Timer.defaults.should.have.properties({
+                startNow: true
+            });
         });
 
         it('should have an isRunning method', function(){
-            Should.exist(Timer.prototype.isRunning);
+            Timer.prototype.isRunning.should.be.a.Function;
         });
 
         it('should have a getElapsedTime method', function(){
-            Should.exist(Timer.prototype.getElapsedTime);
+            Timer.prototype.getElapsedTime.should.be.a.Function;
         });
 
         it('should have a start method', function(){
-            Should.exist(Timer.prototype.start);
+            Timer.prototype.start.should.be.a.Function;
         });
 
         it('should have a pause method', function(){
-            Should.exist(Timer.prototype.pause);
+            Timer.prototype.pause.should.be.a.Function;
         });
 
         it('should have a restart method', function(){
-            Should.exist(Timer.prototype.restart);
+            Timer.prototype.restart.should.be.a.Function;
         });
 
         it('should have a stop method', function(){
-            Should.exist(Timer.prototype.stop);
+            Timer.prototype.stop.should.be.a.Function;
         });
     });
 

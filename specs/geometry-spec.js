@@ -3,20 +3,20 @@
  *that are affected by rounding errors
  */
 
-describe('Point (private class)', function(){
+describe('Point', function(){
     var Point = gh.Point;
 
-    describe('API', function(){
+    describe('Private API', function(){
         it('should have a get method', function(){
-            Should.exist(Point.prototype.get);
+            Point.prototype.get.should.be.a.Function;
         });
 
         it('should have a set method', function(){
-            Should.exist(Point.prototype.set);
+            Point.prototype.set.should.be.a.Function;
         });
 
         it('should have a change method', function(){
-            Should.exist(Point.prototype.change);
+            Point.prototype.change.should.be.a.Function;
         });
     });
 
@@ -142,25 +142,25 @@ describe('Point (private class)', function(){
     });
 });
 
-describe('Line (private class)', function(){
+describe('Line', function(){
     var Point = gh.Point;
     var Line = gh.Line;
 
-    describe('API', function(){
+    describe('Private API', function(){
         it('should have a get method', function(){
-            Should.exist(Line.prototype.get);
+            Line.prototype.get.should.be.a.Function;
         });
 
         it('should have a contains method', function(){
-            Should.exist(Line.prototype.contains);
+            Line.prototype.contains.should.be.a.Function;
         });
 
         it('should have an intersection method', function(){
-            Should.exist(Line.prototype.intersection);
+            Line.prototype.intersection.should.be.a.Function;
         });
 
         it('should have a collidesWith method', function(){
-            Should.exist(Line.prototype.collidesWith);
+            Line.prototype.collidesWith.should.be.a.Function;
         });
     });
 

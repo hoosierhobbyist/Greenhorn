@@ -41,7 +41,6 @@ class Sound
         snd.stop() for snd in _list
         return
 
-    #<---INSTANCE LEVEL--->
     constructor: (@_config = {}) ->
         #assign default values if they have been omitted
         for own key, value of Sound.defaults
@@ -127,7 +126,7 @@ class Sound
     #sound control
     play: (opt = {}) =>
         if Greenhorn.isRunning()
-            if Sound.config.useAudioTag
+            if @_audio?
                 @_audio.loop = opt.loop ? @_config.loop
                 @_audio.volume = opt.volume ? @_config.volume
                 @_audio.play()
@@ -163,7 +162,7 @@ class Sound
                     @_source.start @_startTime, @_elapsedTime
     restart: (opt = {}) =>
         if Greenhorn.isRunning()
-            if Sound.config.useAudioTag
+            if @_audio?
                 @_audio.currentTime = 0
                 @_audio.loop = opt.loop ? @_config.loop
                 @_audio.volume = opt.volume ? @_config.volume
@@ -198,13 +197,13 @@ class Sound
                 @_source.start @_startTime, @_elapsedTime
     pause: =>
         if Greenhorn.isRunning()
-            if Sound.config.useAudioTag
+            if @_audio?
                 @_audio.pause()
             else
                 @_source.stop()
     stop: =>
         if Greenhorn.isRunning()
-            if Sound.config.useAudioTag
+            if @_audio?
                 @_audio.pause()
                 @_audio.currentTime = 0
             else

@@ -1,25 +1,25 @@
 describe('EventEmitter', function(){
     var EventEmitter = gh.EventEmitter;
 
-    describe('API', function(){
+    describe('Public API', function(){
         it('should have an on method', function(){
-            Should.exist(EventEmitter.prototype.on);
+            EventEmitter.prototype.on.should.be.a.Function;
         });
 
         it('should have a once method', function(){
-            Should.exist(EventEmitter.prototype.once);
+            EventEmitter.prototype.once.should.be.a.Function;
         });
 
         it('should have an emit method', function(){
-            Should.exist(EventEmitter.prototype.emit);
+            EventEmitter.prototype.emit.should.be.a.Function;
         });
 
         it('should have a remove method', function(){
-            Should.exist(EventEmitter.prototype.remove);
+            EventEmitter.prototype.remove.should.be.a.Function;
         });
 
         it('should have a listeners method', function(){
-            Should.exist(EventEmitter.prototype.listeners);
+            EventEmitter.prototype.listeners.should.be.a.Function;
         });
     });
 
