@@ -5,8 +5,34 @@ sedabull@gmail.com
 ###
 
 class Sound
-    #closure
+    #closures
     _list = []
+    _play = (opt) ->
+        #create audio nodes
+        gainNode = audioContext.createGain()
+        @_source = audioContext.createBufferSource()
+
+        #set values on source node
+        @_source.buffer = @_buffer
+        @_source.loop = opt.loop ? @_config.loop
+        @_source.onended = =>
+            @_isEnded = true
+            @_elapsedTime += audioContext.currentTime - @_startTime
+            if @_elapsedTime >= @_buffer.duration
+                @_elapsedTime = 0
+
+        #set value on gain node
+        gainNode.gain.value = opt.volume ? @_config.volume
+
+        #connect nodes
+        @_source.connect gainNode
+        gainNode.connect audioContext.destination
+
+        #record start time
+        @_startTime = audioContext.currentTime
+
+        #start playing
+        @_source.start @_startTime, @_elapsedTime
 
     #class level objects
     @config:
@@ -32,7 +58,7 @@ class Sound
                 snd.play()
             else
                 snd.play volume: 0, loop: false
-                setTimeout (-> snd.stop()), 50
+                setTimeout (-> snd.stop()), 50 #FIX: closure issue?
         return
     @_pauseAll = ->
         snd.pause() for snd in _list
@@ -47,12 +73,12 @@ class Sound
             @_config[key] ?= value
 
         #prefix the sound path
-        if Sound.config.path.match /\/$/
-            @_config.url = Sound.config.path.concat @_config.url
-        else
-            if Sound.config.path
+        unless /(^\w+:\/\/|^\/)/.test @_config.url
+            if /\/$/.test Sound.config.path
+                @_config.url = Sound.config.path + @_config.url
+            else if Sound.config.path
                 Sound.config.path += '/'
-                @_config.url = Sound.config.path.concat @_config.url
+                @_config.url = Sound.config.path + @_config.url
 
         #not using web audio api
         if Sound.config.useAudioTag
@@ -69,15 +95,15 @@ class Sound
             wav_src.type = 'audio/wav'
 
             #assign proper srcs
-            if @_config.url.match /\.mp3$/
+            if /\.mp3$/.test @_config.url
                 mp3_src.src = @_config.url
                 ogg_src.src = @_config.url.replace '.mp3', '.ogg'
                 wav_src.src = @_config.url.replace '.mp3', '.wav'
-            else if @_config.url.match /\.ogg$/
+            else if /\.ogg$/.test @_config.url
                 ogg_src.src = @_config.url
                 mp3_src.src = @_config.url.replace '.ogg', '.mp3'
                 wav_src.src = @_config.url.replace '.ogg', '.wav'
-            else if @_config.url.match /\.wav$/
+            else if /\.wav$/.test @_config.url
                 wav_src.src = @_config.url
                 mp3_src.src = @_config.url.replace '.wav', '.mp3'
                 ogg_src.src = @_config.url.replace '.wav', '.ogg'
@@ -108,12 +134,10 @@ class Sound
             request.responseType = 'arraybuffer'
 
             #request event handlers
-            request.successCallback = (buffer) =>
-                @_buffer = buffer
-                if Greenhorn.isRunning() and @_config.autoplay
-                    @play()
+            request.successCallback = (@_buffer) =>
+                if Greenhorn.isRunning() and @_config.autoplay then @play()
             request.errorCallback = ->
-                throw new Error "AJAX request Error"
+                console.log "could not load sound file at url: #{@_config.url}"
             request.onload = ->
                 audioContext.decodeAudioData @response, @successCallback, @errorCallback
 
@@ -128,7 +152,7 @@ class Sound
         if @_audio?
             !(@_audio.paused or @_audio.ended)
         else
-            @_isEnded
+            !@_isEnded
     elapsedTime: ->
         if @_audio?
             @_audio.currentTime * 1000
@@ -146,35 +170,12 @@ class Sound
                 if @_isEnded
                     #set isEnded to false
                     @_isEnded = false
+                    _play.call this, opt
 
-                    #create audio nodes
-                    gainNode = audioContext.createGain()
-                    @_source = audioContext.createBufferSource()
-
-                    #set values on source node
-                    @_source.buffer = @_buffer
-                    @_source.loop = opt.loop ? @_config.loop
-                    @_source.onended = =>
-                        @_isEnded = true
-                        @_elapsedTime += audioContext.currentTime - @_startTime
-                        if @_elapsedTime >= @_buffer.duration
-                            @_elapsedTime = 0
-
-                    #set value on gain node
-                    gainNode.gain.value = opt.volume ? @_config.volume
-
-                    #connect nodes
-                    @_source.connect gainNode
-                    gainNode.connect audioContext.destination
-
-                    #record start time
-                    @_startTime = audioContext.currentTime
-
-                    #start playing
-                    @_source.start @_startTime, @_elapsedTime
     restart: (opt = {}) ->
         if Greenhorn.isRunning()
             if @_audio?
+                @_audio.pause()
                 @_audio.currentTime = 0
                 @_audio.loop = opt.loop ? @_config.loop
                 @_audio.volume = opt.volume ? @_config.volume
@@ -183,38 +184,15 @@ class Sound
                 #stop source
                 @_source.stop()
                 @_elapsedTime = 0
+                _play.call this, opt
 
-                #create audio nodes
-                gainNode = audioContext.createGain()
-                @_source = audioContext.createBufferSource()
-
-                #set values on source node
-                @_source.buffer = @_buffer
-                @_source.loop = opt.loop ? @_config.loop
-                @_source.onended = =>
-                    @_isEnded = true
-                    @_elapsedTime += audioContext.currentTime - @_startTime
-                    if @_elapsedTime >= @_buffer.duration
-                        @_elapsedTime = 0
-
-                #set value on gain node
-                gainNode.gain.value = opt.volume ? @_config.volume
-
-                #connect nodes
-                @_source.connect gainNode
-                gainNode.connect audioContext.destination
-
-                #record start time
-                @_startTime = audioContext.currentTime
-
-                #start playing
-                @_source.start @_startTime, @_elapsedTime
     pause: ->
         if Greenhorn.isRunning()
             if @_audio?
                 @_audio.pause()
             else
                 @_source.stop()
+
     stop: ->
         if Greenhorn.isRunning()
             if @_audio?
