@@ -12,8 +12,7 @@ class EventEmitter
         @_events = {}
 
     on: (event, listener, options = {}) ->
-        unless @_events[event]
-            @_events[event] = []
+        @_events[event] ?= []
         @_events[event].push listener
         for own key, value of options
             @_events[event][key] = value
@@ -23,7 +22,6 @@ class EventEmitter
         wrapper = ->
             listener.apply this, arguments
             @remove event, wrapper
-
         @on event, wrapper, options
 
     emit: (event, args...) ->
@@ -50,10 +48,8 @@ class EventEmitter
         return false
 
     listeners: (event) ->
-        if event?
-            @_events[event] ? false
-        else
-            @_events
+        if event? then @_events[event] ? false
+        else @_events
 
 #add to namespace object
 gh.EventEmitter = EventEmitter
