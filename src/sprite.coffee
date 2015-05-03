@@ -82,45 +82,35 @@ class Sprite extends EventEmitter
     @howMany: ->
         _list.length
     @getAll: (what, excep...) ->
-        for sp in _list when sp not in excep
-            sp.get what
+        sp.get what for sp in _list when sp not in excep
     @setAll: (what, to, excep...) ->
-        for sp in _list when sp not in excep
-            sp.set what, to
+        sp.set what, to for sp in _list when sp not in excep
         return
     @changeAll: (what, step, excep...) ->
-        for sp in _list when sp not in excep
-            sp.change what, step
+        sp.change what, step for sp in _list when sp not in excep
         return
     @emitAll: (event, args...) ->
-        for sp in _list
-            sp.emit event, args...
+        sp.emit event, args... for sp in _list
         return
     @remove: (sprite) ->
         sprite._stop() if sprite.isRunning()
-        for sp, i in _list when sp is sprite
-            _list.splice i, 1
-            return
+        i = _list.indexOf sprite
+        if i > -1 then _list.splice i, 1
     @removeAll: (excep...) ->
         for sp in _list when sp not in excep
             sp._stop() if sp.isRunning()
-
         _list = []
-        for sp in excep
-            _list.push sp
+        _list.push sp for sp in excep
         _list.sort _sortRule
         return
     @_drawAll: ->
-        for sp in _list
-            sp._draw()
+        sp._draw() for sp in _list
         return
     @_startAll: ->
-        for sp in _list
-            sp._start()
+        sp._start() for sp in _list
         return
     @_stopAll: ->
-        for sp in _list
-            sp._stop()
+        sp._stop() for sp in _list
         return
 
     #instance methods
@@ -137,28 +127,28 @@ class Sprite extends EventEmitter
         angles = {}
         magnitudes = {}
         for own key, value of config
-            if key.match /(^width$|^height$)/
+            if /(^width$|^height$)/.test key
                 delete config[key]
                 size[key] = value
-            else if key.match /(^distance$|^speed$|^rate$|^scale$)/i
+            else if /(^distance$|^speed$|^rate$|^scale$)/.test key
                 delete config[key]
                 magnitudes[key] = value
-            else if key.match /(^posAngle$|^motAngle$|^accAngle$)/
+            else if /(^posAngle$|^motAngle$|^accAngle$)/.test key
                 delete config[key]
                 angles[key] = value
-            else if key.match /^ba$/
+            else if /^ba$/.test key
                 delete config[key]
                 config.ba_top = value
                 config.ba_bottom = value
                 config.ba_right = value
                 config.ba_left = value
-            else if key.match /^on-\w+/
+            else if /^on-\w+/.test key
                 delete config[key]
                 if typeof value is 'function'
                     @on key.slice(3), value
                 else if Object.prototype.toString.call(value) is '[object Array]'
                     @on key.slice(3), value[0], value[1]
-            else if key.match /^once-\w+/
+            else if /^once-\w+/.test key
                 delete config[key]
                 if typeof value is 'function'
                     @once key.slice(5), value
@@ -219,7 +209,7 @@ class Sprite extends EventEmitter
         @_updateID?
     _start: ->
         @emit 'start'
-        @_updateID = setInterval @_update, 1000 / Greenhorn.config.frameRate
+        @_updateID = setInterval (=> @_update), 1000 / Greenhorn.config.frameRate
     _stop: ->
         @emit 'stop'
         clearInterval @_updateID
@@ -227,63 +217,63 @@ class Sprite extends EventEmitter
 
     #getter
     get: (what, _emit = true) ->
-        if what.match /^imageFile$/
+        if /^imageFile$/.test what
             value = @_dis.image.src
-        else if what.match /(^x$|^y$|^a$)/
+        else if /(^x$|^y$|^a$)/.test what
             value = @_pos[what]
-        else if what.match /(^dx$|^dy$|^da$)/
+        else if /(^dx$|^dy$|^da$)/.test what
             value = @_mot[what]
-        else if what.match /(^ddx$|^ddy$|^dda$)/
+        else if /(^ddx$|^ddy$|^dda$)/.test what
             value = @_acc[what]
-        else if what.match /^top$/
+        else if /^top$/.test what
             if @_bnd.shape is 'polygon'
                 value = (pt.get('y') for pt in @_bnd.points)
                 value = Math.max value...
             else if @_bnd.shape is 'circle'
                 value = @_pos.y + @_bnd.radius
-        else if what.match /^bottom$/
+        else if /^bottom$/.test what
             if @_bnd.shape is 'polygon'
                 value = (pt.get('y') for pt in @_bnd.points)
                 value = Math.min value...
             else if @_bnd.shape is 'circle'
                 value = @_pos.y - @_bnd.radius
-        else if what.match /^right$/
+        else if /^right$/.test what
             if @_bnd.shape is 'polygon'
                 value = (pt.get('x') for pt in @_bnd.points)
                 value = Math.max value...
             else if @_bnd.shape is 'circle'
                 value = @_pos.x + @_bnd.radius
-        else if what.match /^left$/
+        else if /^left$/.test what
             if @_bnd.shape is 'polygon'
                 value = (pt.get('x') for pt in @_bnd.points)
                 value = Math.min value...
             else if @_bnd.shape is 'circle'
                 value = @_pos.x - @_bnd.radius
-        else if what.match /^radius$/
+        else if /^radius$/.test what
             if @_bnd.radius?
                 value = @_bnd.radius
             else
                 value = (pt.get('dist') for pt in @_bnd.points)
                 value = Math.max value...
-        else if what.match /^distance$/
+        else if /^distance$/.test what
             value = Math.sqrt @_pos.x**2 + @_pos.y**2
-        else if what.match /^speed$/
+        else if /^speed$/.test what
             value = Math.sqrt @_mot.dx**2 + @_mot.dy**2
-        else if what.match /^rate$/
+        else if /^rate$/.test what
             value = Math.sqrt @_acc.ddx**2 + @_acc.ddy**2
-        else if what.match /^posAngle$/
+        else if /^posAngle$/.test what
             value = Math.atan2 @_pos.y, @_pos.x
-        else if what.match /^motAngle$/
+        else if /^motAngle$/.test what
             value = Math.atan2 @_mot.dy, @_mot.dx
-        else if what.match /^accAngle$/
+        else if /^accAngle$/.test what
             value = Math.atan2 @_acc.ddy, @_acc.ddx
-        else if what.match /(^width$|^height$)/
+        else if /(^width$|^height$)/.test what
             value = @_dis[what] * @_dis.scale
-        else if what.match /(^level$|^scale$|^visible$|^highlight$)/
+        else if /(^level$|^scale$|^visible$|^highlight$)/.test what
             value = @_dis[what]
-        else if what.match /^ba_(top|bottom|right|left)$/
+        else if /^ba_(top|bottom|right|left)$/.test what
             value = @_bas[what.split('_')[1]].ba
-        else if what.match /^shape$/
+        else if /^shape$/.test what
             value = @_bnd.shape
         else
             value = @[what]
@@ -292,10 +282,10 @@ class Sprite extends EventEmitter
 
     #setter
     set: (what, to, _emit = true) ->
-        if what.match /(^x$|^y$)/
+        if /(^x$|^y$)/.test what
             old = @_pos[what] if _emit
             @_pos[what] = to
-        else if what.match /^a$/
+        else if /^a$/.test what
             if @_pos.a?
                 diff = to - @_pos.a
             old = @_pos.a if _emit
@@ -303,13 +293,13 @@ class Sprite extends EventEmitter
             if diff and @_bnd.shape is 'polygon'
                 for pt in @_bnd.points
                     pt.change 'a', diff
-        else if what.match /(^dx$|^dy$|^da$)/
+        else if /(^dx$|^dy$|^da$)/.test what
             old = @_mot[what] if _emit
             @_mot[what] = to
-        else if what.match /(^ddx$|^ddy$|^dda$)/
+        else if /(^ddx$|^ddy$|^dda$)/.test what
             old = @_acc[what] if _emit
             @_acc[what] = to
-        else if what.match /^top$/
+        else if /^top$/.test what
             old = @get 'top', false if _emit
             if @_bnd.shape is 'polygon'
                 _top = @_bnd.points[0]
@@ -317,7 +307,7 @@ class Sprite extends EventEmitter
                 @_pos.y = to - _top._y
             else if @_bnd.shape is 'circle'
                 @_pos.y = to - @get 'radius'
-        else if what.match /^bottom$/
+        else if /^bottom$/.test what
             old = @get 'bottom', false if _emit
             if @_bnd.shape is 'polygon'
                 _bottom = @_bnd.points[0]
@@ -325,7 +315,7 @@ class Sprite extends EventEmitter
                 @_pos.y = to - _bottom._y
             else if @_bnd.shape is 'circle'
                 @_pos.y = to + @get 'radius'
-        else if what.match /^right$/
+        else if /^right$/.test what
             old = @get 'right', false if _emit
             if @_bnd.shape is 'polygon'
                 _right = @_bnd.points[0]
@@ -333,7 +323,7 @@ class Sprite extends EventEmitter
                 @_pos.x = to - _right._x
             else if @_bnd.shape is 'circle'
                 @_pos.x = to - @get 'radius'
-        else if what.match /^left$/
+        else if /^left$/.test what
             old = @get 'left', false if _emit
             if @_bnd.shape is 'polygon'
                 _left = @_bnd.points[0]
@@ -341,13 +331,13 @@ class Sprite extends EventEmitter
                 @_pos.x = to - _left._x
             else if @_bnd.shape is 'circle'
                 @_pos.x = to + @get 'radius'
-        else if what.match /^radius$/
+        else if /^radius$/.test what
             old = @get 'radius', false if _emit
             if @_bnd.shape is 'circle'
                 @_bnd.radius = to
             else
                 throw new Error "Cannot set radius when shape isnt 'circle'"
-        else if what.match /^imageFile$/
+        else if /^imageFile$/.test what
             old = @get 'imageFile', false if _emit
             if Sprite.config.imagePath.match /\/$/
                 @_dis.image.src = Sprite.config.imagePath.concat to
@@ -357,51 +347,51 @@ class Sprite extends EventEmitter
                     @_dis.image.src = Sprite.config.imagePath.concat to
                 else
                     @_dis.image.src = to
-        else if what.match /^distance$/
+        else if /^distance$/.test what
             old = @get 'distance', false if _emit
             proxy =
                 x: to * Math.cos @get 'posAngle', false
                 y: to * Math.sin @get 'posAngle', false
             @set '_pos', proxy, false
-        else if what.match /^speed$/
+        else if /^speed$/.test what
             old = @get 'speed', false if _emit
             proxy =
                 dx: to * Math.cos @get 'motAngle', false
                 dy: to * Math.sin @get 'motAngle', false
             @set '_mot', proxy, false
-        else if what.match /^rate$/
+        else if /^rate$/.test what
             old = @get 'rate', false if _emit
             proxy =
                 ddx: to * Math.cos @get 'accAngle', false
                 ddy: to * Math.sin @get 'accAngle', false
             @set '_acc', proxy, false
-        else if what.match /^posAngle$/
+        else if /^posAngle$/.test what
             old = @get 'posAngle', false if _emit
             proxy =
                 x: @get('distance', false) * Math.cos to
                 y: @get('distance', false) * Math.sin to
             @set '_pos', proxy, false
-        else if what.match /^motAngle$/
+        else if /^motAngle$/.test what
             old = @get 'motAngle', false if _emit
             proxy =
                 dx: @get('speed', false) * Math.cos to
                 dy: @get('speed', false) * Math.sin to
             @set '_mot', proxy, false
-        else if what.match /^accAngle$/
+        else if /^accAngle$/.test what
             old = @get 'accAngle', false if _emit
             proxy =
                 ddx: @get('rate', false) * Math.cos to
                 ddy: @get('rate', false) * Math.sin to
             @set '_acc', proxy, false
-        else if what.match /(^_?dis|^_?pos|^_?mot|^_?acc|^config)/
+        else if /(^_?dis|^_?pos|^_?mot|^_?acc|^config)/.test what
             #set old to what here?
             @set k, v, false for own k, v of to
-        else if what.match /(^level$|^visible$|^highlight$)/
+        else if /(^level$|^visible$|^highlight$)/.test what
             old = @_dis[what] if _emit
             @_dis[what] = to
             if what is 'level'
                 _list.sort _sortRule
-        else if what.match /^scale$/
+        else if /^scale$/.test what
             if @_dis.scale?
                 if @_bnd.shape is 'polygon'
                     for pt in @_bnd.points
@@ -415,7 +405,7 @@ class Sprite extends EventEmitter
                     pt.set 'dist', pt.get('dist') * @_dis.scale
             else if @_bnd.shape is 'circle'
                 @set 'radius', @get('radius') * @_dis.scale
-        else if what.match /^ba$/
+        else if /^ba$/.test what
             if _emit
                 old = #deep copy?
                     ba_top: @bas['top']
@@ -428,7 +418,7 @@ class Sprite extends EventEmitter
                 ba_right: to
                 ba_left: to
             @set 'config', proxy, false
-        else if what.match /^ba_(top|bottom|right|left)$/
+        else if /^ba_(top|bottom|right|left)$/.test what
             side = what.split('_')[1]
             oldCollision =
                 if @_bas[side]?
@@ -450,7 +440,7 @@ class Sprite extends EventEmitter
             @_bas[side] = _boundaryCallbacks[to][side]
             @_bas[side].ba = to
             @on "#{newCollision}:#{side}", @_bas[side]
-        else if what.match /^shape$/ #needs refining
+        else if /^shape$/.test what #needs refining
             old = @_bnd.shape if _emit
             if @_bnd.shape is 'circle'
                 if to is 'polygon'
@@ -460,7 +450,7 @@ class Sprite extends EventEmitter
                 if to is 'circle'
                     @_bnd.radius = @get 'radius'
                     @_bnd.shape = to
-        else if what.match /^points$/
+        else if /^points$/.test what
             old = @_bnd.points.slice 0 if _emit
             @_bnd.points = []
             for pt in to
@@ -475,47 +465,47 @@ class Sprite extends EventEmitter
     #changer
     #emit virtual change, real change or both?
     change: (what, step, _emit = true) ->
-        if what.match /(^x$|^y$|^a$)/
+        if /(^x$|^y$|^a$)/.test what
             @_pos[what] += step / Greenhorn.config.frameRate
             if what is 'a' and @_bnd.shape is 'polygon'
                 pt.change('a', step / Greenhorn.config.frameRate) for pt in @_bnd.points
-        else if what.match /(^dx$|^dy$|^da$)/
+        else if /(^dx$|^dy$|^da$)/.test what
             @_mot[what] += step / Greenhorn.config.frameRate
-        else if what.match /(^ddx$|^ddy$|^dda$)/
+        else if /(^ddx$|^ddy$|^dda$)/.test what
             @_acc[what] += step / Greenhorn.config.frameRate
-        else if what.match /^level$/
+        else if /^level$/.test what
             @_dis.level += step / Greenhorn.config.frameRate
-        else if what.match /^distance$/
+        else if /^distance$/.test what
             proxy =
                 dx: step * Math.cos @get 'posAngle', false
                 dy: step * Math.sin @get 'posAngle', false
             @change '_pos', proxy, false
-        else if what.match /^speed$/
+        else if /^speed$/.test what
             proxy =
                 ddx: step * Math.cos @get 'motAngle', false
                 ddy: step * Math.sin @get 'motAngle', false
             @change '_mot', proxy, false
-        else if what.match /^rate$/
+        else if /^rate$/.test what
             proxy =
                 dddx: step * Math.cos @get 'accAngle', false
                 dddy: step * Math.sin @get 'accAngle', false
             @change '_acc', proxy, false
-        else if what.match /^posAngle$/
+        else if /^posAngle$/.test what
             proxy =
                 x: @get('distance', false) * Math.cos step + @get 'posAngle', false
                 y: @get('distance', false) * Math.sin step + @get 'posAngle', false
             @set '_pos', proxy, false
-        else if what.match /^motAngle$/
+        else if /^motAngle$/.test what
             proxy =
                 dx: @get('speed', false) * Math.cos step + @get 'motAngle', false
                 dy: @get('speed', false) * Math.sin step + @get 'motAngle', false
             @set '_mot', proxy, false
-        else if what.match /^accAngle$/
+        else if /^accAngle$/.test what
             proxy =
                 ddx: @get('rate', false) * Math.cos step + @get 'accAngle', false
                 ddy: @get('rate', false) * Math.sin step + @get 'accAngle', false
             @set '_acc', proxy, false
-        else if what.match /(^_?dis|^_?pos|^_?mot|^_?acc)/
+        else if /(^_?dis|^_?pos|^_?mot|^_?acc)/.test what
             @change k.slice(1), v, false for own k, v of step
         else
             @[what] += step / Greenhorn.config.frameRate
@@ -671,7 +661,7 @@ class Sprite extends EventEmitter
 
             #fire draw:after event
             @emit 'draw:after'
-    _update: =>
+    _update: ->
         #fire update event
         @emit 'update'
 
@@ -694,15 +684,15 @@ class Sprite extends EventEmitter
         #determine other events to fire
         for own event, listeners of @_events
             #fire 'mouse:hover' event
-            if event.match /^mouse:hover$/
+            if /^mouse:hover$/.test event
                 if @collidesWith 'mouse'
                     @emit event
             #fire 'mouse:noHover' event
-            if event.match /^mouse:!hover$/
+            if /^mouse:!hover$/.test event
                 unless @collidesWith 'mouse'
                     @emit event
             #fire 'isDown' event
-            if event.match /^isDown:(\w+|\d)/
+            if /^isDown:(\w+|\d)/.test event
                 token = event.split(':')[1].toUpperCase()
                 if token.match /-/
                     _emit = false
@@ -722,7 +712,7 @@ class Sprite extends EventEmitter
                     if Greenhorn.isDown[KEYS[token]]
                         @emit event
             #fire 'isUp' event
-            else if event.match /^isUp:(\w+|\d)/
+            else if /^isUp:(\w+|\d)/.test event
                 token = event.split(':')[1].toUpperCase()
                 if token.match /-/
                     _emit = false
@@ -742,15 +732,15 @@ class Sprite extends EventEmitter
                     unless Greenhorn.isDown[KEYS[token]]
                         @emit event
             #fire 'collisionWith:other' events
-            else if event.match /^collisionWith:\w+/
+            else if /^collisionWith:\w+/.test event
                 if @collidesWith listeners.other
                     @emit event, listeners.other
             #fire 'noCollisionWith:other' events
-            else if event.match /^!collisionWith:\w+/
+            else if /^!collisionWith:\w+/.test event
                 unless @collidesWith listeners.other
                     @emit event, listeners.other
             #fire 'distanceTo:other-cmp-value' events
-            else if event.match /^distanceTo:\w+-(gt|lt|eq|ge|le|ne)-\d*\.?\d*$/
+            else if /^distanceTo:\w+-(gt|lt|eq|ge|le|ne)-\d*\.?\d*$/.test event
                 tokens = event.split(':')[1]
                 tokens = tokens.split '-'
                 tokens[2] = parseFloat tokens[2]
@@ -774,7 +764,7 @@ class Sprite extends EventEmitter
                         if @distanceTo(listeners.other) != tokens[2]
                             @emit event, listeners.other
             #fire 'angleTo:other-cmp-value' events
-            else if event.match /^angleTo:\w+-(gt|lt|eq|ge|le|ne)-\d*\.?\d*$/
+            else if /^angleTo:\w+-(gt|lt|eq|ge|le|ne)-\d*\.?\d*$/.test event
                 tokens = event.split(':')[1]
                 tokens = tokens.split '-'
                 tokens[2] = parseFloat tokens[2]
@@ -798,7 +788,7 @@ class Sprite extends EventEmitter
                         if @angleTo(listeners.other) != tokens[2]
                             @emit event, listeners.other
             #fire 'attr-cmp-value' events
-            else if event.match /^\w+-(gt|lt|eq|ge|le|ne)-\d*\.?\d*$/
+            else if /^\w+-(gt|lt|eq|ge|le|ne)-\d*\.?\d*$/.test event
                 tokens = event.split '-'
                 tokens[2] = parseFloat tokens[2]
                 switch tokens[1]
@@ -820,7 +810,7 @@ class Sprite extends EventEmitter
                     when 'ne'
                         if @get(tokens[0], false) != tokens[2]
                             @emit event
-            else if event.match /^\w+-(eq|ne)-\w+/
+            else if /^\w+-(eq|ne)-\w+/.test event
                 tokens = event.split '-'
                 if tokens[2].match /(^true$|^false$)/
                     `tokens[2] = (0, eval)(tokens[2])`
@@ -831,7 +821,7 @@ class Sprite extends EventEmitter
                     when 'ne'
                         if @get(tokens[0], false) isnt tokens[2]
                             @emit event
-        this
+        return this
 
     #debugging
     toString: ->
