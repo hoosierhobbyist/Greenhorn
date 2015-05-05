@@ -146,6 +146,32 @@ describe('EventEmitter', function(){
             ee.emit('test', 1, 2, 3);
             fired.should.be.true;
         });
+        
+        it('should always fire all listeners', function(){
+            var fired = [false, false, false, false false];
+            
+            ee.once('test', function(){
+                fired[0] = true;
+            });
+            ee.on('test', function(){
+                fired[1] = true;
+            });
+            ee.on('test', function(){
+                fired[2] = true;
+            });
+            ee.once('test', function(){
+                fired[3] = true;
+            });
+            ee.on('test', function(){
+                fired[4] = true;
+            });
+            
+            ee.emit('test');
+            ee.listeners('test').should.have.length(3);
+            fired.forEach(function(value){
+                value.should.be.true;
+            });
+        });
     });
 
     describe('::remove', function(){
