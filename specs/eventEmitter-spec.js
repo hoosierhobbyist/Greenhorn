@@ -146,31 +146,47 @@ describe('EventEmitter', function(){
             ee.emit('test', 1, 2, 3);
             fired.should.be.true;
         });
-        
+
         it('should always fire all listeners', function(){
-            var fired = [false, false, false, false false];
-            
-            ee.once('test', function(){
+            var fired = [false, false, false, false, false];
+            function test0(){
                 fired[0] = true;
-            });
-            ee.on('test', function(){
+                console.log('fired-0');
+            } function test1(){
                 fired[1] = true;
-            });
-            ee.on('test', function(){
+                console.log('fired-1');
+            } function test2(){
                 fired[2] = true;
-            });
-            ee.once('test', function(){
+                console.log('fired-2');
+            } function test3(){
                 fired[3] = true;
-            });
-            ee.on('test', function(){
+                console.log('fired-3');
+            } function test4(){
                 fired[4] = true;
-            });
-            
+                console.log('fired-4');
+            }
+
+            ee.once('test', test0);
+            ee.on('test', test1);
+            ee.on('test', test2);
+            ee.once('test', test3);
+            ee.on('test', test4);
+
             ee.emit('test');
             ee.listeners('test').should.have.length(3);
-            fired.forEach(function(value){
-                value.should.be.true;
-            });
+            ee.listeners('test').should.eql([test1, test2, test4]);
+            for(var i = 0; i < fired.length; ++i){
+                fired[i].should.be.true;
+            }
+
+            fired[1] = false;
+            fired[2] = false;
+            fired[4] = false;
+            ee.emit('test');
+            ee.listeners('test').should.have.length(3);
+            for(var i = 0; i < fired.length; ++i){
+                fired[i].should.be.true;
+            }
         });
     });
 

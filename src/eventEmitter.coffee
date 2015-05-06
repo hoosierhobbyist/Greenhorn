@@ -10,6 +10,7 @@ sedabull@gmail.com
 class EventEmitter
     constructor: ->
         @_events = {}
+        @_expired = []
 
     on: (event, listener, options = {}) ->
         @_events[event] ?= []
@@ -21,13 +22,20 @@ class EventEmitter
     once: (event, listener, options = {}) ->
         wrapper = ->
             listener.apply this, arguments
-            @remove event, wrapper
+            index = @_events[event].indexOf wrapper
+            @_expired.push index
         @on event, wrapper, options
 
     emit: (event, args...) ->
         if @_events[event]?
             for listener in @_events[event]
                 listener.apply this, args
+            if @_expired.length
+                for index, i in @_expired
+                    @_events[event].splice index, 1
+                    for j in [i...@_expired.length]
+                        @_expired[j] -= 1
+                @_expired = []
             return true
         return false
 
