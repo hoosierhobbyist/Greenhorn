@@ -148,23 +148,11 @@ describe('EventEmitter', function(){
         });
 
         it('should only remove listeners registered with ::once, not ::on', function(){
-            var fired = [false, false, false, false, false];
-            function test0(){
-                fired[0] = true;
-                console.log('fired-0');
-            } function test1(){
-                fired[1] = true;
-                console.log('fired-1');
-            } function test2(){
-                fired[2] = true;
-                console.log('fired-2');
-            } function test3(){
-                fired[3] = true;
-                console.log('fired-3');
-            } function test4(){
-                fired[4] = true;
-                console.log('fired-4');
-            }
+            var test0 = function(){};
+            var test1 = function(){};
+            var test2 = function(){};
+            var test3 = function(){}
+            var test4 = function(){};
 
             ee.once('test', test0);
             ee.on('test', test1);
@@ -175,9 +163,6 @@ describe('EventEmitter', function(){
             ee.emit('test');
             ee.listeners('test').should.have.length(3);
             ee.listeners('test').should.eql([test1, test2, test4]);
-            for(var i = 0; i < fired.length; ++i){
-                fired[i].should.be.true;
-            }
         });
     });
 
