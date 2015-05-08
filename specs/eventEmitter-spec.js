@@ -272,8 +272,8 @@ describe('EventEmitter', function(){
 
             ee.on('test', test1);
             ee.on('test', test2);
-            ee.on('test', test3);
-            ee.listeners('test').should.containDeepOrdered([test1, test2, test3]);
+            ee.once('test', test3);
+            ee.listeners('test').should.eql([test1, test2, test3]);
         });
 
         it('should return false when trying to access an unregistered event', function(){
