@@ -24,6 +24,7 @@ class EventEmitter
             listener.apply this, arguments
             index = @_events[event].indexOf wrapper
             @_expired.push index
+        wrapper['gh-original'] = listener
         @on event, wrapper, options
 
     emit: (event, args...) ->
@@ -43,12 +44,18 @@ class EventEmitter
         if @_events[event]?
             if listener?
                 i = @_events[event].indexOf listener
-                if i isnt -1
+                if i > -1
                     @_events[event].splice i, 1
                     if @_events[event].length is 0
                         delete @_events[event]
                     return true
                 else
+                    for wrapper, index in @_events[event]
+                        if wrapper['gh-original'] is listener
+                            @_events[event].splice index, 1
+                            if @_events[event].length is 0
+                                delete @_events[event]
+                            return true
                     return false
             else
                 delete @_events[event]
